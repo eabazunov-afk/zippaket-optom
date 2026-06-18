@@ -70,7 +70,8 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
     if ($withPhoto) {
         $header = '<div class="z-prod-photo"><img src="' . htmlspecialchars(z_slider_img($r)) . '" alt="ZIP-пакет ' . htmlspecialchars($size) . '" loading="lazy"></div>';
     } else {
-        $header = '<div class="z-prod-ph"><div class="bag"></div><div class="cap">press-seal · без бегунка</div></div>';
+        // Грипперы (zip-lock, press-seal) — реальное фото
+        $header = '<div class="z-prod-photo"><img src="/images/gripper.jpg" alt="ZIP-LOCK пакет (гриппер) ' . htmlspecialchars($size) . '" loading="lazy"></div>';
     }
 
     $stockLabel = number_format($stock, 0, '', ' ');
