@@ -14,6 +14,9 @@ www/**/*.log
 www/**/debug*.txt
 www/**/notify_log.txt
 
+# Runtime-состояния Telegram-сессий (персональные данные)
+www/tg/users/
+
 # Визуальный компаньон брейншторма
 .superpowers/
 
