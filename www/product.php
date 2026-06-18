@@ -24,6 +24,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(generateCsrfToken()) ?>">
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <?php if ($product): ?>
     <meta name="description" content="<?= htmlspecialchars($product['meta_description'] ?: $product['full_name']) ?>">
@@ -112,7 +113,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                         </div>
                         <div class="product-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
                             <input type="number" id="qty" class="filter-input small" value="<?= pv_default_qty($minQty, $qtyStep) ?>" min="<?= $minQty ?>" step="<?= $qtyStep ?>" style="width:110px">
-                            <button class="btn btn-primary add-to-cart"
+                            <button class="btn btn-primary js-cart-add"
                                     data-id="<?= (int)$product['id'] ?>"
                                     data-name="<?= htmlspecialchars($product['full_name']) ?>"
                                     data-price="<?= htmlspecialchars((string)($hasPrice ? $priceVal : 0)) ?>"
@@ -132,5 +133,6 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
         <?php include __DIR__ . '/footer.php'; ?>
     </div>
     <script src="/js/script.js"></script>
+    <script src="/js/cart.js"></script>
 </body>
 </html>
