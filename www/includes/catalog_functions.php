@@ -66,6 +66,40 @@ class Catalog {
     }
     
     /**
+     * Получить один товар по id (только активные). null, если не найден.
+     */
+    public function getProductById(int $id): ?array
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM products WHERE id = :id AND is_active = 1");
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $product = $stmt->fetch();
+            if (!$product) {
+                return null;
+            }
+
+            $product['formatted_price'] = number_format($product['price_rub'], 2, ',', ' ') . ' ₽';
+            $product['formatted_stock'] = number_format($product['stock_quantity'], 0, ',', ' ');
+            $product['size_display'] = $product['width'] . '×' . $product['height'] . ' мм';
+            $product['image_url'] = !empty($product['image_url']) ? $product['image_url'] : '/images/no-image.jpg';
+
+            if (strpos($product['category'], 'слайдер') !== false) {
+                $product['type_icon'] = 'sliders-h';
+                $product['type_name'] = 'Слайдер';
+            } else {
+                $product['type_icon'] = 'lock';
+                $product['type_name'] = 'ZIP-LOCK';
+            }
+
+            return $product;
+        } catch (PDOException $e) {
+            error_log("Ошибка получения товара по id: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Получить товары с фильтрацией и пагинацией
      */
     public function getProducts($filters = [], $page = 1, $perPage = 12) {
