@@ -5,6 +5,13 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     UTMTracker::init();
 }
 ?>
+<!-- ZLOCK premium theme: тёмная шапка/футер на всех страницах + шрифты/иконки -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="/css/site-premium.css">
 
 <!-- Верхняя панель -->
 <div class="top-bar">

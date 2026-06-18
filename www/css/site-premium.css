@@ -1,0 +1,135 @@
+/* ===========================================================================
+   site-premium.css — глобальная тёмная премиум-тема ZLOCK (dark glass).
+   Подключается в header.php → грузится на ВСЕХ страницах.
+   Содержит: дизайн-токены + перекраску общих шапки/футера/верхней панели.
+   Шрифты (Space Grotesk / Plus Jakarta Sans) и иконки Phosphor подключает header.php.
+   =========================================================================== */
+
+:root {
+    /* Поверхности (тонированный near-black navy, не чистый чёрный) */
+    --z-bg: #070E18;
+    --z-bg-2: #0A1422;
+    --z-surface: rgba(255, 255, 255, 0.045);
+    --z-surface-2: rgba(255, 255, 255, 0.07);
+    --z-hairline: rgba(255, 255, 255, 0.09);
+    --z-hairline-strong: rgba(255, 255, 255, 0.16);
+
+    /* Текст */
+    --z-text: #EAF2FB;
+    --z-text-2: #A9C0DA;
+    --z-text-3: #7E94B0;
+
+    /* Акценты — один мятный + один золотой CTA */
+    --z-mint: #5FE3D0;
+    --z-mint-2: #34D3BE;
+    --z-mint-deep: #0A8F8F;
+    --z-gold: #FFB020;
+    --z-gold-2: #FFCB63;
+    --z-tg: #229ED9;
+
+    /* Тени — тонированы под фон (навигатор-сине-чёрные, не pure black) */
+    --z-shadow-sm: 0 6px 20px rgba(4, 10, 20, 0.45);
+    --z-shadow: 0 18px 44px rgba(4, 10, 20, 0.55);
+    --z-shadow-lg: 0 40px 90px rgba(2, 8, 18, 0.62);
+    --z-glow-mint: 0 16px 48px rgba(10, 143, 143, 0.30);
+    --z-glow-gold: 0 16px 40px rgba(255, 176, 32, 0.30);
+
+    --z-radius: 20px;
+    --z-radius-sm: 14px;
+    --z-pill: 30px;
+    --z-ease: cubic-bezier(.2, .7, .2, 1);
+    --z-container: 1240px;
+
+    --font-display: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Тёмная тема активна на страницах с этим классом (главная). На остальных —
+   только общие шапка/футер тёмные, контент остаётся в своей теме. */
+body.zlock {
+    background: var(--z-bg);
+    color: var(--z-text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+}
+body.zlock ::selection { background: var(--z-mint); color: var(--z-bg); }
+.z-tnum { font-variant-numeric: tabular-nums; }
+
+/* ===== ОБЩАЯ ШАПКА (единая тёмная на всех страницах) ===== */
+.top-bar {
+    background: var(--z-bg-2);
+    border-bottom: 1px solid var(--z-hairline);
+}
+.top-bar a, .top-bar .work-hours { color: var(--z-text-2); }
+.top-bar i { color: var(--z-mint); }
+
+.main-header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(7, 14, 24, 0.78);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--z-hairline);
+}
+.main-nav .nav-link {
+    color: var(--z-text-2);
+    font-family: var(--font-body);
+    font-weight: 500;
+    transition: color .25s var(--z-ease);
+}
+.main-nav .nav-link:hover { color: var(--z-mint); }
+.main-header .cart-link { color: var(--z-text); }
+.main-header .cart-link:hover { color: var(--z-mint); }
+
+/* Кнопка "Заказать звонок" → золотой премиум-CTA */
+.main-header .btn-primary, .z-btn-gold {
+    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%);
+    color: #2a1c00;
+    border: none;
+    border-radius: var(--z-pill);
+    font-weight: 700;
+    box-shadow: var(--z-glow-gold);
+    transition: transform .2s var(--z-ease), box-shadow .2s var(--z-ease);
+}
+.main-header .btn-primary:hover, .z-btn-gold:hover { transform: translateY(-2px); box-shadow: 0 20px 48px rgba(255, 176, 32, .42); }
+
+.hamburger-menu .square { background: var(--z-text); }
+
+/* Мобильное меню — тёмное */
+.mobile-menu { background: var(--z-bg-2); border-left: 1px solid var(--z-hairline); }
+.mobile-menu-header { border-bottom: 1px solid var(--z-hairline); }
+.mobile-nav-link { color: var(--z-text-2); }
+.mobile-nav-link i { color: var(--z-mint); }
+.mobile-contact-item { color: var(--z-text-2); }
+.mobile-contact-item a, .mobile-contact-item strong { color: var(--z-text); }
+
+/* ===== ОБЩИЙ ФУТЕР (единый тёмный) ===== */
+.main-footer {
+    background: var(--z-bg-2);
+    border-top: 1px solid var(--z-hairline);
+    color: var(--z-text-2);
+}
+.main-footer .footer-title, .main-footer .logo-subtitle, .main-footer .logo-text { color: var(--z-text); }
+.main-footer .footer-description,
+.main-footer .footer-link,
+.main-footer .legal-link,
+.main-footer .footer-copyright,
+.main-footer .contact-item span { color: var(--z-text-2); }
+.main-footer .contact-item a { color: var(--z-text); }
+.main-footer .footer-link:hover, .main-footer .legal-link:hover, .main-footer .contact-item a:hover { color: var(--z-mint); }
+.main-footer .contact-item i { color: var(--z-mint); }
+.main-footer .logo-icon {
+    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep));
+    color: var(--z-bg);
+}
+.main-footer .footer-social .social-link,
+.main-footer .social-link {
+    background: var(--z-surface);
+    border: 1px solid var(--z-hairline);
+    color: var(--z-text-2);
+    transition: all .25s var(--z-ease);
+}
+.main-footer .social-link:hover { color: var(--z-mint); border-color: var(--z-mint); transform: translateY(-2px); }
+.main-footer .footer-bottom { border-top: 1px solid var(--z-hairline); }
+.main-footer .payment-icons i { color: var(--z-text-3); }
