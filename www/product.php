@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/catalog_functions.php';
 require_once __DIR__ . '/includes/product_view.php';
+require_once __DIR__ . '/includes/seo.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $catalog = new Catalog();
@@ -36,6 +37,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/catalog.css">
+    <link rel="stylesheet" href="/css/premium.css">
     <?php if ($product):
         $stock = pv_stock_status((int)$product['stock_quantity']);
         $ld = [
@@ -56,9 +58,22 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     <script type="application/ld+json">
     <?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
     </script>
+    <?php
+        $crumbs = [
+            ['name' => 'Главная', 'url' => '/'],
+            ['name' => 'Каталог', 'url' => '/katalog_zip_paketov/'],
+        ];
+        if (!empty($product['category'])) {
+            $crumbs[] = ['name' => $product['category'], 'url' => '/katalog_zip_paketov/?category=' . rawurlencode($product['category'])];
+        }
+        $crumbs[] = ['name' => ($product['short_name'] ?: $product['full_name']), 'url' => '/product/' . (int)$product['id']];
+    ?>
+    <script type="application/ld+json">
+    <?= seo_breadcrumb_jsonld($crumbs) ?>
+    </script>
     <?php endif; ?>
 </head>
-<body>
+<body class="premium">
     <div class="site-wrapper">
         <?php include __DIR__ . '/header.php'; ?>
         <main class="main-content">

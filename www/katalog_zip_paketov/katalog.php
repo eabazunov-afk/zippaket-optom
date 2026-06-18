@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/catalog_functions.php';
 require_once __DIR__ . '/../includes/product_view.php';
+require_once __DIR__ . '/../includes/seo.php';
 
 // Получаем параметры фильтрации
 $filters = [
@@ -58,7 +59,21 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zippaket-optom.ru/katalog_zip_paketov">
     <meta property="og:image" content="https://zippaket-optom.ru/images/og-image.jpg">
-    
+    <?php
+        $catCanonical = '/katalog_zip_paketov/' . (!empty($filters['category']) ? '?category=' . rawurlencode($filters['category']) : '');
+        $crumbs = [
+            ['name' => 'Главная', 'url' => '/'],
+            ['name' => 'Каталог', 'url' => '/katalog_zip_paketov/'],
+        ];
+        if (!empty($filters['category'])) {
+            $crumbs[] = ['name' => $filters['category'], 'url' => $catCanonical];
+        }
+    ?>
+    <link rel="canonical" href="<?= htmlspecialchars(seo_url($catCanonical)) ?>">
+    <script type="application/ld+json">
+    <?= seo_breadcrumb_jsonld($crumbs) ?>
+    </script>
+
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/images/zlock.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/zlock.ico">
@@ -79,7 +94,8 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
     <!-- Основные стили -->
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/catalog.css">
-    
+    <link rel="stylesheet" href="/css/premium.css">
+
     <style>
         /* Компактные фильтры для ПК */
         .compact-filters {
@@ -288,7 +304,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         }
     </style>
 </head>
-<body>
+<body class="premium">
     <div class="site-wrapper">
         <!-- Header -->
         <?php include __DIR__ . '/../header.php'; ?>

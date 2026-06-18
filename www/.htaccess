@@ -36,6 +36,9 @@ RewriteRule ^ %1 [R=301,L]
 # ЧПУ для страницы товара: /product/123 -> product.php?id=123
 RewriteRule ^product/([0-9]+)/?$ product.php?id=$1 [L,QSA]
 
+# Динамический sitemap (отдаётся по чистому /sitemap.xml)
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
 # Сжатие текстовых файлов
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
