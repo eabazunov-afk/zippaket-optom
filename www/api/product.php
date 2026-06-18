@@ -6,33 +6,22 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $quick = isset($_GET['quick']);
 
 if (!$id) {
+    http_response_code(404);
     die('Товар не найден');
 }
 
 $catalog = new Catalog();
-// Здесь нужно добавить метод getProductById в класс Catalog
-// Для простоты пока используем прямой запрос
+$product = $catalog->getProductById($id);
 
-try {
-    $db = new PDO(
-        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
-        DB_USER,
-        DB_PASS
-    );
-    
-    $stmt = $db->prepare("SELECT * FROM products WHERE id = ? AND is_active = 1");
-    $stmt->execute([$id]);
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$product) {
-        die('Товар не найден');
-    }
-    
-    if ($quick) {
-        // Быстрый просмотр
-        $price = number_format($product['price_rub'], 2, ',', ' ');
-        $size = $product['width'] . '×' . $product['height'] . ' мм';
-        ?>
+if (!$product) {
+    http_response_code(404);
+    die('Товар не найден');
+}
+
+if ($quick) {
+    $price = number_format($product['price_rub'], 2, ',', ' ');
+    $size = $product['width'] . '×' . $product['height'] . ' мм';
+    ?>
         <div class="quick-view-product">
             <div class="quick-view-grid">
                 <div class="quick-view-image">
@@ -40,7 +29,7 @@ try {
                 </div>
                 <div class="quick-view-info">
                     <h2><?= htmlspecialchars($product['full_name']) ?></h2>
-                    
+
                     <div class="quick-view-specs">
                         <div class="spec-row">
                             <span class="spec-label">Размер:</span>
@@ -70,14 +59,14 @@ try {
                             </span>
                         </div>
                     </div>
-                    
+
                     <div class="quick-view-price">
                         <div class="price"><?= $price ?> ₽/шт</div>
                         <div class="stock">В наличии: <?= number_format($product['stock_quantity'], 0, ',', ' ') ?> шт</div>
                     </div>
-                    
+
                     <div class="quick-view-actions">
-                        <button class="btn btn-primary add-to-cart" 
+                        <button class="btn btn-primary add-to-cart"
                                 data-id="<?= $product['id'] ?>"
                                 data-name="<?= htmlspecialchars($product['full_name']) ?>"
                                 data-price="<?= $product['price_rub'] ?>">
@@ -91,12 +80,7 @@ try {
             </div>
         </div>
         <?php
-    } else {
-        // Полная карточка товара - для отдельной страницы
-        // Здесь можно вывести полную информацию
-    }
-    
-} catch (PDOException $e) {
-    error_log("Ошибка: " . $e->getMessage());
-    die('Ошибка загрузки товара');
+} else {
+    // Полная карточка товара - для отдельной страницы
+    // Здесь можно вывести полную информацию
 }
