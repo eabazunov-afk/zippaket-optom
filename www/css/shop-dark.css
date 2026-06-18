@@ -120,6 +120,10 @@ body.zlock .pm-summary {
     box-shadow: var(--z-shadow-sm) !important;
 }
 body.zlock .pm-total { color: #fff !important; }
+@media (max-width: 640px) {
+    body.zlock .pm-summary { grid-template-columns: 1fr !important; }
+    body.zlock .pm-summary > div:last-child { text-align: left !important; }
+}
 
 /* ---- Checkout / формы ---- */
 body.zlock .form-group input,
