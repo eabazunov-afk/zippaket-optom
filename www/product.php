@@ -113,7 +113,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                         </div>
                         <div class="product-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
                             <input type="number" id="qty" class="filter-input small" value="<?= pv_default_qty($minQty, $qtyStep) ?>" min="<?= $minQty ?>" step="<?= $qtyStep ?>" style="width:110px">
-                            <button class="btn btn-primary add-to-cart"
+                            <button class="btn btn-primary js-cart-add"
                                     data-id="<?= (int)$product['id'] ?>"
                                     data-name="<?= htmlspecialchars($product['full_name']) ?>"
                                     data-price="<?= htmlspecialchars((string)($hasPrice ? $priceVal : 0)) ?>"

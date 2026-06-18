@@ -5,7 +5,7 @@
     return m ? m.getAttribute('content') : '';
   }
   function refreshCounter(count) {
-    document.querySelectorAll('.cart-counter').forEach(function (c) {
+    document.querySelectorAll('.js-cart-counter').forEach(function (c) {
       c.textContent = count;
       c.style.display = count > 0 ? 'flex' : 'none';
     });
@@ -20,7 +20,7 @@
   }
   document.addEventListener('DOMContentLoaded', function () {
     post({ action: 'get' }).then(function (d) { if (d.success) refreshCounter(d.count); });
-    document.querySelectorAll('.add-to-cart').forEach(function (btn) {
+    document.querySelectorAll('.js-cart-add').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
         var id = btn.dataset.id;

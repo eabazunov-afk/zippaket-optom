@@ -53,7 +53,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
             </button>
             <a href="/cart.php" class="cart-link" style="position:relative;display:inline-flex;align-items:center;margin-left:10px" aria-label="Корзина">
                 <i class="fas fa-shopping-cart" style="font-size:1.3rem"></i>
-                <span class="cart-counter" style="display:none;position:absolute;top:-8px;right:-10px;background:#ffb020;color:#0b1f3a;border-radius:999px;min-width:18px;height:18px;font-size:0.7rem;font-weight:700;align-items:center;justify-content:center;padding:0 4px">0</span>
+                <span class="js-cart-counter" style="display:none;position:absolute;top:-8px;right:-10px;background:#ffb020;color:#0b1f3a;border-radius:999px;min-width:18px;height:18px;font-size:0.7rem;font-weight:700;align-items:center;justify-content:center;padding:0 4px">0</span>
             </a>
 
             <!-- Гамбургер меню с четырьмя квадратами - ИСПРАВЛЕНО -->
