@@ -1,0 +1,231 @@
+/* ===========================================================================
+   premium.css — премиум-тема пути покупки (каталог/товар/корзина/checkout).
+   Подключается на страницах с <body class="premium">, чтобы не затрагивать
+   главную и админку. Дизайн-токены — по спеку (Современный Premium):
+   тёмный градиент, мятный акцент, светлые карточки, скругления, мягкие тени.
+   =========================================================================== */
+
+:root {
+    --pm-bg-dark-1: #0B1F3A;
+    --pm-bg-dark-2: #12345C;
+    --pm-mint: #5FE3D0;
+    --pm-mint-deep: #0A8F8F;
+    --pm-cta: #FFB020;
+    --pm-cta-deep: #E0961A;
+    --pm-content-bg: #F4F7FB;
+    --pm-card: #FFFFFF;
+    --pm-text: #0B1F3A;
+    --pm-text-muted: #64748B;
+    --pm-border: #E6ECF3;
+    --pm-radius: 16px;
+    --pm-radius-btn: 30px;
+    --pm-shadow-sm: 0 4px 16px rgba(11, 31, 58, 0.06);
+    --pm-shadow-md: 0 10px 30px rgba(11, 31, 58, 0.10);
+    --pm-shadow-mint: 0 8px 24px rgba(10, 143, 143, 0.28);
+}
+
+/* --- База страницы --- */
+body.premium {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    color: var(--pm-text);
+}
+body.premium .main-content {
+    background: var(--pm-content-bg);
+}
+body.premium .catalog-section,
+body.premium .catalog-header-section {
+    background: var(--pm-content-bg);
+}
+
+/* --- Премиум-шапка страницы (тёмный стеклянный градиент) --- */
+.premium .pm-pagehead {
+    background: linear-gradient(135deg, var(--pm-bg-dark-1) 0%, var(--pm-bg-dark-2) 100%);
+    color: #fff;
+    border-radius: var(--pm-radius);
+    padding: 34px 32px;
+    margin: 22px 0 26px;
+    box-shadow: var(--pm-shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+.premium .pm-pagehead::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(95, 227, 208, 0.30), transparent 70%);
+    pointer-events: none;
+}
+.premium .pm-pagehead h1 {
+    margin: 0;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+.premium .pm-pagehead .pm-sub {
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 400;
+}
+
+/* --- Кнопки --- */
+.premium .btn {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    border-radius: var(--pm-radius-btn);
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.premium .btn-primary {
+    background: linear-gradient(135deg, var(--pm-mint) 0%, var(--pm-mint-deep) 100%);
+    border: none;
+    color: #06231f;
+    box-shadow: var(--pm-shadow-mint);
+}
+.premium .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(10, 143, 143, 0.38);
+    color: #06231f;
+}
+.premium .btn-outline {
+    background: transparent;
+    border: 2px solid var(--pm-mint-deep);
+    color: var(--pm-mint-deep);
+}
+.premium .btn-outline:hover {
+    background: rgba(10, 143, 143, 0.08);
+    transform: translateY(-2px);
+}
+.premium .btn-cta {
+    background: linear-gradient(135deg, var(--pm-cta) 0%, var(--pm-cta-deep) 100%);
+    color: #3a2400;
+    border: none;
+}
+
+/* --- Карточки товара (каталог) --- */
+.premium .product-card,
+.premium .compact-card {
+    background: var(--pm-card);
+    border: 1px solid var(--pm-border);
+    border-radius: var(--pm-radius);
+    box-shadow: var(--pm-shadow-sm);
+    transition: transform .18s ease, box-shadow .18s ease;
+    overflow: hidden;
+}
+.premium .product-card:hover,
+.premium .compact-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--pm-shadow-md);
+}
+.premium .compact-card.special {
+    border-color: var(--pm-cta);
+    box-shadow: 0 8px 24px rgba(255, 176, 32, 0.18);
+}
+
+/* --- Цена --- */
+.premium .current-price,
+.premium .price {
+    color: var(--pm-mint-deep);
+    font-weight: 800;
+}
+
+/* --- Карточка товара (страница) — «стеклянное» инфо --- */
+.premium .product-page {
+    background: var(--pm-card);
+    border: 1px solid var(--pm-border);
+    border-radius: var(--pm-radius);
+    box-shadow: var(--pm-shadow-sm);
+    padding: 26px;
+}
+.premium .spec-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--pm-content-bg);
+    border: 1px solid var(--pm-border);
+    border-radius: 40px;
+    padding: 6px 14px;
+    margin: 0 8px 8px 0;
+    font-size: .9rem;
+    color: var(--pm-text);
+}
+.premium .spec-item i { color: var(--pm-mint-deep); }
+
+.premium .stock-info.in-stock { color: var(--pm-mint-deep); font-weight: 600; }
+.premium .stock-info.out-of-stock { color: var(--pm-cta-deep); font-weight: 600; }
+
+/* --- Хлебные крошки --- */
+.premium .breadcrumbs {
+    font-size: .88rem;
+    color: var(--pm-text-muted);
+}
+.premium .breadcrumbs a { color: var(--pm-mint-deep); text-decoration: none; }
+.premium .breadcrumbs a:hover { text-decoration: underline; }
+.premium .breadcrumbs .separator { color: var(--pm-border); margin: 0 8px; }
+
+/* --- Поля ввода / формы --- */
+.premium .filter-input,
+.premium .form-group input,
+.premium .form-group select,
+.premium .form-group textarea {
+    border: 1px solid var(--pm-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.premium .filter-input:focus,
+.premium .form-group input:focus,
+.premium .form-group select:focus,
+.premium .form-group textarea:focus {
+    outline: none;
+    border-color: var(--pm-mint);
+    box-shadow: 0 0 0 3px rgba(95, 227, 208, 0.25);
+}
+
+/* --- Корзина --- */
+.premium .cart-table {
+    background: var(--pm-card);
+    border-radius: var(--pm-radius);
+    box-shadow: var(--pm-shadow-sm);
+    overflow: hidden;
+}
+.premium .cart-table th {
+    background: var(--pm-content-bg);
+    color: var(--pm-text-muted);
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 14px;
+}
+.premium .cart-table td { padding: 14px; }
+
+/* --- Сумма/итоги --- */
+.premium .pm-summary {
+    background: var(--pm-card);
+    border: 1px solid var(--pm-border);
+    border-radius: var(--pm-radius);
+    box-shadow: var(--pm-shadow-sm);
+    padding: 20px 22px;
+}
+.premium .pm-summary .pm-total {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--pm-text);
+}
+
+/* --- Пустое состояние --- */
+.premium .no-products {
+    background: var(--pm-card);
+    border: 1px dashed var(--pm-border);
+    border-radius: var(--pm-radius);
+    padding: 40px;
+    text-align: center;
+}
+.premium .no-products i { color: var(--pm-mint); font-size: 2.4rem; }
+
+/* --- Адаптив --- */
+@media (max-width: 640px) {
+    .premium .pm-pagehead { padding: 24px 20px; }
+    .premium .product-page { padding: 18px; }
+}

@@ -17,6 +17,12 @@ if ($uri !== '/' && $real !== false && is_file($real)) {
     return false; // встроенный сервер обслужит сам
 }
 
+// /sitemap.xml -> sitemap.php (динамический)
+if ($uri === '/sitemap.xml') {
+    require $docroot . '/sitemap.php';
+    return true;
+}
+
 // /product/123 -> product.php?id=123
 if (preg_match('#^/product/([0-9]+)/?$#', $uri, $m)) {
     $_GET['id'] = $_REQUEST['id'] = $m[1];

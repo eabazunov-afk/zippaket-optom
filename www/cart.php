@@ -17,13 +17,14 @@ $csrf = generateCsrfToken();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/catalog.css">
+    <link rel="stylesheet" href="/css/premium.css">
 </head>
-<body>
+<body class="premium">
 <div class="site-wrapper">
     <?php include __DIR__ . '/header.php'; ?>
     <main class="main-content">
         <section class="catalog-section"><div class="container">
-            <h1>Корзина</h1>
+            <div class="pm-pagehead"><h1>Корзина</h1><div class="pm-sub">Доставку менеджер согласует после оформления</div></div>
             <?php if (empty($lines)): ?>
                 <div class="no-products">
                     <i class="fas fa-shopping-cart"></i>
@@ -54,8 +55,8 @@ $csrf = generateCsrfToken();
                     <?php endforeach; ?>
                     </tbody>
                 </table>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;flex-wrap:wrap;gap:12px">
-                    <div style="font-size:1.2rem">Итого: <b><?= pv_format_price($totals['items_total']) ?></b> <small style="color:#94a3b8">(доставка согласуется отдельно)</small></div>
+                <div class="pm-summary" style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;flex-wrap:wrap;gap:12px">
+                    <div class="pm-total">Итого: <?= pv_format_price($totals['items_total']) ?> <small style="color:#94a3b8;font-weight:400">(доставка согласуется отдельно)</small></div>
                     <a href="/checkout.php" class="btn btn-primary"><i class="fas fa-arrow-right"></i> Оформить заказ</a>
                 </div>
             <?php endif; ?>

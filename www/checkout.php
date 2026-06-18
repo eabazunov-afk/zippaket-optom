@@ -76,13 +76,14 @@ function old_val(array $old, string $k): string { return htmlspecialchars((strin
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/catalog.css">
+    <link rel="stylesheet" href="/css/premium.css">
 </head>
-<body>
+<body class="premium">
 <div class="site-wrapper">
     <?php include __DIR__ . '/header.php'; ?>
     <main class="main-content">
         <section class="catalog-section"><div class="container">
-            <h1>Оформление заказа</h1>
+            <div class="pm-pagehead"><h1>Оформление заказа</h1><div class="pm-sub">Безопасная оплата · данные защищены</div></div>
             <?php if (empty($lines)): ?>
                 <div class="no-products"><p>Корзина пуста.</p><a href="/katalog_zip_paketov" class="btn btn-primary">В каталог</a></div>
             <?php else: ?>

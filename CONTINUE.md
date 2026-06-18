@@ -25,9 +25,14 @@
   (`includes/notify/`), wiring в checkout и webhook. Код готов; ⚠️ для amoCRM нужен
   перевыпуск токена (истёк 31.05.2026), для email — рабочий MTA на проде.
   См. `docs/superpowers/plans/2026-06-18-уведомления.md`.
+- **План 6 — Premium-редизайн (путь покупки) + SEO**: тема `css/premium.css` по флагу
+  `body.premium` на каталоге/товаре/корзине/checkout/успехе; динамический `sitemap.xml`,
+  BreadcrumbList, canonical, фикс бага `SITE_URL`. Главная — отдельной итерацией.
+  См. `docs/superpowers/plans/2026-06-18-редизайн-и-seo.md`.
 
 Дальше по дорожной карте:
-- **План 6 — Premium-редизайн + SEO**.
+- **Редизайн главной страницы** (hero + блоки) — отдельная итерация.
+- Боевые доступы: креды ЮKassa, перевыпуск токена amoCRM, MTA для email.
 
 Артефакты: спека — `docs/superpowers/specs/`, планы — `docs/superpowers/plans/`,
 research — `thoughts/research/`.
@@ -77,7 +82,7 @@ mysql -u root c103264_zippaket_optom_ru < db/seed/products-data.sql
 ```bash
 cd www
 php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
-# ожидается: OK (46 tests, ...)  # после Плана 5
+# ожидается: OK (49 tests, ...)  # после Плана 6
 ```
 Запустить сайт: указать `www/` корнем веб-сервера (Apache из Laragon) или
 `php -S localhost:8000 -t www` для быстрой проверки страниц.
