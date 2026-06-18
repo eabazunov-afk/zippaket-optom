@@ -82,7 +82,7 @@ class Catalog {
             $product['formatted_price'] = number_format($product['price_rub'], 2, ',', ' ') . ' ₽';
             $product['formatted_stock'] = number_format($product['stock_quantity'], 0, ',', ' ');
             $product['size_display'] = $product['width'] . '×' . $product['height'] . ' мм';
-            $product['image_url'] = !empty($product['image_url']) ? $product['image_url'] : '/images/no-image.jpg';
+            $product['image_url'] = !empty($product['image_url']) ? $product['image_url'] : '/images/no-image.png';
 
             if (strpos($product['category'], 'слайдер') !== false) {
                 $product['type_icon'] = 'sliders-h';
@@ -213,8 +213,8 @@ class Catalog {
                 $product['formatted_price'] = number_format($product['price_rub'], 2, ',', ' ') . ' ₽';
                 $product['formatted_stock'] = number_format($product['stock_quantity'], 0, ',', ' ');
                 $product['size_display'] = $product['width'] . '×' . $product['height'] . ' мм';
-                $product['image_url'] = !empty($product['image_url']) ? $product['image_url'] : '/images/no-image.jpg';
-                
+                $product['image_url'] = !empty($product['image_url']) ? $product['image_url'] : '/images/no-image.png';
+
                 // Определяем тип для иконки
                 if (strpos($product['category'], 'слайдер') !== false) {
                     $product['type_icon'] = 'sliders-h';

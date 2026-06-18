@@ -41,7 +41,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
             '@context' => 'https://schema.org',
             '@type' => 'Product',
             'name' => $product['full_name'],
-            'image' => 'https://zippaket-optom.ru' . $product['image_url'],
+            'image' => (strpos($product['image_url'], 'no-image') === false) ? 'https://zippaket-optom.ru' . $product['image_url'] : null,
             'description' => $product['meta_description'] ?: $product['full_name'],
             'offers' => array_filter([
                 '@type' => 'Offer',
@@ -50,6 +50,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                 'availability' => $stock['in_stock'] ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
             ], static fn($v) => $v !== null),
         ];
+        $ld = array_filter($ld, static fn($v) => $v !== null);
     ?>
     <script type="application/ld+json">
     <?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
