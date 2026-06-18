@@ -37,9 +37,12 @@ define('SITE_URL', 'https://zippaket-optom.ru/');
 define('ADMIN_EMAIL', 'info@zip-site.ru');
 define('SUPPORT_PHONE', '8 (800) 123-45-67');
 
-// Платёжный шлюз (ЮKassa) — заполнить на этапе Плана 4
+// Платёжный шлюз (ЮKassa) — План 4.
+// shopId+secretKey берутся из ЛК ЮKassa (тестовый магазин — для разработки).
+// Webhook настраивается в ЛК на URL: https://<домен>/api/payment_callback.php (событие payment.succeeded).
 define('YOOKASSA_SHOP_ID', 'ВАШ_YOOKASSA_SHOP_ID');
 define('YOOKASSA_SECRET_KEY', 'ВАШ_YOOKASSA_SECRET_KEY');
+define('YOOKASSA_API_URL', 'https://api.yookassa.ru/v3');
 
 // Настройки безопасности
 define('SESSION_NAME', 'ZIP_SESSION');

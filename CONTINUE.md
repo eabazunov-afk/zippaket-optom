@@ -14,9 +14,13 @@
 - **План 3 — Корзина и checkout**: серверная сессионная корзина, страница корзины,
   оформление (физ/юр, доставка, способ оплаты, CSRF), создание заказа
   (`orders`/`order_items`, snapshot), счётчик корзины.
+- **План 4 — Оплата ЮKassa**: `YooKassaGateway` (контракт `PaymentGateway`), создание
+  платежа из checkout с redirect на форму ЮKassa, webhook `api/payment_callback.php`
+  (verifySignature по IP + повторный getPayment), переход заказа `pending_payment→paid`.
+  Код готов; нужны креды тестового магазина ЮKassa в `config.php` + настройка webhook
+  в ЛК. См. `docs/superpowers/plans/2026-06-18-оплата-юкасса.md`.
 
 Дальше по дорожной карте:
-- **План 4 — Оплата ЮKassa** (нужны доступы ЮKassa: shopId + секретный ключ; есть sandbox).
 - **План 5 — Уведомления** (заказ → amoCRM/Telegram/email; токен amoCRM истёк 31.05.2026 — перевыпустить).
 - **План 6 — Premium-редизайн + SEO**.
 
@@ -68,7 +72,7 @@ mysql -u root c103264_zippaket_optom_ru < db/seed/products-data.sql
 ```bash
 cd www
 php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
-# ожидается: OK (26 tests, ...)
+# ожидается: OK (35 tests, ...)  # после Плана 4
 ```
 Запустить сайт: указать `www/` корнем веб-сервера (Apache из Laragon) или
 `php -S localhost:8000 -t www` для быстрой проверки страниц.

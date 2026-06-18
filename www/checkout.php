@@ -3,6 +3,15 @@ require_once __DIR__ . '/includes/cart.php';
 require_once __DIR__ . '/includes/checkout_validation.php';
 require_once __DIR__ . '/includes/order.php';
 require_once __DIR__ . '/includes/product_view.php';
+require_once __DIR__ . '/includes/payment/payment_factory.php';
+
+/** Абсолютный URL возврата покупателя после оплаты (ЮKassa требует absolute). */
+function checkout_return_url(string $orderNumber): string
+{
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    return $scheme . '://' . $host . '/order_success.php?order=' . urlencode($orderNumber);
+}
 
 $errors = [];
 $old = [];
@@ -21,6 +30,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = order_create($v['data'], $lines);
             if ($res['ok']) {
                 cart_session_clear();
+                // Онлайн-оплата картой: создаём платёж в ЮKassa и уводим на её форму.
+                if ($v['data']['payment_method'] === 'online' && payment_gateway_configured()) {
+                    try {
+                        $payment = payment_gateway()->createPayment([
+                            'id' => $res['order_id'],
+                            'order_number' => $res['order_number'],
+                            'total' => $res['total'],
+                        ], checkout_return_url($res['order_number']));
+                        order_set_payment($res['order_id'], $payment['payment_id']);
+                        redirect($payment['confirmation_url']);
+                    } catch (Throwable $e) {
+                        // Заказ уже создан (pending_payment). Мягкая деградация: ведём на success,
+                        // менеджер свяжется и выставит оплату вручную.
+                        error_log('createPayment failed for order ' . $res['order_number'] . ': ' . $e->getMessage());
+                    }
+                }
                 redirect('/order_success.php?order=' . urlencode($res['order_number']));
             } else {
                 $errors['_'] = $res['error'] === 'empty_cart' ? 'Корзина пуста' : 'Ошибка оформления, попробуйте позже';

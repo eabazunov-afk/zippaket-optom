@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/cart_logic.php';
+require_once __DIR__ . '/order_status.php';
+require_once __DIR__ . '/payment/payment_status_map.php';
 
 function order_create(array $checkoutData, array $lines): array
 {
@@ -61,10 +63,81 @@ function order_create(array $checkoutData, array $lines): array
         }
 
         $db->commit();
-        return ['ok' => true, 'order_id' => $orderId, 'order_number' => $orderNo];
+        return ['ok' => true, 'order_id' => $orderId, 'order_number' => $orderNo, 'total' => $totals['items_total']];
     } catch (Throwable $e) {
         if ($db->inTransaction()) { $db->rollBack(); }
         error_log('order_create error: ' . $e->getMessage());
         return ['ok' => false, 'error' => 'db_error'];
     }
+}
+
+/** Заказ по id. */
+function order_get(int $orderId): ?array
+{
+    $stmt = getDbConnection()->prepare("SELECT * FROM orders WHERE id = ?");
+    $stmt->execute([$orderId]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
+/** Заказ по номеру. */
+function order_get_by_number(string $orderNumber): ?array
+{
+    $stmt = getDbConnection()->prepare("SELECT * FROM orders WHERE order_number = ?");
+    $stmt->execute([$orderNumber]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
+/** Заказ по payment_id провайдера. */
+function order_get_by_payment_id(string $paymentId): ?array
+{
+    $stmt = getDbConnection()->prepare("SELECT * FROM orders WHERE payment_id = ?");
+    $stmt->execute([$paymentId]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
+/** Привязать платёж к заказу (после createPayment). */
+function order_set_payment(int $orderId, string $paymentId): void
+{
+    $stmt = getDbConnection()->prepare(
+        "UPDATE orders SET payment_id = ?, payment_status = 'pending' WHERE id = ?"
+    );
+    $stmt->execute([$paymentId, $orderId]);
+}
+
+/**
+ * Применить статус платежа провайдера к заказу (вызывается из webhook).
+ * Меняет orders.status только при разрешённом переходе (idempotent).
+ * @return string applied|ignored|forbidden|not_found
+ */
+function order_apply_payment_status(string $paymentId, string $providerStatus, bool $paid): string
+{
+    $db = getDbConnection();
+    $order = order_get_by_payment_id($paymentId);
+    if ($order === null) {
+        return 'not_found';
+    }
+
+    // payment_status пишем всегда (для аудита), даже если статус заказа не меняется.
+    $target = yookassa_target_order_status($providerStatus, $paid);
+    if ($target === null) {
+        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
+        $upd->execute([$providerStatus, (int)$order['id']]);
+        return 'ignored';
+    }
+
+    if ($order['status'] === $target) {
+        return 'applied'; // уже в целевом статусе — идемпотентно ок
+    }
+    if (!can_transition($order['status'], $target)) {
+        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
+        $upd->execute([$providerStatus, (int)$order['id']]);
+        return 'forbidden';
+    }
+
+    $upd = $db->prepare("UPDATE orders SET status = ?, payment_status = ? WHERE id = ?");
+    $upd->execute([$target, $providerStatus, (int)$order['id']]);
+    return 'applied';
 }

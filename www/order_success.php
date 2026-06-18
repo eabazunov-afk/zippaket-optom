@@ -1,6 +1,16 @@
 <?php
 require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/order.php';
 $orderNumber = isset($_GET['order']) ? preg_replace('/[^A-Za-z0-9\-]/', '', $_GET['order']) : '';
+
+$order = $orderNumber !== '' ? order_get_by_number($orderNumber) : null;
+$orderStatus = $order['status'] ?? '';
+// Текст статуса для покупателя.
+$statusText = [
+    'paid'            => ['Оплачен. Спасибо! Мы приступаем к выполнению заказа.', '#10b981', 'fa-check-circle'],
+    'pending_payment' => ['Ожидает оплаты. Если вы не завершили оплату — мы свяжемся с вами.', '#f59e0b', 'fa-clock'],
+    'canceled'        => ['Платёж отменён. Заказ можно оформить заново или связаться с нами.', '#dc2626', 'fa-times-circle'],
+][$orderStatus] ?? ['Заказ принят. Мы свяжемся с вами для подтверждения и согласования доставки.', '#10b981', 'fa-check-circle'];
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -18,12 +28,12 @@ $orderNumber = isset($_GET['order']) ? preg_replace('/[^A-Za-z0-9\-]/', '', $_GE
     <?php include __DIR__ . '/header.php'; ?>
     <main class="main-content">
         <section class="catalog-section"><div class="container" style="text-align:center;padding:40px 0">
-            <i class="fas fa-check-circle" style="font-size:3rem;color:#10b981"></i>
+            <i class="fas <?= $statusText[2] ?>" style="font-size:3rem;color:<?= $statusText[1] ?>"></i>
             <h1>Заказ оформлен</h1>
             <?php if ($orderNumber): ?>
                 <p>Номер заказа: <b><?= htmlspecialchars($orderNumber) ?></b></p>
             <?php endif; ?>
-            <p>Статус: ожидает оплаты. Мы свяжемся с вами для подтверждения и согласования доставки.</p>
+            <p><?= htmlspecialchars($statusText[0]) ?></p>
             <a href="/katalog_zip_paketov" class="btn btn-primary">Продолжить покупки</a>
         </div></section>
     </main>
