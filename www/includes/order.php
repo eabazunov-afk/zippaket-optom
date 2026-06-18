@@ -97,6 +97,39 @@ function order_items_get(int $orderId): array
     return $stmt->fetchAll() ?: [];
 }
 
+/** Список заказов для админки (новые сверху). */
+function orders_list(int $limit = 200): array
+{
+    $stmt = getDbConnection()->prepare("SELECT * FROM orders ORDER BY created_at DESC, id DESC LIMIT ?");
+    $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll() ?: [];
+}
+
+/**
+ * Ручная смена статуса заказа администратором (с проверкой матрицы переходов).
+ * @return array{ok:bool, error?:string}
+ */
+function order_admin_set_status(int $orderId, string $newStatus): array
+{
+    if (!in_array($newStatus, order_statuses(), true)) {
+        return ['ok' => false, 'error' => 'bad_status'];
+    }
+    $order = order_get($orderId);
+    if ($order === null) {
+        return ['ok' => false, 'error' => 'not_found'];
+    }
+    if ($order['status'] === $newStatus) {
+        return ['ok' => true];
+    }
+    if (!can_transition($order['status'], $newStatus)) {
+        return ['ok' => false, 'error' => 'forbidden_transition'];
+    }
+    $stmt = getDbConnection()->prepare("UPDATE orders SET status = ? WHERE id = ?");
+    $stmt->execute([$newStatus, $orderId]);
+    return ['ok' => true];
+}
+
 /** Заказ по payment_id провайдера. */
 function order_get_by_payment_id(string $paymentId): ?array
 {

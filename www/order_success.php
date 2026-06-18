@@ -36,7 +36,13 @@ $statusText = [
                 <p>Номер заказа: <b><?= htmlspecialchars($orderNumber) ?></b></p>
             <?php endif; ?>
             <p><?= htmlspecialchars($statusText[0]) ?></p>
-            <a href="/katalog_zip_paketov" class="btn btn-primary">Продолжить покупки</a>
+            <?php if ($order && ($order['payment_method'] ?? '') === 'invoice'): ?>
+                <p style="color:var(--z-text-2,#64748b)">Для оплаты по счёту скачайте счёт и оплатите по реквизитам. После поступления оплаты менеджер подтвердит заказ.</p>
+                <a href="/invoice.php?order=<?= urlencode($orderNumber) ?>" class="btn btn-primary" target="_blank"><i class="fas fa-file-invoice"></i> Скачать счёт</a>
+                <a href="/katalog_zip_paketov" class="btn btn-outline">Продолжить покупки</a>
+            <?php else: ?>
+                <a href="/katalog_zip_paketov" class="btn btn-primary">Продолжить покупки</a>
+            <?php endif; ?>
         </div></section>
     </main>
     <?php include __DIR__ . '/footer.php'; ?>
