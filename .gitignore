@@ -1,0 +1,26 @@
+# Секреты и конфиги
+.envrc
+www/includes/config.php
+www/tg/config.php
+
+# Дампы БД и бэкапы (персональные данные лидов, большие файлы)
+*.sql
+*.sql.gz
+*.tar.gz
+
+# Логи
+www/logs/
+www/**/*.log
+www/**/debug*.txt
+www/**/notify_log.txt
+
+# Визуальный компаньон брейншторма
+.superpowers/
+
+# Composer
+www/vendor/
+www/composer
+
+# Системное
+.DS_Store
+Thumbs.db
