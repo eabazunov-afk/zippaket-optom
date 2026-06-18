@@ -1,0 +1,139 @@
+/* ===========================================================================
+   home-premium.css — премиум-слой для ГЛАВНОЙ.
+   Подключается после style.css при <body class="premium">.
+   Ключевой приём: переопределяем CSS-переменные style.css на премиум-палитру
+   спека — лендинг перекрашивается каскадно, без правки отдельных компонентов.
+   Зависит от токенов premium.css (подключать premium.css перед этим файлом).
+   =========================================================================== */
+
+body.premium {
+    /* Remap палитры style.css -> премиум (тёмная навигация, мята, золото) */
+    --primary: #0A8F8F;        /* акцент: мятно-бирюзовый */
+    --primary-dark: #077272;
+    --primary-light: #5FE3D0;
+    --secondary: #0B1F3A;      /* глубокий тёмно-синий */
+    --accent: #FFB020;         /* CTA/акция: золото */
+    --dark: #0B1F3A;
+
+    /* Премиум-тени */
+    --shadow: 0 4px 16px rgba(11, 31, 58, 0.07);
+    --shadow-md: 0 10px 30px rgba(11, 31, 58, 0.10);
+    --shadow-lg: 0 20px 45px rgba(11, 31, 58, 0.14);
+
+    /* Скругления — мягче */
+    --radius: 0.75rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.25rem;
+}
+
+/* main-content на главной оставляем прозрачным (у секций свои фоны) */
+body.premium .main-content { background: transparent; }
+
+/* --- HERO --- */
+body.premium .hero-section .video-overlay {
+    background: linear-gradient(120deg, rgba(11, 31, 58, 0.92) 0%, rgba(18, 52, 92, 0.78) 55%, rgba(10, 143, 143, 0.45) 100%);
+}
+body.premium .hero-badge {
+    background: rgba(95, 227, 208, 0.14);
+    border: 1px solid rgba(95, 227, 208, 0.45);
+    color: #5FE3D0;
+    backdrop-filter: blur(6px);
+    border-radius: 40px;
+}
+body.premium .hero-title .text-gradient {
+    background: linear-gradient(135deg, #5FE3D0 0%, #8af0e2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+body.premium .hero-features .feature i { color: #5FE3D0; }
+
+/* Главный CTA hero — золотой (акция/конверсия) */
+body.premium .hero-actions .btn-primary {
+    background: linear-gradient(135deg, #FFB020 0%, #E0961A 100%);
+    color: #3a2400;
+    box-shadow: 0 10px 28px rgba(255, 176, 32, 0.32);
+}
+body.premium .hero-actions .btn-primary:hover {
+    box-shadow: 0 14px 34px rgba(255, 176, 32, 0.42);
+}
+
+/* --- Заголовки секций --- */
+body.premium .section-title {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--secondary);
+}
+body.premium .section-header { position: relative; }
+body.premium .section-header .section-title::after {
+    content: "";
+    display: block;
+    width: 64px;
+    height: 4px;
+    margin: 14px auto 0;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #5FE3D0, #0A8F8F);
+}
+
+/* --- Чередование фонов секций --- */
+body.premium .special-offer-section,
+body.premium .contact-section {
+    background: #F4F7FB;
+}
+body.premium .production-section {
+    background: linear-gradient(135deg, #0B1F3A 0%, #12345C 100%);
+    color: #fff;
+}
+body.premium .production-section .section-title { color: #fff; }
+body.premium .production-section .section-subtitle { color: rgba(255,255,255,0.78); }
+
+/* --- Карточки (спецпредложение, производство, SEO) --- */
+body.premium .product-slider-card,
+body.premium .production-step,
+body.premium .seo-category-card {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+body.premium .product-slider-card:hover,
+body.premium .seo-category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+body.premium .production-step {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(95, 227, 208, 0.18);
+}
+
+/* --- Таймер спецпредложения --- */
+body.premium .timer-display {
+    color: var(--accent);
+}
+
+/* --- CTA-секция --- */
+body.premium .cta-section {
+    background: linear-gradient(135deg, #0A8F8F 0%, #0B1F3A 100%);
+}
+
+/* --- Форма заявки --- */
+body.premium .lead-form {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+body.premium .lead-form input,
+body.premium .lead-form textarea,
+body.premium .lead-form select {
+    border-radius: 12px;
+}
+body.premium .lead-form input:focus,
+body.premium .lead-form textarea:focus,
+body.premium .lead-form select:focus {
+    border-color: #5FE3D0;
+    box-shadow: 0 0 0 3px rgba(95, 227, 208, 0.25);
+}
+
+/* --- SEO-блок --- */
+body.premium .seo-category-card {
+    border-top-width: 4px !important;
+    border-top-color: #0A8F8F !important;
+}
