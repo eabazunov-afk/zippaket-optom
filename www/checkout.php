@@ -5,6 +5,7 @@ require_once __DIR__ . '/includes/order.php';
 require_once __DIR__ . '/includes/product_view.php';
 require_once __DIR__ . '/includes/payment/payment_factory.php';
 require_once __DIR__ . '/includes/notify/order_notifier.php';
+require_once __DIR__ . '/includes/recaptcha.php';
 
 /** Абсолютный URL возврата покупателя после оплаты (ЮKassa требует absolute). */
 function checkout_return_url(string $orderNumber): string
@@ -23,7 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $old = $_POST;
         $v = checkout_validate($_POST);
         $lines = cart_session_lines();
-        if (empty($lines)) {
+        if (!recaptcha_verify($_POST['recaptcha_token'] ?? '', 'checkout')) {
+            $errors['_'] = 'Проверка безопасности не пройдена. Обновите страницу и попробуйте снова.';
+        } elseif (empty($lines)) {
             $errors['_'] = 'Корзина пуста';
         } elseif (!$v['ok']) {
             $errors = $v['errors'];
@@ -33,16 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 cart_session_clear();
                 // Уведомляем команду о новом заказе (best-effort, не влияет на флоу).
                 $createdOrder = order_get((int)$res['order_id']);
+                $orderItems = order_items_get((int)$res['order_id']);
                 if ($createdOrder !== null) {
-                    notify_new_order($createdOrder, order_items_get((int)$res['order_id']));
+                    notify_new_order($createdOrder, $orderItems);
                 }
-                // Онлайн-оплата картой: создаём платёж в ЮKassa и уводим на её форму.
+                // Онлайн-оплата картой: создаём платёж в ЮKassa (с чеком 54-ФЗ) и уводим на её форму.
                 if ($v['data']['payment_method'] === 'online' && payment_gateway_configured()) {
                     try {
                         $payment = payment_gateway()->createPayment([
                             'id' => $res['order_id'],
                             'order_number' => $res['order_number'],
                             'total' => $res['total'],
+                            'email' => $createdOrder['email'] ?? '',
+                            'phone' => $createdOrder['phone'] ?? '',
+                            'items' => $orderItems,
                         ], checkout_return_url($res['order_number']));
                         order_set_payment($res['order_id'], $payment['payment_id']);
                         redirect($payment['confirmation_url']);
@@ -78,6 +85,7 @@ function old_val(array $old, string $k): string { return htmlspecialchars((strin
     <link rel="stylesheet" href="/css/catalog.css">
     <link rel="stylesheet" href="/css/premium.css">
     <link rel="stylesheet" href="/css/shop-dark.css">
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lfd5FksAAAAAGQNGm2ny-aJhjuw6Mp5th7SNJRf"></script>
 </head>
 <body class="premium zlock">
 <div class="site-wrapper">
@@ -91,8 +99,9 @@ function old_val(array $old, string $k): string { return htmlspecialchars((strin
                 <?php if (!empty($errors['_'])): ?>
                     <div class="form-error" style="color:#dc2626;margin-bottom:12px"><?= htmlspecialchars($errors['_']) ?></div>
                 <?php endif; ?>
-                <form method="POST" action="/checkout.php" style="max-width:560px">
+                <form id="checkoutForm" method="POST" action="/checkout.php" style="max-width:560px">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
+                    <input type="hidden" name="recaptcha_token" id="checkoutRecaptchaToken">
 
                     <div style="display:flex;gap:8px;margin-bottom:14px">
                         <label><input type="radio" name="customer_type" value="individual" <?= (($old['customer_type'] ?? 'individual') === 'individual') ? 'checked' : '' ?>> Физлицо</label>
@@ -161,6 +170,27 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   radios.forEach(function (r) { r.addEventListener('change', sync); });
   sync();
+
+  // reCAPTCHA v3 на оформлении
+  var form = document.getElementById('checkoutForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      if (form.dataset.recaptchaDone) return; // повторный сабмит после получения токена
+      e.preventDefault();
+      if (typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
+        grecaptcha.ready(function () {
+          grecaptcha.execute('6Lfd5FksAAAAAGQNGm2ny-aJhjuw6Mp5th7SNJRf', { action: 'checkout' }).then(function (token) {
+            document.getElementById('checkoutRecaptchaToken').value = token;
+            form.dataset.recaptchaDone = '1';
+            form.submit();
+          });
+        });
+      } else {
+        form.dataset.recaptchaDone = '1';
+        form.submit();
+      }
+    });
+  }
 });
 </script>
 </body>

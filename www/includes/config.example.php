@@ -43,6 +43,8 @@ define('SUPPORT_PHONE', '8 (800) 123-45-67');
 define('YOOKASSA_SHOP_ID', 'ВАШ_YOOKASSA_SHOP_ID');
 define('YOOKASSA_SECRET_KEY', 'ВАШ_YOOKASSA_SECRET_KEY');
 define('YOOKASSA_API_URL', 'https://api.yookassa.ru/v3');
+// Код НДС для чека 54-ФЗ: 1=без НДС, 2=0%, 3=10%, 4=20%, 5=10/110, 6=20/120
+define('YOOKASSA_VAT_CODE', 1);
 
 // Настройки безопасности
 define('SESSION_NAME', 'ZIP_SESSION');

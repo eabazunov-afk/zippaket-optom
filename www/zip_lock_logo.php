@@ -43,7 +43,8 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     
     <!-- Стили -->
     <link rel="stylesheet" href="/css/style.css">
-    
+    <link rel="stylesheet" href="/css/shop-dark.css">
+
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -68,7 +69,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     }
     </script>
 </head>
-<body>
+<body class="zlock">
     <div class="site-wrapper">
         <!-- Header -->
         <?php include 'header.php'; ?>

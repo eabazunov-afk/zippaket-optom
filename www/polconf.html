@@ -386,6 +386,24 @@
             margin-right: 0.5rem;
         }
     </style>
+    <!-- ZLOCK dark premium override (источник истины — в конце, побеждает по порядку) -->
+    <style>
+        :root { --zd-bg:#070E18; --zd-bg2:#0A1422; --zd-surf:rgba(255,255,255,.045); --zd-line:rgba(255,255,255,.09);
+                --zd-text:#EAF2FB; --zd-text2:#A9C0DA; --zd-mint:#5FE3D0; }
+        body { background:var(--zd-bg) !important; color:var(--zd-text2) !important; }
+        .policy-header { background:linear-gradient(135deg,#0B1F3A,#12345C) !important; color:#fff !important; border-bottom:1px solid var(--zd-line); }
+        .policy-content, .policy-section, .policy-table, .important-note, .policy-footer {
+            background:var(--zd-surf) !important; border-color:var(--zd-line) !important; color:var(--zd-text2) !important; }
+        .policy-content, .policy-section { box-shadow:0 18px 44px rgba(4,10,20,.4) !important; }
+        h1,h2,h3,h4 { color:var(--zd-text) !important; }
+        a, .back-to-home { color:var(--zd-mint) !important; }
+        .point-number, .policy-badge { background:linear-gradient(135deg,var(--zd-mint),#0A8F8F) !important; color:#06222b !important; }
+        .highlight { background:rgba(95,227,208,.12) !important; color:var(--zd-text) !important; }
+        .important-note { border-left:4px solid var(--zd-mint) !important; }
+        .policy-table th { background:var(--zd-bg2) !important; color:var(--zd-text) !important; }
+        .policy-table td { border-color:var(--zd-line) !important; }
+        .footer-logo, .footer-links a { color:var(--zd-text) !important; }
+    </style>
 </head>
 <body>
     <!-- Шапка -->
