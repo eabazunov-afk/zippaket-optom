@@ -33,6 +33,9 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} ^(.+)/$
 RewriteRule ^ %1 [R=301,L]
 
+# ЧПУ для страницы товара: /product/123 -> product.php?id=123
+RewriteRule ^product/([0-9]+)/?$ product.php?id=$1 [L,QSA]
+
 # Сжатие текстовых файлов
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
