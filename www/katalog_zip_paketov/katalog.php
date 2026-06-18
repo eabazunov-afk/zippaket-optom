@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/catalog_functions.php';
+require_once __DIR__ . '/../includes/product_view.php';
 
 // Получаем параметры фильтрации
 $filters = [
@@ -676,7 +677,11 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
                                         <div class="stock-count"><?= number_format($product['stock_quantity'], 0, ',', ' ') ?> шт</div>
                                         <?php endif; ?>
                                     </div>
-                                    
+
+                                    <div class="pack-note" style="color:#94a3b8;font-size:0.8rem;margin:4px 0">
+                                        <?= htmlspecialchars(pv_pack_note((int)($product['min_order_qty'] ?? 1), (int)($product['qty_step'] ?? 1))) ?>
+                                    </div>
+
                                     <div class="product-pricing">
                                         <div class="price-block">
                                             <span class="current-price"><?= $price ?> ₽</span>
