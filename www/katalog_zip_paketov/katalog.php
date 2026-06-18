@@ -95,6 +95,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/catalog.css">
     <link rel="stylesheet" href="/css/premium.css">
+    <link rel="stylesheet" href="/css/shop-dark.css">
 
     <style>
         /* Компактные фильтры для ПК */
@@ -304,7 +305,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         }
     </style>
 </head>
-<body class="premium">
+<body class="premium zlock">
     <div class="site-wrapper">
         <!-- Header -->
         <?php include __DIR__ . '/../header.php'; ?>

@@ -1,0 +1,173 @@
+/* ===========================================================================
+   shop-dark.css — единая тёмная тема для страниц магазина
+   (каталог, товар, корзина, checkout, успех). Использует токены site-premium.css.
+   Подключать ПОСЛЕ style.css / catalog.css / premium.css.
+   Префикс body.zlock даёт нужную специфичность поверх инлайн-стилей каталога.
+   =========================================================================== */
+
+body.zlock .main-content,
+body.zlock .site-wrapper,
+body.zlock .catalog-section,
+body.zlock .catalog-header-section,
+body.zlock .catalog-page,
+body.zlock section { background: transparent; }
+
+/* Заголовки/текст */
+body.zlock h1, body.zlock h2, body.zlock h3, body.zlock h4 { color: var(--z-text); }
+body.zlock p, body.zlock label, body.zlock small, body.zlock li, body.zlock span { color: var(--z-text-2); }
+body.zlock .section-title { color: #fff; }
+body.zlock .section-subtitle { color: var(--z-text-2); }
+body.zlock a { color: var(--z-mint); }
+
+/* Премиум-шапка страниц (.pm-pagehead) уже тёмная — оставляем */
+
+/* ---- Фильтры каталога ---- */
+body.zlock .compact-filters,
+body.zlock .filters-panel,
+body.zlock .catalog-filters {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .compact-filter-item {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text) !important;
+}
+body.zlock .compact-filter-item label,
+body.zlock .compact-filter-item span { color: var(--z-text-2) !important; }
+body.zlock select,
+body.zlock input[type="text"],
+body.zlock input[type="number"],
+body.zlock input[type="search"],
+body.zlock .filter-input,
+body.zlock .filter-select {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline-strong) !important;
+    color: var(--z-text) !important;
+}
+body.zlock select option { background: var(--z-bg-2); color: var(--z-text); }
+body.zlock input::placeholder, body.zlock textarea::placeholder { color: var(--z-text-3); }
+body.zlock input:focus, body.zlock select:focus, body.zlock textarea:focus {
+    border-color: var(--z-mint) !important;
+    box-shadow: 0 0 0 3px rgba(95, 227, 208, .22) !important;
+    outline: none;
+}
+
+/* ---- Карточки товара (каталог) ---- */
+body.zlock .product-card,
+body.zlock .compact-card,
+body.zlock .catalog-card,
+body.zlock .product-item {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+    color: var(--z-text) !important;
+}
+body.zlock .product-card:hover,
+body.zlock .compact-card:hover { border-color: rgba(95, 227, 208, .4) !important; box-shadow: var(--z-shadow) !important; }
+body.zlock .compact-card.special { border-color: rgba(255, 176, 32, .4) !important; }
+body.zlock .product-card .product-name,
+body.zlock .product-card h3,
+body.zlock .compact-card h3,
+body.zlock .product-title { color: #fff !important; }
+body.zlock .price, body.zlock .current-price, body.zlock .product-price { color: var(--z-mint) !important; }
+body.zlock .old-price { color: var(--z-text-3) !important; }
+body.zlock .spec-item,
+body.zlock .product-spec,
+body.zlock .badge {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text-2) !important;
+}
+body.zlock .spec-item i { color: var(--z-mint) !important; }
+
+/* Фото товара — светлая подложка под прозрачный PNG, но в тёмной рамке */
+body.zlock .product-card img,
+body.zlock .compact-card img,
+body.zlock .product-image img { background: #f3f6fb; border-radius: 12px; }
+
+/* ---- Страница товара ---- */
+body.zlock .product-page {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .product-page-image img { background: #f3f6fb !important; }
+body.zlock .breadcrumbs { color: var(--z-text-3); }
+body.zlock .breadcrumbs a { color: var(--z-mint); text-decoration: none; }
+body.zlock .breadcrumbs .separator { color: var(--z-hairline-strong); }
+body.zlock .breadcrumbs .current { color: var(--z-text-2); }
+body.zlock .stock-info.in-stock { color: var(--z-mint) !important; }
+body.zlock .stock-info.out-of-stock { color: var(--z-gold) !important; }
+body.zlock .pack-note { color: var(--z-text-3) !important; }
+body.zlock .price-unit { color: var(--z-text-2) !important; }
+
+/* ---- Корзина ---- */
+body.zlock .cart-table {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    border-radius: var(--z-radius);
+    overflow: hidden;
+}
+body.zlock .cart-table th { background: var(--z-surface-2) !important; color: var(--z-text-2) !important; }
+body.zlock .cart-table td { color: var(--z-text) !important; border-color: var(--z-hairline) !important; }
+body.zlock .cart-table tr { border-color: var(--z-hairline) !important; }
+body.zlock .cart-table img { background: #f3f6fb; border-radius: 8px; }
+body.zlock .pm-summary {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .pm-total { color: #fff !important; }
+
+/* ---- Checkout / формы ---- */
+body.zlock .form-group input,
+body.zlock .form-group select,
+body.zlock .form-group textarea {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline-strong) !important;
+    color: var(--z-text) !important;
+    border-radius: 12px;
+}
+body.zlock .form-error, body.zlock .error { color: #ff8a8a !important; }
+body.zlock #companyFields { border-color: var(--z-hairline-strong) !important; }
+body.zlock .form-note { color: var(--z-text-3) !important; }
+
+/* ---- Кнопки ---- */
+body.zlock .btn-primary {
+    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important;
+    color: #06231f !important;
+    border: none !important;
+    box-shadow: var(--z-glow-mint) !important;
+}
+body.zlock .btn-primary:hover { transform: translateY(-2px); }
+body.zlock .btn-outline {
+    background: transparent !important;
+    border: 2px solid var(--z-mint-deep) !important;
+    color: var(--z-mint) !important;
+}
+
+/* ---- Пустые состояния / успех ---- */
+body.zlock .no-products {
+    background: var(--z-surface) !important;
+    border: 1px dashed var(--z-hairline-strong) !important;
+    color: var(--z-text-2) !important;
+}
+body.zlock .no-products i { color: var(--z-mint) !important; }
+body.zlock .pagination a,
+body.zlock .pagination span {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text-2) !important;
+}
+body.zlock .pagination .active,
+body.zlock .pagination a:hover { background: rgba(95, 227, 208, .14) !important; color: var(--z-mint) !important; border-color: var(--z-mint) !important; }
+
+/* Спецпредложения/секции с белым фоном из inline-стилей — гасим */
+body.zlock [style*="background: white"],
+body.zlock [style*="background:#fff"],
+body.zlock [style*="background: #fff"] {
+    background: var(--z-surface) !important;
+    color: var(--z-text) !important;
+}

@@ -38,6 +38,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/catalog.css">
     <link rel="stylesheet" href="/css/premium.css">
+    <link rel="stylesheet" href="/css/shop-dark.css">
     <?php if ($product):
         $stock = pv_stock_status((int)$product['stock_quantity']);
         $ld = [
@@ -73,7 +74,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     </script>
     <?php endif; ?>
 </head>
-<body class="premium">
+<body class="premium zlock">
     <div class="site-wrapper">
         <?php include __DIR__ . '/header.php'; ?>
         <main class="main-content">

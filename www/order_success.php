@@ -23,8 +23,9 @@ $statusText = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/premium.css">
+    <link rel="stylesheet" href="/css/shop-dark.css">
 </head>
-<body class="premium">
+<body class="premium zlock">
 <div class="site-wrapper">
     <?php include __DIR__ . '/header.php'; ?>
     <main class="main-content">
