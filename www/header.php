@@ -46,10 +46,10 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
 
             <!-- Навигация -->
             <nav class="main-nav">
-                <a href="/index.php#special-offer" class="nav-link">Спецпредложение</a>
+                <a href="/katalog_zip_paketov/" class="nav-link">Каталог</a>
+                <a href="/index.php#materials" class="nav-link">Материалы</a>
                 <a href="/index.php#calculator" class="nav-link">Калькулятор</a>
                 <a href="/zip_paket_s_logotipom" class="nav-link">С логотипом</a>
-                <a href="/index.php#production" class="nav-link">Производство</a>
                 <a href="/index.php#contact" class="nav-link">Контакты</a>
             </nav>
 
@@ -89,27 +89,23 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     </div>
     
     <nav class="mobile-nav">
-        <a href="#special-offer" class="mobile-nav-link">
-            <i class="fas fa-star"></i>
-            <span>Спецпредложение</span>
+        <a href="/katalog_zip_paketov/" class="mobile-nav-link">
+            <i class="fas fa-store"></i>
+            <span>Каталог</span>
+        </a>
+        <a href="/index.php#materials" class="mobile-nav-link">
+            <i class="fas fa-layer-group"></i>
+            <span>Материалы</span>
         </a>
         <a href="/index.php#calculator" class="mobile-nav-link">
             <i class="fas fa-calculator"></i>
             <span>Калькулятор</span>
         </a>
-
-
         <a href="/zip_paket_s_logotipom" class="mobile-nav-link">
              <i class="fas fa-ravelry" aria-hidden="true"></i>
             <span>С логотипом</span>
         </a>
-
-
-        <a href="#production" class="mobile-nav-link">
-            <i class="fas fa-industry"></i>
-            <span>Производство</span>
-        </a>
-        <a href="#contact" class="mobile-nav-link">
+        <a href="/index.php#contact" class="mobile-nav-link">
             <i class="fas fa-map-marker-alt"></i>
             <span>Контакты</span>
         </a>

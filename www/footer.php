@@ -33,20 +33,20 @@
             <div class="footer-links">
                 <div class="footer-column">
                     <h4 class="footer-title">Компания</h4>
-                    <a href="#advantages" class="footer-link">Преимущества</a>
-                    <a href="#production" class="footer-link">Производство</a>
-                    <a href="#calculator" class="footer-link">Калькулятор</a>
-                    <a href="#contact" class="footer-link">Контакты</a>
+                    <a href="/katalog_zip_paketov/" class="footer-link">Каталог</a>
+                    <a href="/index.php#materials" class="footer-link">Материалы</a>
+                    <a href="/index.php#calculator" class="footer-link">Калькулятор</a>
+                    <a href="/index.php#contact" class="footer-link">Контакты</a>
                     <a href="/admin/" class="footer-link" target="_blank">Админ-панель</a>
                 </div>
                 
                 <div class="footer-column">
                     <h4 class="footer-title">Продукция</h4>
-                    <a href="#catalog" class="footer-link">ZIP-Lock пакеты</a>
-                    <a href="#catalog" class="footer-link">Stand-Up пакеты</a>
-                    <a href="#catalog" class="footer-link">Вакуумные пакеты</a>
-                    <a href="#catalog" class="footer-link">Пакеты с ручкой</a>
-                    <a href="#catalog" class="footer-link">Индивидуальный заказ</a>
+                    <a href="/katalog_zip_paketov/" class="footer-link">Весь каталог</a>
+                    <a href="/katalog_zip_paketov/" class="footer-link">Пакеты-слайдеры</a>
+                    <a href="/katalog_zip_paketov/" class="footer-link">ZIP-Lock пакеты</a>
+                    <a href="/zip_paket_s_logotipom" class="footer-link">Пакеты с логотипом</a>
+                    <a href="/index.php#calculator" class="footer-link">Индивидуальный заказ</a>
                 </div>
                 
                 <div class="footer-column">

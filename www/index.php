@@ -176,8 +176,8 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <h1 class="z-h1" data-reveal>Производство <span class="z-grad">ZIP-пакетов</span><br>на заказ от 1 дня</h1>
                         <p class="z-hero-sub" data-reveal>Расчёт стоимости за 10 минут — напрямую от производителя со скидкой до 30%. Собственное производство, любой тираж, гарантия качества.</p>
                         <div class="z-cta-row" data-reveal>
-                            <a href="#calc" class="z-btn z-btn-gold z-shine"><i class="ph ph-calculator"></i>Рассчитать стоимость</a>
-                            <a href="#products" class="z-btn z-btn-glass"><i class="ph ph-package"></i>Смотреть каталог</a>
+                            <a href="#calculator" class="z-btn z-btn-gold z-shine"><i class="ph ph-calculator"></i>Рассчитать стоимость</a>
+                            <a href="/katalog_zip_paketov/" class="z-btn z-btn-glass"><i class="ph ph-package"></i>Весь каталог</a>
                         </div>
                         <div class="z-checks" data-reveal>
                             <div class="z-check"><i class="ph ph-check-circle"></i>Бесплатные образцы</div>
@@ -319,6 +319,11 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     <div class="z-prod-grid" style="margin-bottom:0">
                         <?php if ($zGrippersTop): foreach ($zGrippersTop as $r) echo z_card($r, false, $zGripperMax);
                         else: ?><p class="z-lead">Скоро в наличии.</p><?php endif; ?>
+                    </div>
+
+                    <div class="z-center" style="margin-top:40px" data-reveal>
+                        <a href="/katalog_zip_paketov/" class="z-btn z-btn-gold z-shine"><i class="ph ph-storefront"></i>Открыть весь каталог<i class="ph ph-arrow-right"></i></a>
+                        <p style="color:var(--z-text-2);margin-top:12px;font-size:14px">Более <?= count($zSliders) + count($zGrippers) ?> позиций · фильтры по размеру/толщине · оптовые цены</p>
                     </div>
                 </div>
             </section>
