@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/cart.php';
 require_once __DIR__ . '/includes/checkout_validation.php';
 require_once __DIR__ . '/includes/order.php';
+require_once __DIR__ . '/includes/product_view.php';
 
 $errors = [];
 $old = [];
