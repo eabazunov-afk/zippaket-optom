@@ -7,8 +7,9 @@ www/tg/config.php
 *.sql
 *.sql.gz
 *.tar.gz
-# но миграции схемы — нужны в репозитории
+# но миграции схемы и PII-free сид — нужны в репозитории
 !db/migrations/*.sql
+!db/seed/*.sql
 
 # Логи
 www/logs/
