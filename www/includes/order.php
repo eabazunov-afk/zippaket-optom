@@ -89,6 +89,14 @@ function order_get_by_number(string $orderNumber): ?array
     return $row ?: null;
 }
 
+/** Позиции заказа (order_items). */
+function order_items_get(int $orderId): array
+{
+    $stmt = getDbConnection()->prepare("SELECT * FROM order_items WHERE order_id = ? ORDER BY id");
+    $stmt->execute([$orderId]);
+    return $stmt->fetchAll() ?: [];
+}
+
 /** Заказ по payment_id провайдера. */
 function order_get_by_payment_id(string $paymentId): ?array
 {
@@ -110,7 +118,12 @@ function order_set_payment(int $orderId, string $paymentId): void
 /**
  * Применить статус платежа провайдера к заказу (вызывается из webhook).
  * Меняет orders.status только при разрешённом переходе (idempotent).
- * @return string applied|ignored|forbidden|not_found
+ * @return string applied|noop|ignored|forbidden|not_found
+ *   applied  — статус заказа реально изменён (первый раз) → можно слать уведомление;
+ *   noop     — заказ уже в целевом статусе (повтор webhook) → уведомление НЕ слать;
+ *   ignored  — статус платежа промежуточный, заказ не трогаем;
+ *   forbidden— переход запрещён матрицей статусов;
+ *   not_found— заказ по payment_id не найден.
  */
 function order_apply_payment_status(string $paymentId, string $providerStatus, bool $paid): string
 {
@@ -129,7 +142,9 @@ function order_apply_payment_status(string $paymentId, string $providerStatus, b
     }
 
     if ($order['status'] === $target) {
-        return 'applied'; // уже в целевом статусе — идемпотентно ок
+        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
+        $upd->execute([$providerStatus, (int)$order['id']]);
+        return 'noop'; // уже в целевом статусе — идемпотентно, повторно не уведомляем
     }
     if (!can_transition($order['status'], $target)) {
         $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");

@@ -10,6 +10,7 @@
  */
 require_once __DIR__ . '/../includes/order.php';
 require_once __DIR__ . '/../includes/payment/payment_factory.php';
+require_once __DIR__ . '/../includes/notify/order_notifier.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -58,5 +59,13 @@ if ($result === 'not_found') {
     callback_done(404, 'order_not_found');
 }
 
-// applied / ignored / forbidden — приняли уведомление (200), повтор не нужен.
+// Уведомления только при ПЕРВОМ переходе в оплачен (applied), не на повторах (noop).
+if ($result === 'applied' && $status === 'succeeded' && $paid) {
+    $order = order_get_by_payment_id($event['payment_id']);
+    if ($order !== null) {
+        notify_order_paid($order, order_items_get((int)$order['id']));
+    }
+}
+
+// applied / noop / ignored / forbidden — приняли уведомление (200), повтор не нужен.
 callback_done(200, $result);

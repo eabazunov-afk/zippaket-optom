@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/checkout_validation.php';
 require_once __DIR__ . '/includes/order.php';
 require_once __DIR__ . '/includes/product_view.php';
 require_once __DIR__ . '/includes/payment/payment_factory.php';
+require_once __DIR__ . '/includes/notify/order_notifier.php';
 
 /** Абсолютный URL возврата покупателя после оплаты (ЮKassa требует absolute). */
 function checkout_return_url(string $orderNumber): string
@@ -30,6 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = order_create($v['data'], $lines);
             if ($res['ok']) {
                 cart_session_clear();
+                // Уведомляем команду о новом заказе (best-effort, не влияет на флоу).
+                $createdOrder = order_get((int)$res['order_id']);
+                if ($createdOrder !== null) {
+                    notify_new_order($createdOrder, order_items_get((int)$res['order_id']));
+                }
                 // Онлайн-оплата картой: создаём платёж в ЮKassa и уводим на её форму.
                 if ($v['data']['payment_method'] === 'online' && payment_gateway_configured()) {
                     try {

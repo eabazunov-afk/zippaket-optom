@@ -20,8 +20,13 @@
   Код готов; нужны креды тестового магазина ЮKassa в `config.php` + настройка webhook
   в ЛК. См. `docs/superpowers/plans/2026-06-18-оплата-юкасса.md`.
 
+- **План 5 — Уведомления**: при оформлении и оплате заказа — Telegram (админу),
+  Email (админу/клиенту), лид в amoCRM. Чистые форматтеры + best-effort каналы
+  (`includes/notify/`), wiring в checkout и webhook. Код готов; ⚠️ для amoCRM нужен
+  перевыпуск токена (истёк 31.05.2026), для email — рабочий MTA на проде.
+  См. `docs/superpowers/plans/2026-06-18-уведомления.md`.
+
 Дальше по дорожной карте:
-- **План 5 — Уведомления** (заказ → amoCRM/Telegram/email; токен amoCRM истёк 31.05.2026 — перевыпустить).
 - **План 6 — Premium-редизайн + SEO**.
 
 Артефакты: спека — `docs/superpowers/specs/`, планы — `docs/superpowers/plans/`,
@@ -72,7 +77,7 @@ mysql -u root c103264_zippaket_optom_ru < db/seed/products-data.sql
 ```bash
 cd www
 php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
-# ожидается: OK (35 tests, ...)  # после Плана 4
+# ожидается: OK (46 tests, ...)  # после Плана 5
 ```
 Запустить сайт: указать `www/` корнем веб-сервера (Apache из Laragon) или
 `php -S localhost:8000 -t www` для быстрой проверки страниц.
