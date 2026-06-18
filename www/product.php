@@ -16,6 +16,8 @@ if (!$product) {
 
 $minQty  = (int)($product['min_order_qty'] ?? 1);
 $qtyStep = (int)($product['qty_step'] ?? 1);
+$hasPrice = $product && $product['price_rub'] !== null && (float)$product['price_rub'] > 0;
+$priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -35,21 +37,22 @@ $qtyStep = (int)($product['qty_step'] ?? 1);
     <link rel="stylesheet" href="/css/catalog.css">
     <?php if ($product):
         $stock = pv_stock_status((int)$product['stock_quantity']);
+        $ld = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $product['full_name'],
+            'image' => 'https://zippaket-optom.ru' . $product['image_url'],
+            'description' => $product['meta_description'] ?: $product['full_name'],
+            'offers' => array_filter([
+                '@type' => 'Offer',
+                'price' => $hasPrice ? number_format($priceVal, 2, '.', '') : null,
+                'priceCurrency' => 'RUB',
+                'availability' => $stock['in_stock'] ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
+            ], static fn($v) => $v !== null),
+        ];
     ?>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": <?= json_encode($product['full_name'], JSON_UNESCAPED_UNICODE) ?>,
-      "image": <?= json_encode('https://zippaket-optom.ru' . $product['image_url'], JSON_UNESCAPED_UNICODE) ?>,
-      "description": <?= json_encode($product['meta_description'] ?: $product['full_name'], JSON_UNESCAPED_UNICODE) ?>,
-      "offers": {
-        "@type": "Offer",
-        "price": "<?= number_format((float)$product['price_rub'], 2, '.', '') ?>",
-        "priceCurrency": "RUB",
-        "availability": "<?= $stock['in_stock'] ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder' ?>"
-      }
-    }
+    <?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
     </script>
     <?php endif; ?>
 </head>
@@ -92,8 +95,12 @@ $qtyStep = (int)($product['qty_step'] ?? 1);
                             <?php if (!empty($product['color'])): ?><span class="spec-item"><i class="fas fa-palette"></i> <?= htmlspecialchars($product['color']) ?></span><?php endif; ?>
                         </div>
                         <div class="product-pricing" style="margin:14px 0">
-                            <span class="current-price" style="font-size:1.8rem;font-weight:800"><?= pv_format_price((float)$product['price_rub']) ?></span>
+                        <?php if ($hasPrice): ?>
+                            <span class="current-price" style="font-size:1.8rem;font-weight:800"><?= pv_format_price($priceVal) ?></span>
                             <span class="price-unit">/ шт</span>
+                        <?php else: ?>
+                            <span class="current-price" style="font-size:1.4rem;font-weight:800">Цена по запросу</span>
+                        <?php endif; ?>
                         </div>
                         <div class="stock-info <?= $stock['in_stock'] ? 'in-stock' : 'out-of-stock' ?>" style="margin:10px 0">
                             <i class="fas <?= $stock['in_stock'] ? 'fa-check-circle' : 'fa-clock' ?>"></i>
@@ -107,7 +114,7 @@ $qtyStep = (int)($product['qty_step'] ?? 1);
                             <button class="btn btn-primary add-to-cart"
                                     data-id="<?= (int)$product['id'] ?>"
                                     data-name="<?= htmlspecialchars($product['full_name']) ?>"
-                                    data-price="<?= $product['price_rub'] ?>"
+                                    data-price="<?= htmlspecialchars((string)($hasPrice ? $priceVal : 0)) ?>"
                                     data-min="<?= $minQty ?>"
                                     data-step="<?= $qtyStep ?>">
                                 <i class="fas fa-shopping-cart"></i> В корзину
