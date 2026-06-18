@@ -1,0 +1,77 @@
+# Включаем модуль перенаправления
+RewriteEngine On
+
+# Базовый URL
+RewriteBase /
+
+# Ваша существующая CSP политика
+<IfModule mod_headers.c>
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-56n51Te25XL0G2sWAhTNzQFSoGTQjPEfyN6b9PCjP94=' https://www.google.com https://www.gstatic.com;"
+</IfModule>
+
+# Перенаправление с zip_paket_s_logotipom на файл zip_lock_logo.php
+RewriteRule ^zip_paket_s_logotipom/?$ zip_lock_logo.php [L,QSA]
+
+# Убираем index.php из URL
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9]\ /index\.php\ HTTP/
+RewriteRule ^index\.php$ https://%{HTTP_HOST}/ [R=301,L]
+
+# Убираем katalog.php из URL для папки katalog_zip_paketov
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /katalog_zip_paketov/katalog\.php\ HTTP/
+RewriteRule ^katalog_zip_paketov/katalog\.php$ /katalog_zip_paketov/ [R=301,L]
+
+# Внутреннее перенаправление для папки katalog_zip_paketov
+RewriteRule ^katalog_zip_paketov/?$ katalog_zip_paketov/katalog.php [L,QSA]
+
+# Если есть GET параметры, например /katalog_zip_paketov/?category=slider
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^katalog_zip_paketov/(.*)$ katalog_zip_paketov/katalog.php [L,QSA]
+
+# Убираем слэш в конце URL для SEO
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^(.+)/$
+RewriteRule ^ %1 [R=301,L]
+
+# Сжатие текстовых файлов
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/xml
+    AddOutputFilterByType DEFLATE application/rss+xml application/atom+xml
+    AddOutputFilterByType DEFLATE application/x-font-ttf application/x-font-opentype
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# Кэширование статических файлов
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType application/xhtml+xml "access plus 1 hour"
+</IfModule>
+
+# Защита от просмотра директорий
+Options -Indexes
+
+# Защита файлов .htaccess и .htpasswd
+<FilesMatch "^\.ht">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Принудительный HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Редирект с www на без www
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ https://%1/$1 [R=301,L]

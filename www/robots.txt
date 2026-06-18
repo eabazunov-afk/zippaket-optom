@@ -1,0 +1,37 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /private/
+Disallow: /*.php$
+Disallow: /*.sql$
+Allow: /*.php?$
+Allow: /*.html?$
+
+# Yandex
+User-agent: Yandex
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /private/
+Clean-param: utm_source&utm_medium&utm_campaign /
+
+# Google
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /private/
+
+# Bing
+User-agent: bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /private/
+
+# Главное зеркало
+Host: https://zippaket-optom.ru
+
+# Карта сайта
+Sitemap: https://zippaket-optom.ru/sitemap.xml

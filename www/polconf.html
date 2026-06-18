@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Политика конфиденциальности | Производство ZIP-пакетов</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ===== БАЗОВЫЕ СТИЛИ ===== */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #60a5fa;
+            --secondary: #059669;
+            --accent: #f59e0b;
+            --dark: #111827;
+            --gray-900: #1f2937;
+            --gray-800: #374151;
+            --gray-700: #4b5563;
+            --gray-600: #6b7280;
+            --gray-500: #9ca3af;
+            --gray-400: #d1d5db;
+            --gray-300: #e5e7eb;
+            --gray-200: #f3f4f6;
+            --gray-100: #f9fafb;
+            --white: #ffffff;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius: 0.5rem;
+            --radius-lg: 1rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--gray-800);
+            line-height: 1.6;
+            background: var(--white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ===== ШАПКА ===== */
+        .policy-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 4rem 0 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .policy-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+
+        .policy-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ===== КНОПКИ ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* ===== КОНТЕНТ ПОЛИТИКИ ===== */
+        .policy-content {
+            max-width: 900px;
+            margin: 0 auto 4rem;
+        }
+
+        .policy-section {
+            margin-bottom: 3rem;
+            padding: 2.5rem;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .policy-section h2 {
+            color: var(--dark);
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .policy-section h2 i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .policy-section h3 {
+            color: var(--gray-800);
+            font-size: 1.25rem;
+            margin: 2rem 0 1rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .policy-section p {
+            margin-bottom: 1rem;
+            color: var(--gray-700);
+            line-height: 1.7;
+        }
+
+        .policy-section ul {
+            margin: 1rem 0 1.5rem 2rem;
+            list-style-type: none;
+        }
+
+        .policy-section li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--gray-700);
+        }
+
+        .policy-section li:before {
+            content: '•';
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* ===== ТАБЛИЦА ===== */
+        .policy-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .policy-table th {
+            background: var(--gray-100);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-800);
+            border-bottom: 2px solid var(--gray-300);
+        }
+
+        .policy-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .policy-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .policy-table tr:hover td {
+            background: var(--gray-50);
+        }
+
+        /* ===== БАДЖИ ===== */
+        .policy-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .policy-footer {
+            background: var(--dark);
+            color: var(--white);
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--white);
+            text-decoration: none;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .footer-logo i {
+            color: var(--primary-light);
+            font-size: 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+        }
+
+        /* ===== КНОПКА НАЗАД ===== */
+        .back-to-home {
+            margin-bottom: 2rem;
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .policy-header {
+                padding: 3rem 0 2rem;
+            }
+
+            .policy-header h1 {
+                font-size: 2rem;
+            }
+
+            .policy-section {
+                padding: 1.5rem;
+            }
+
+            .policy-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .policy-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .policy-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .policy-section {
+                padding: 1.25rem;
+            }
+        }
+
+        /* ===== НОМЕРА ПУНКТОВ ===== */
+        .point-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        h2.with-number {
+            display: flex;
+            align-items: center;
+        }
+
+        /* ===== ВЫДЕЛЕНИЕ ТЕКСТА ===== */
+        .highlight {
+            background: linear-gradient(120deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .important-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.25rem;
+            border-radius: var(--radius);
+            margin: 1.5rem 0;
+        }
+
+        .important-note i {
+            color: #f59e0b;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="policy-header">
+        <div class="container">
+            <a href="/" class="footer-logo" style="margin-bottom: 2rem; display: inline-flex;">
+                <i class="fas fa-lock"></i>
+                <span>ZLOCK</span>
+            </a>
+            <h1>Политика в отношении обработки персональных данных</h1>
+            <p>Настоящий документ определяет порядок обработки и защиты персональных данных посетителей нашего сайта</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Кнопка назад -->
+        <div class="back-to-home">
+            <a href="/" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i>
+                Вернуться на главную
+            </a>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="policy-content">
+            <!-- Раздел 1 -->
+            <section class="policy-section">
+                <h2 class="with-number">
+                    <span class="point-number">1</span>
+                    <span>Общие положения</span>
+                </h2>
+                
+                <p>Настоящая политика обработки персональных данных составлена в соответствии с требованиями Федерального закона от 27.07.2006. № 152-ФЗ «О персональных данных» (далее — <span class="highlight">Закон о персональных данных</span>) и определяет порядок обработки персональных данных и меры по обеспечению безопасности персональных данных, предпринимаемые <span class="highlight">ZLOCK</span> (далее — <span class="highlight">Оператор</span>).</p>
+                
+                <h3><i class="fas fa-shield-alt"></i> 1.1. Основные принципы</h3>
+                <p>Оператор ставит своей важнейшей целью и условием осуществления своей деятельности соблюдение прав и свобод человека и гражданина при обработке его персональных данных, в том числе защиты прав на неприкосновенность частной жизни, личную и семейную тайну.</p>
+                
+                <h3><i class="fas fa-globe"></i> 1.2. Область применения</h3>
+                <p>Настоящая политика Оператора в отношении обработки персональных данных (далее — <span class="highlight">Политика</span>) применяется ко всей информации, которую Оператор может получить о посетителях веб-сайта <span class="highlight">https://zippaket-optom.ru</span>.</p>
+            </section>
+
+            <!-- Раздел 2 -->
+            <section class="policy-section">
+                <h2 class="with-number">
+                    <span class="point-number">2</span>
+                    <span>Основные понятия, используемые в Политике</span>
+                </h2>
+                
+                <ul>
+                    <li><strong>Автоматизированная обработка персональных данных</strong> — обработка персональных данных с помощью средств вычислительной техники.</li>
+                    <li><strong>Блокирование персональных данных</strong> — временное прекращение обработки персональных данных (за исключением случаев, если обработка необходима для уточнения персональных данных).</li>
+                    <li><strong>Веб-сайт</strong> — совокупность графических и информационных материалов, а также программ для ЭВМ и баз данных, обеспечивающих их доступность в сети интернет по сетевому адресу <span class="highlight">https://zippaket-optom.ru</span>.</li>
+                    <li><strong>Информационная система персональных данных</strong> — совокупность содержащихся в базах данных персональных данных и обеспечивающих их обработку информационных технологий и технических средств.</li>
+                    <li><strong>Обезличивание персональных данных</strong> — действия, в результате которых невозможно определить без использования дополнительной информации принадлежность персональных данных конкретному Пользователю или иному субъекту персональных данных.</li>
+                    <li><strong>Обработка персональных данных</strong> — любое действие (операция) или совокупность действий (операций), совершаемых с использованием средств автоматизации или без использования таких средств с персональными данными, включая сбор, запись, систематизацию, накопление, хранение, уточнение (обновление, изменение), извлечение, использование, передачу (распространение, предоставление, доступ), обезличивание, блокирование, удаление, уничтожение персональных данных.</li>
+                    <li><strong>Оператор</strong> — государственный орган, муниципальный орган, юридическое или физическое лицо, самостоятельно или совместно с другими лицами организующие и/или осуществляющие обработку персональных данных, а также определяющие цели обработки персональных данных, состав персональных данных, подлежащих обработке, действия (операции), совершаемые с персональными данными.</li>
+                    <li><strong>Персональные данные</strong> — любая информация, относящаяся прямо или косвенно к определенному или определяемому Пользователю веб-сайта <span class="highlight">https://zippaket-optom.ru</span>.</li>
+                    <li><strong>Персональные данные, разрешенные субъектом персональных данных для распространения</strong> — персональные данные, доступ неограниченного круга лиц к которым предоставлен субъектом персональных данных путем дачи согласия на обработку персональных данных, разрешенных субъектом персональных данных для распространения в порядке, предусмотренном Законом о персональных данных (далее — персональные данные, разрешенные для распространения).</li>
+                    <li><strong>Пользователь</strong> — любой посетитель веб-сайта <span class="highlight">https://zippaket-optom.ru</span>.</li>
+                    <li><strong>Предоставление персональных данных</strong> — действия, направленные на раскрытие персональных данных определенному лицу или определенному кругу лиц.</li>
+                    <li><strong>Распространение персональных данных</strong> — любые действия, направленные на раскрытие персональных данных неопределенному кругу лиц (передача персональных данных) или на ознакомление с персональными данными неограниченного круга лиц, в том числе обнародование персональных данных в средствах массовой информации, размещение в информационно-телекоммуникационных сетях или предоставление доступа к персональным данным каким-либо иным способом.</li>
+                    <li><strong>Трансграничная передача персональных данных</strong> — передача персональных данных на территорию иностранного государства органу власти иностранного государства, иностранному физическому или иностранному юридическому лицу.</li>
+                    <li><strong>Уничтожение персональных данных</strong> — любые действия, в результате которых персональные данные уничтожаются безвозвратно с невозможностью дальнейшего восстановления содержания персональных данных в информационной системе персональных данных и/или уничтожаются материальные носители персональных данных.</li>
+                </ul>
+            </section>
+
+            <!-- Раздел 3 -->
+            <section class="policy-section">
+                <h2 class="with-number">
+                    <span class="point-number">3</span>
+                    <span>Основные права и обязанности Оператора</span>
+                </h2>
+                
+                <h3><i class="fas fa-user-check"></i> 3.1. Права Оператора</h3>
+                <p>Оператор имеет право:</p>
+                <ul>
+                    <li>получать от субъекта персональных данных достоверные информацию и/или документы, содержащие персональные данные;</li>
+                    <li>в случае отзыва субъектом персональных данных согласия на обработку персональных данных, а также, направления обращения с требованием о прекращении обработки персональных данных, Оператор вправе продолжить обработку персональных данных без согласия субъекта персональных данных при наличии оснований, указанных в Законе о персональных данных;</li>
+                    <li>самостоятельно определять состав и перечень мер, необходимых и достаточных для обеспечения выполнения обязанностей, предусмотренных Законом о персональных данных и принятыми в соответствии с ним нормативными правовыми актами, если иное не предусмотрено Законом о персональных данных или другими федеральными законами.</li>
+                </ul>
+                
+                <h3><i class="fas fa-tasks"></i> 3.2. Обязанности Оператора</h3>
+                <p>Оператор обязан:</p>
+                <ul>
+                    <li>предоставлять субъекту персональных данных по его просьбе информацию, касающуюся обработки его персональных данных;</li>
+                    <li>организовывать обработку персональных данных в порядке, установленном действующим законодательством РФ;</li>
+                    <li>отвечать на обращения и запросы субъектов персональных данных и их законных представителей в соответствии с требованиями Закона о персональных данных;</li>
+                    <li>сообщать в уполномоченный орган по защите прав субъектов персональных данных по запросу этого органа необходимую информацию в течение 10 дней с даты получения такого запроса;</li>
+                    <li>публиковать или иным образом обеспечивать неограниченный доступ к настоящей Политике в отношении обработки персональных данных;</li>
+                    <li>принимать правовые, организационные и технические меры для защиты персональных данных от неправомерного или случайного доступа к ним, уничтожения, изменения, блокирования, копирования, предоставления, распространения персональных данных, а также от иных неправомерных действий в отношении персональных данных;</li>
+                    <li>прекратить передачу (распространение, предоставление, доступ) персональных данных, прекратить обработку и уничтожить персональные данные в порядке и случаях, предусмотренных Законом о персональных данных;</li>
+                    <li>исполнять иные обязанности, предусмотренные Законом о персональных данных.</li>
+                </ul>
+            </section>
+
+            <!-- Раздел 4 -->
+            <section class="policy-section">
+                <h2 class="with-number">
+                    <span class="point-number">4</span>
+                    <span>Основные права и обязанности субъектов персональных данных</span>
+                </h2>
+                
+                <h3><i class="fas fa-user-shield"></i> 4.1. Права субъектов</h3>
+                <p>Субъекты персональных данных имеют право:</p>
+                <ul>
+                    <li>получать информацию, касающуюся обработки его персональных данных, за исключением случаев, предусмотренных федеральными законами. Сведения предоставляются субъекту персональных данных Оператором в доступной форме, и в них не должны содержаться персональные данные, относящиеся к другим субъектам персональных данных, за исключением случаев, когда имеются законные основания для раскрытия таких персональных данных. Перечень информации и порядок ее получения установлен Законом о персональных данных;</li>
+                    <li>требовать от оператора уточнения его персональных данных, их блокирования или уничтожения в случае, если персональные данные являются неполными, устаревшими, неточными, незаконно полученными или не являются необходимыми для заявленной цели обработки, а также принимать предусмотренные законом меры по защите своих прав;</li>
+                    <li>выдвигать условие предварительного согласия при обработке персональных данных в целях продвижения на рынке товаров, работ и услуг;</li>
+                    <li>на отзыв согласия на обработку персональных данных, а также, на направление требования о прекращении обработки персональных данных;</li>
+                    <li>обжаловать в уполномоченный орган по защите прав субъектов персональных данных или в судебном порядке неправомерные действия или бездействие Оператора при обработке его персональных данных;</li>
+                    <li>на осуществление иных прав, предусмотренных законодательством РФ.</li>
+                </ul>
+                
+                <h3><i class="fas fa-user-edit"></i> 4.2. Обязанности субъектов</h3>
+                <p>Субъекты персональных данных обязаны:</p>
+                <ul>
+                    <li>предоставлять Оператору достоверные данные о себе;</li>
+                    <li>сообщать Оператору об уточнении (обновлении, изменении) своих персональных данных.</li>
+                </ul>
+                
+                <div class="important-note">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Важно:</strong> Лица, передавшие Оператору недостоверные сведения о себе, либо сведения о другом субъекте персональных данных без согласия последнего, несут ответственность в соответствии с законодательством РФ.
+                </div>
+            </section>
+
+            <!-- Раздел 6 (таблица) -->
+            <section class="policy-section">
+                <h2 class="with-number">
+                    <span class="point-number">6</span>
+                    <span>Цели обработки персональных данных</span>
+                </h2>
+                
+                <table class="policy-table">
+                    <thead>
+                        <tr>
+                            <th>Цель обработки</th>
+                            <th>Персональные данные</th>
+                            <th>Правовые основания</th>
+                            <th>Виды обработки</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Предоставление доступа Пользователю к сервисам, информации и/или материалам, содержащимся на веб-сайте</td>
+                            <td>
+                                <span class="policy-badge">Фамилия, имя, отчество</span>
+                                <span class="policy-badge">Электронный адрес</span>
+                                <span class="policy-badge">Номера телефонов</span>
+                            </td>
+                            <td>Уставные (учредительные) документы Оператора</td>
+                            <td>Сбор, запись, систематизация, накопление, хранение, уничтожение и обезличивание персональных данных</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Раздел 12 -->
+            <section class="policy-section">
+                <h2 class="with-number">
+                    <span class="point-number">12</span>
+                    <span>Заключительные положения</span>
+                </h2>
+                
+                <p><strong>12.1.</strong> Пользователь может получить любые разъяснения по интересующим вопросам, касающимся обработки его персональных данных, обратившись к Оператору с помощью электронной почты <span class="highlight">ziptrade.info@mail.ru</span>.</p>
+                
+                <p><strong>12.2.</strong> В данном документе будут отражены любые изменения политики обработки персональных данных Оператором. Политика действует бессрочно до замены ее новой версией.</p>
+                
+                <p><strong>12.3.</strong> Актуальная версия Политики в свободном доступе расположена в сети Интернет по адресу <span class="highlight">https://zippaket-optom.ru/polconf.html</span>.</p>
+                
+                <div class="important-note">
+                    <i class="fas fa-calendar-alt"></i>
+                    <strong>Дата последнего обновления:</strong> 28 января 2026 года
+                </div>
+            </section>
+
+            <!-- Кнопки действий -->
+            <div style="display: flex; gap: 1rem; margin-top: 3rem; flex-wrap: wrap;">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    На главную
+                </a>
+                <a href="mailto:ziptrade.info@mail.ru" class="btn btn-outline">
+                    <i class="fas fa-envelope"></i>
+                    Задать вопрос
+                </a>
+                <button onclick="window.print()" class="btn btn-outline">
+                    <i class="fas fa-print"></i>
+                    Распечатать
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <footer class="policy-footer">
+        <div class="container">
+            <div class="footer-content">
+                <a href="/" class="footer-logo">
+                    <i class="fas fa-lock"></i>
+                    <span>ZLOCK - Производство ZIP-пакетов</span>
+                </a>
+                
+                <div class="footer-links">
+                    <a href="/">Главная</a>
+                    <a href="#contact">Контакты</a>
+                    <a href="mailto:info@zip.na4u.ru">Написать нам</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Плавная прокрутка для внутренних ссылок
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Подсветка активного раздела при прокрутке
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.policy-section');
+            const scrollPosition = window.scrollY + 100;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if(scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    section.style.boxShadow = 'var(--shadow-lg)';
+                    section.style.borderLeftColor = 'var(--primary-dark)';
+                } else {
+                    section.style.boxShadow = 'var(--shadow)';
+                    section.style.borderLeftColor = 'var(--primary)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

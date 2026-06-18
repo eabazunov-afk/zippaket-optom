@@ -1,0 +1,48 @@
+# /admin/.htaccess
+Options -Indexes -MultiViews
+ServerSignature Off
+
+# Запрет доступа к критичным файлам
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak|backup|sql|db)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Запрет доступа к скрытым файлам
+<FilesMatch "^\.">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Защита от XSS, clickjacking
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Запрет просмотра каталогов
+IndexIgnore *
+
+# Защита от SQL-инъекций через .htaccess
+RewriteEngine On
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+RewriteRule ^(.*)$ - [F,L]
+
+# Ограничение методов
+<LimitExcept GET POST>
+    Deny from all
+</LimitExcept>
+
+# Запрет прямого доступа к includes и logs
+RedirectMatch 403 ^/admin/includes/.*$
+RedirectMatch 403 ^/admin/logs/.*$
+
+# Защита API
+<FilesMatch "^(get_lead\.php)$">
+    # Разрешить доступ только через внутренние запросы
+    RewriteCond %{HTTP_REFERER} !^https?://[^/]+/admin/ [NC]
+    RewriteRule .* - [F,L]
+</FilesMatch>
