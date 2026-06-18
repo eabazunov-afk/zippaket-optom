@@ -24,6 +24,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(generateCsrfToken()) ?>">
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <?php if ($product): ?>
     <meta name="description" content="<?= htmlspecialchars($product['meta_description'] ?: $product['full_name']) ?>">
@@ -132,5 +133,6 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
         <?php include __DIR__ . '/footer.php'; ?>
     </div>
     <script src="/js/script.js"></script>
+    <script src="/js/cart.js"></script>
 </body>
 </html>

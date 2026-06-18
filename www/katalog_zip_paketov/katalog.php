@@ -48,6 +48,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(generateCsrfToken()) ?>">
     <title><?= $pageTitle ?> | ZLOCK - Производство ZIP-пакетов</title>
     <meta name="description" content="Каталог ZIP-пакетов от производителя. Более 50 видов пакетов с замком слайдер и zip-lock. Любые размеры и толщина. Оптом и в розницу.">
     
@@ -851,6 +852,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
     <!-- Основные скрипты -->
     <script src="/js/script.js"></script>
     <script src="/js/catalog.js"></script>
+    <script src="/js/cart.js"></script>
 
  <!-- Скрипт для мобильного фильтра -->
     <script>
