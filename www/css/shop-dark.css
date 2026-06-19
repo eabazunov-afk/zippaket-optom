@@ -13,6 +13,19 @@ body.zlock .catalog-page,
 body.zlock section { background: transparent; }
 
 /* Заголовки/текст */
+/* Единая премиум-типографика на страницах магазина (убираем разнобой с Inter).
+   Иконочные шрифты (i.fas/.ph) НЕ трогаем. */
+body.zlock, body.zlock p, body.zlock a, body.zlock span, body.zlock div,
+body.zlock li, body.zlock td, body.zlock th, body.zlock label,
+body.zlock input, body.zlock select, body.zlock textarea, body.zlock button,
+body.zlock small, body.zlock b, body.zlock strong, body.zlock h5, body.zlock h6 {
+    font-family: var(--font-body) !important;
+}
+body.zlock h1, body.zlock h2, body.zlock h3, body.zlock h4,
+body.zlock .section-title, body.zlock .product-name, body.zlock .pm-total,
+body.zlock .pm-pagehead h1, body.zlock .current-price {
+    font-family: var(--font-display) !important;
+}
 body.zlock h1, body.zlock h2, body.zlock h3, body.zlock h4 { color: var(--z-text); }
 body.zlock p, body.zlock label, body.zlock small, body.zlock li, body.zlock span { color: var(--z-text-2); }
 body.zlock .section-title { color: #fff; }
