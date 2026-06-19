@@ -52,5 +52,12 @@ if ($uri === '/' || $uri === '') {
     return true;
 }
 
-// Остальное — пусть сервер вернёт файл или 404
-return false;
+// Существующий файл (css/js/png/php) — отдаёт встроенный сервер
+$real2 = realpath($docroot . $uri);
+if ($real2 !== false && is_file($real2)) {
+    return false;
+}
+// Неизвестный путь — кастомная 404
+http_response_code(404);
+require $docroot . '/404.php';
+return true;

@@ -30,6 +30,16 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     <?php if ($product): ?>
     <meta name="description" content="<?= htmlspecialchars($product['meta_description'] ?: $product['full_name']) ?>">
     <link rel="canonical" href="https://zippaket-optom.ru/product/<?= (int)$product['id'] ?>">
+    <?php
+        $ogImg = (mb_stripos((string)$product['category'], 'слайдер') !== false)
+            ? ((mb_stripos((string)$product['color'], 'мат') !== false) ? '/images/eva.png' : '/images/pvd.png')
+            : '/images/gripper.jpg';
+    ?>
+    <meta property="og:title" content="<?= htmlspecialchars($product['full_name']) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($product['meta_description'] ?: $product['full_name']) ?>">
+    <meta property="og:type" content="product">
+    <meta property="og:url" content="https://zippaket-optom.ru/product/<?= (int)$product['id'] ?>">
+    <meta property="og:image" content="https://zippaket-optom.ru<?= htmlspecialchars($ogImg) ?>">
     <?php endif; ?>
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">

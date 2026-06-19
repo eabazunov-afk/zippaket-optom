@@ -1,6 +1,9 @@
 # Включаем модуль перенаправления
 RewriteEngine On
 
+# Кастомная страница 404
+ErrorDocument 404 /404.php
+
 # Базовый URL
 RewriteBase /
 
