@@ -1,6 +1,6 @@
 <?php $pageTitle = 'Политика использования cookie'; require __DIR__ . '/includes/page_head.php'; ?>
 
-<div class="legal-stub"><i class="fas fa-triangle-exclamation"></i> <b>ЗАГЛУШКА.</b> Базовый текст cookie-политики — при необходимости уточнить с юристом.</div>
+<div class="legal-stub"><i class="fas fa-circle-info"></i> Информация об использовании cookie на сайте.</div>
 
 <h2>Что такое cookie</h2>
 <p>Cookie — небольшие текстовые файлы, которые сайт сохраняет в браузере посетителя. Они помогают сайту работать, запоминать настройки и собирать обезличенную статистику посещаемости.</p>

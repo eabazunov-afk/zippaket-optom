@@ -1,6 +1,6 @@
 <?php $pageTitle = 'Контакты'; require __DIR__ . '/includes/page_head.php'; ?>
 
-<div class="legal-stub"><i class="fas fa-triangle-exclamation"></i> <b>ЗАГЛУШКА.</b> Реквизиты и контакты подставляются из настроек (SELLER_*) — заменить на реальные.</div>
+<div class="legal-stub"><i class="fas fa-circle-info"></i> Реквизиты подставляются из настроек продавца (<code>SELLER_*</code>) — укажите реальные ИНН/ОГРН/адрес.</div>
 
 <div class="legal-req">
     <h3 style="margin-top:0">Продавец</h3>

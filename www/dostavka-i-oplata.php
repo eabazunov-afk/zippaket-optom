@@ -1,6 +1,6 @@
 <?php $pageTitle = 'Доставка и оплата'; require __DIR__ . '/includes/page_head.php'; ?>
 
-<div class="legal-stub"><i class="fas fa-triangle-exclamation"></i> <b>ЗАГЛУШКА.</b> Уточнить реальные тарифы, сроки и зоны доставки.</div>
+<div class="legal-stub"><i class="fas fa-circle-info"></i> Общие условия. Конкретные тарифы и сроки доставки уточняйте у менеджера при оформлении.</div>
 
 <h2>Доставка</h2>
 <ul>
