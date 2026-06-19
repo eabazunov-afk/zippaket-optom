@@ -1,3 +1,12 @@
+<?php
+// Внутренний инструмент заполнения счёта — только для авторизованных администраторов.
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../admin/includes/security_config.php';
+require_once __DIR__ . '/../admin/includes/auth.php';
+require_once __DIR__ . '/../admin/includes/permissions.php';
+checkAdminAuth();
+if (empty($_SESSION['admin_id'])) { header('Location: /admin/login.php'); exit; }
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>

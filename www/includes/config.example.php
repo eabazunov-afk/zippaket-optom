@@ -9,6 +9,9 @@ require_once dirname(__FILE__) . '/functions.php';
 define('RECAPTCHA_SITE_KEY', 'ВАШ_RECAPTCHA_SITE_KEY');
 define('RECAPTCHA_SECRET_KEY', 'ВАШ_RECAPTCHA_SECRET_KEY');
 
+// Ключ api-fns.ru (поиск реквизитов по ИНН для счетов) — только из админ-инструмента.
+define('FNS_API_KEY', 'ВАШ_FNS_API_KEY');
+
 // Настройки времени
 date_default_timezone_set('Europe/Moscow');
 
