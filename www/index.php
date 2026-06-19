@@ -360,22 +360,26 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         </div>
                     </div>
 
-                    <!-- Рабочий калькулятор (бэкенд сохранён) -->
-                    <span id="calculator" class="z-calc-anchor"></span>
-                    <div class="z-calc-widget" data-reveal>
-                        <div class="z-calc-host">
-                            <section class="calculator-section">
-                                <div class="container">
-                                    <?php
-                                    require_once 'includes/calculator.php';
-                                    echo displayCalculatorForm();
-                                    ?>
-                                </div>
-                            </section>
-                        </div>
-                    </div>
                 </div>
             </section>
+
+            <!-- Калькулятор в модальном окне (рабочий бэкенд сохранён) -->
+            <div class="z-modal" id="calcModal" aria-hidden="true">
+                <div class="z-modal-overlay" data-calc-close></div>
+                <div class="z-modal-box" role="dialog" aria-modal="true" aria-label="Калькулятор стоимости">
+                    <button class="z-modal-close" type="button" data-calc-close aria-label="Закрыть"><i class="fas fa-times"></i></button>
+                    <div class="z-calc-host">
+                        <section class="calculator-section">
+                            <div class="container">
+                                <?php
+                                require_once 'includes/calculator.php';
+                                echo displayCalculatorForm();
+                                ?>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
 
             <!-- ===== ОТЗЫВЫ / ДОВЕРИЕ (⚠️ ЗАГЛУШКИ — заменить на реальные) ===== -->
             <section class="z-section">

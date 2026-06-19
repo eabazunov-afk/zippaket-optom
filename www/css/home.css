@@ -173,11 +173,19 @@ body.zlock .site-wrapper { background: transparent; }
 .z-tg-chips div { display: flex; align-items: center; gap: 8px; color: var(--z-text-2); font-size: 14px; }
 .z-tg-chips i { color: var(--z-mint); }
 
-/* виджет калькулятора — в светлой карточке на тёмной странице (он свёрстан под светлый фон) */
-.z-calc-widget { margin-top: 26px; }
-.z-calc-host { background: #fff; border-radius: 24px; padding: clamp(20px, 3vw, 40px); box-shadow: var(--z-shadow); }
+/* виджет калькулятора — в светлой карточке (он свёрстан под светлый фон) */
+.z-calc-host { background: #fff; border-radius: 20px; padding: clamp(18px, 3vw, 36px); box-shadow: var(--z-shadow-lg); }
 .z-calc-host .container { padding: 0; max-width: none; }
-.z-calc-anchor { position: relative; top: -90px; }
+
+/* Модальное окно калькулятора */
+.z-modal { position: fixed; inset: 0; z-index: 1000; display: none; padding: 24px; overflow-y: auto; }
+.z-modal.open { display: block; }
+.z-modal-overlay { position: fixed; inset: 0; background: rgba(4, 10, 20, .74); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+.z-modal-box { position: relative; z-index: 1; width: 100%; max-width: 760px; margin: 32px auto; animation: zModalIn .3s var(--z-ease); }
+.z-modal-close { position: absolute; top: -16px; right: -16px; z-index: 3; width: 42px; height: 42px; border-radius: 50%; border: none; background: var(--z-gold); color: #2a1c00; font-size: 18px; cursor: pointer; box-shadow: var(--z-shadow); transition: transform .2s var(--z-ease); }
+.z-modal-close:hover { transform: rotate(90deg); }
+@keyframes zModalIn { from { opacity: 0; transform: translateY(24px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (max-width: 640px) { .z-modal { padding: 12px; } .z-modal-close { top: 6px; right: 6px; } }
 
 /* ---- Контакты ---- */
 .z-contact { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; padding: 48px; border-radius: 26px; }

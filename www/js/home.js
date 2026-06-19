@@ -70,7 +70,24 @@
         setInterval(tick, 1000);
     }
 
-    function init() { initReveal(); initTimer(); }
+    function initCalcModal() {
+        var modal = document.getElementById('calcModal');
+        if (!modal) return;
+        function open() { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function close() { modal.classList.remove('open'); document.body.style.overflow = ''; }
+        // Любая ссылка, ведущая на #calculator (включая /index.php#calculator), открывает модалку
+        var links = document.querySelectorAll('a[href$="#calculator"]');
+        for (var i = 0; i < links.length; i++) {
+            links[i].addEventListener('click', function (e) { e.preventDefault(); open(); });
+        }
+        var closers = modal.querySelectorAll('[data-calc-close]');
+        for (var j = 0; j < closers.length; j++) { closers[j].addEventListener('click', close); }
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+        // Открыть, если пришли по якорю с другой страницы
+        if (window.location.hash === '#calculator') open();
+    }
+
+    function init() { initReveal(); initTimer(); initCalcModal(); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
 })();
