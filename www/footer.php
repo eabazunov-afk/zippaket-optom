@@ -54,7 +54,7 @@
                     <h4 class="footer-title">Услуги</h4>
                     <a href="/zip_paket_s_logotipom" class="footer-link">Дизайн упаковки</a>
                     <a href="/zip_paket_s_logotipom" class="footer-link">Печать любой сложности</a>
-                    <a href="/dostavka-i-oplata.html" class="footer-link">Доставка по РФ</a>
+                    <a href="/dostavka-i-oplata.php" class="footer-link">Доставка по РФ</a>
                     <a href="/index.php#contact" class="footer-link">Консультация технолога</a>
                     <a href="/index.php#contact" class="footer-link">Бесплатные образцы</a>
                 </div>
@@ -105,10 +105,11 @@
             
             <div class="footer-legal">
                 <a href="/polconf.html" class="legal-link">Политика конфиденциальности</a>
-                <a href="/oferta.html" class="legal-link">Публичная оферта</a>
-                <a href="/dostavka-i-oplata.html" class="legal-link">Доставка и оплата</a>
-                <a href="/vozvrat.html" class="legal-link">Возврат и обмен</a>
-                <a href="/sitemap.xml" class="legal-link">Карта сайта</a>
+                <a href="/oferta.php" class="legal-link">Публичная оферта</a>
+                <a href="/dostavka-i-oplata.php" class="legal-link">Доставка и оплата</a>
+                <a href="/vozvrat.php" class="legal-link">Возврат и обмен</a>
+                <a href="/cookie-policy.php" class="legal-link">Cookie</a>
+                <a href="/kontakty.php" class="legal-link">Контакты</a>
             </div>
             
             <div class="footer-payment">

@@ -22,7 +22,12 @@ $urls = [];
 $urls[] = ['loc' => $base . '/', 'changefreq' => 'daily', 'priority' => '1.0', 'lastmod' => $today];
 $urls[] = ['loc' => $base . '/katalog_zip_paketov/', 'changefreq' => 'daily', 'priority' => '0.9', 'lastmod' => $today];
 $urls[] = ['loc' => $base . '/zip_paket_s_logotipom/', 'changefreq' => 'monthly', 'priority' => '0.7', 'lastmod' => $today];
+$urls[] = ['loc' => $base . '/dostavka-i-oplata.php', 'changefreq' => 'monthly', 'priority' => '0.5', 'lastmod' => $today];
+$urls[] = ['loc' => $base . '/kontakty.php', 'changefreq' => 'monthly', 'priority' => '0.5', 'lastmod' => $today];
+$urls[] = ['loc' => $base . '/oferta.php', 'changefreq' => 'yearly', 'priority' => '0.3', 'lastmod' => $today];
+$urls[] = ['loc' => $base . '/vozvrat.php', 'changefreq' => 'yearly', 'priority' => '0.3', 'lastmod' => $today];
 $urls[] = ['loc' => $base . '/polconf.html', 'changefreq' => 'yearly', 'priority' => '0.3', 'lastmod' => $today];
+$urls[] = ['loc' => $base . '/cookie-policy.php', 'changefreq' => 'yearly', 'priority' => '0.3', 'lastmod' => $today];
 
 try {
     $db = getDbConnection();

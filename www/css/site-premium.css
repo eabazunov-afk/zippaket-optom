@@ -65,6 +65,17 @@ body.zlock ::selection { background: var(--z-mint); color: var(--z-bg); }
 }
 .z-consent a, .pdn-consent a { color: var(--z-mint); }
 
+/* Контентные (юридические) страницы */
+.legal-page { max-width: 880px; }
+body.zlock .legal-page h2 { color: #fff; margin: 30px 0 12px; font-size: 1.35rem; }
+body.zlock .legal-page h3 { color: var(--z-text); margin: 20px 0 8px; font-size: 1.1rem; }
+body.zlock .legal-page p, body.zlock .legal-page li { color: var(--z-text-2); line-height: 1.7; }
+body.zlock .legal-page ul, body.zlock .legal-page ol { padding-left: 22px; margin: 10px 0; }
+body.zlock .legal-page a { color: var(--z-mint); }
+.legal-stub { background: rgba(255,176,32,.12); border: 1px solid rgba(255,176,32,.35); color: #FFCB63; border-radius: 12px; padding: 14px 16px; margin: 0 0 22px; font-size: 14px; }
+.legal-req { background: var(--z-surface); border: 1px solid var(--z-hairline); border-radius: 12px; padding: 16px 18px; margin: 16px 0; }
+body.zlock .legal-req b { color: #fff; }
+
 /* ===== ОБЩАЯ ШАПКА (единая тёмная на всех страницах) ===== */
 .top-bar {
     background: var(--z-bg-2);

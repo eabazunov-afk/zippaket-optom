@@ -451,8 +451,8 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <i class="fas fa-cookie-bite"></i>
                         <p>Мы используем файлы cookie для улучшения работы сайта и предоставления вам наилучшего сервиса.
                            Продолжая использовать сайт, вы соглашаетесь с
-                           <a href="polconf.html" target="_blank">Политикой конфиденциальности</a> и
-                           <a href="/cookie-policy.html" target="_blank">Политикой использования cookie</a>.
+                           <a href="/polconf.html" target="_blank">Политикой конфиденциальности</a> и
+                           <a href="/cookie-policy.php" target="_blank">Политикой использования cookie</a>.
                         </p>
                     </div>
                     <div class="cookie-actions">
