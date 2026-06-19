@@ -181,7 +181,7 @@ body.zlock .site-wrapper { background: transparent; }
 .z-modal { position: fixed; inset: 0; z-index: 1000; display: none; }
 .z-modal.open { display: block; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .z-modal-overlay { position: fixed; inset: 0; background: rgba(4, 10, 20, .8); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-.z-modal-box { position: relative; z-index: 1; width: calc(100% - 32px); max-width: 720px; margin: 24px auto 44px; animation: zModalIn .3s var(--z-ease); }
+.z-modal-box { position: relative; z-index: 1; width: calc(100% - 32px); max-width: 960px; margin: 24px auto 44px; animation: zModalIn .3s var(--z-ease); }
 .z-modal-close { position: fixed; top: 16px; right: 16px; z-index: 1100; width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--z-gold); color: #2a1c00; font-size: 18px; cursor: pointer; box-shadow: var(--z-shadow); transition: transform .2s var(--z-ease); }
 .z-modal-close:hover { transform: rotate(90deg); }
 @keyframes zModalIn { from { opacity: 0; transform: translateY(24px) scale(.98); } to { opacity: 1; transform: none; } }
@@ -205,6 +205,10 @@ body.zlock .z-calc-host .calculator-header p { color: #eafffb !important; }
 body.zlock .z-calc-host .section-title,
 body.zlock .z-calc-host h2, body.zlock .z-calc-host h3 { color: #fff !important; }
 body.zlock .z-calc-host .results-header { background: var(--z-surface-2) !important; }
+/* Альбомная ориентация: форма слева, результат справа */
+body.zlock .z-calc-host .calculator-body { display: grid !important; grid-template-columns: 1.1fr .9fr; gap: 24px; align-items: start; }
+body.zlock .z-calc-host .calculator-results { margin-top: 0 !important; }
+@media (max-width: 800px) { body.zlock .z-calc-host .calculator-body { grid-template-columns: 1fr !important; } }
 body.zlock .z-calc-host .section-subtitle,
 body.zlock .z-calc-host label,
 body.zlock .z-calc-host .result-label,
