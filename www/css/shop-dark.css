@@ -257,3 +257,106 @@ body.zlock .telegram-icon {
     color: var(--z-bg) !important;
 }
 body.zlock .product-tag { background: rgba(255,176,32,.16) !important; color: var(--z-gold) !important; }
+
+/* ===== Страница «с логотипом» (zip_lock_logo): тёмная унификация легаси-секций ===== */
+/* Спецпредложение «Пакеты с бегунком» */
+body.zlock .special-offer-section { background: var(--z-bg) !important; }
+body.zlock .special-offer-section:before,
+body.zlock .special-offer-section:after { display: none !important; }
+body.zlock .offer-category {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow) !important;
+}
+body.zlock .category-header { border-bottom-color: var(--z-hairline-strong) !important; }
+body.zlock .category-header h3 { color: #fff !important; }
+body.zlock .category-header h3 i { color: var(--z-mint) !important; }
+body.zlock .category-badge {
+    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%) !important;
+    color: #2a1c00 !important;
+}
+/* Карточки товара */
+body.zlock .product-offer-card {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .product-offer-card:hover { border-color: var(--z-mint) !important; }
+body.zlock .product-offer-card:before { display: none !important; }
+body.zlock .product-image-mini {
+    background: #fff !important;            /* белая подложка под фото товара — остаётся светлой */
+    border: 1px solid var(--z-hairline) !important;
+}
+body.zlock .offer-category:first-child .product-image-mini,
+body.zlock .offer-category:last-child .product-image-mini { border: 1px solid var(--z-hairline) !important; }
+body.zlock .product-image-mini::after { display: none !important; }
+body.zlock .product-size { border-bottom-color: var(--z-hairline) !important; }
+body.zlock .size-thickness { background: var(--z-surface) !important; color: var(--z-text-2) !important; }
+/* Прайс-строки */
+body.zlock .price-row { background: var(--z-surface) !important; }
+body.zlock .price-row:hover { background: rgba(95,227,208,.10) !important; }
+body.zlock .price-row:nth-child(1) .price-value { color: var(--z-gold) !important; }
+/* Запрос индивидуального размера */
+body.zlock .custom-size-request {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+}
+body.zlock .request-content h4 { color: #fff !important; }
+body.zlock .request-content p { color: var(--z-text-2) !important; }
+body.zlock .request-icon { background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important; color: var(--z-bg) !important; }
+
+/* Сравнение материалов EVA / ПВД */
+body.zlock .material-comparison,
+body.zlock .material-card {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow) !important;
+}
+body.zlock .material-card .product-image-container { background: #fff !important; border-radius: var(--z-radius-sm); }
+body.zlock .material-header h3 { color: #fff !important; }
+body.zlock .material-divider .divider-text {
+    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important;
+    color: var(--z-bg) !important;
+}
+body.zlock .material-price { border-top-color: var(--z-hairline) !important; }
+body.zlock .material-price .price-value { color: var(--z-mint) !important; }
+
+/* Галерея примеров печати — карточки с inline background:white уже гасятся выше; правим текст */
+body.zlock .gallery-section h3 { color: #fff !important; }
+body.zlock .gallery-section p { color: var(--z-text-2) !important; }
+
+/* CTA-секция: синий градиент → мятный премиум */
+body.zlock .cta-section {
+    background: linear-gradient(135deg, var(--z-mint-deep) 0%, #06303a 100%) !important;
+    border-top: 1px solid var(--z-hairline) !important;
+    border-bottom: 1px solid var(--z-hairline) !important;
+}
+body.zlock .cta-content h2 { color: #fff !important; }
+body.zlock .cta-content p { color: rgba(234,242,251,.88) !important; }
+
+/* Секция контактов + форма заявки */
+body.zlock .contact-section { background: var(--z-bg) !important; }
+body.zlock .contact-form h2, body.zlock .contact-info h2, body.zlock .contact-details h4 { color: #fff !important; }
+body.zlock .contact-form > p, body.zlock .form-note, body.zlock .contact-details p { color: var(--z-text-2) !important; }
+body.zlock .contact-icon {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-mint) !important;
+}
+body.zlock .contact-details a { color: var(--z-mint) !important; }
+body.zlock .social-link {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text-2) !important;
+}
+body.zlock .social-link:hover { background: var(--z-mint) !important; color: var(--z-bg) !important; }
+
+/* SEO-блок внизу: inline color:var(--dark) на тёмном фоне → перебиваем */
+body.zlock .seo-products-section h2,
+body.zlock .seo-products-section h3,
+body.zlock .seo-products-section h4 { color: #fff !important; }
+body.zlock .seo-products-section p,
+body.zlock .seo-products-section li,
+body.zlock .seo-products-section div { color: var(--z-text-2) !important; }
+body.zlock .seo-products-section i[class*="fa-"] { color: var(--z-mint) !important; }
+body.zlock .seo-products-section [style*="border-top"] { border-top-color: var(--z-hairline) !important; }
