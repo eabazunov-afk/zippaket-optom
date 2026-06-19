@@ -21,11 +21,13 @@ $seller = [
 ];
 
 $orderNumber = isset($_GET['order']) ? preg_replace('/[^A-Za-z0-9\-]/', '', $_GET['order']) : '';
+$token = isset($_GET['t']) ? preg_replace('/[^a-f0-9]/', '', $_GET['t']) : '';
 $order = $orderNumber !== '' ? order_get_by_number($orderNumber) : null;
 
-if ($order === null || $order['payment_method'] !== 'invoice') {
+// Защита от IDOR: счёт доступен только с валидным токеном заказа.
+if ($order === null || !order_token_valid($order, $token) || $order['payment_method'] !== 'invoice') {
     http_response_code(404);
-    echo '<!doctype html><meta charset="utf-8"><p style="font-family:sans-serif;padding:40px">Счёт не найден или заказ не предполагает оплату по счёту.</p>';
+    echo '<!doctype html><meta charset="utf-8"><p style="font-family:sans-serif;padding:40px">Счёт не найден или ссылка недействительна.</p>';
     exit;
 }
 
@@ -68,7 +70,7 @@ function rub_words(float $sum): string {
 <body>
     <div class="toolbar">
         <button class="btn" onclick="window.print()">🖨 Печать / Сохранить в PDF</button>
-        <a class="btn" style="background:#475569" href="/order_success.php?order=<?= urlencode($invoiceNo) ?>">← К заказу</a>
+        <a class="btn" style="background:#475569" href="/order_success.php?order=<?= urlencode($invoiceNo) ?>&t=<?= urlencode($token) ?>">← К заказу</a>
     </div>
     <div class="sheet">
         <table class="req">

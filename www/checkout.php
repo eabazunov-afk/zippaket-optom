@@ -8,11 +8,11 @@ require_once __DIR__ . '/includes/notify/order_notifier.php';
 require_once __DIR__ . '/includes/recaptcha.php';
 
 /** Абсолютный URL возврата покупателя после оплаты (ЮKassa требует absolute). */
-function checkout_return_url(string $orderNumber): string
+function checkout_return_url(string $orderNumber, string $token): string
 {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    return $scheme . '://' . $host . '/order_success.php?order=' . urlencode($orderNumber);
+    return $scheme . '://' . $host . '/order_success.php?order=' . urlencode($orderNumber) . '&t=' . urlencode($token);
 }
 
 $errors = [];
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             'email' => $createdOrder['email'] ?? '',
                             'phone' => $createdOrder['phone'] ?? '',
                             'items' => $orderItems,
-                        ], checkout_return_url($res['order_number']));
+                        ], checkout_return_url($res['order_number'], $res['access_token']));
                         order_set_payment($res['order_id'], $payment['payment_id']);
                         redirect($payment['confirmation_url']);
                     } catch (Throwable $e) {
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         error_log('createPayment failed for order ' . $res['order_number'] . ': ' . $e->getMessage());
                     }
                 }
-                redirect('/order_success.php?order=' . urlencode($res['order_number']));
+                redirect('/order_success.php?order=' . urlencode($res['order_number']) . '&t=' . urlencode($res['access_token']));
             } else {
                 $errors['_'] = $res['error'] === 'empty_cart' ? 'Корзина пуста' : 'Ошибка оформления, попробуйте позже';
             }

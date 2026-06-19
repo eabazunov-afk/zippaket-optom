@@ -159,6 +159,7 @@ DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `id` int NOT NULL AUTO_INCREMENT,
   `order_number` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `access_token` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new',
   `customer_type` enum('individual','company') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'individual',
   `customer_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -181,6 +182,7 @@ CREATE TABLE `orders` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_order_number` (`order_number`),
+  KEY `idx_access_token` (`access_token`),
   KEY `idx_status` (`status`),
   KEY `idx_payment_id` (`payment_id`),
   KEY `idx_created` (`created_at`)

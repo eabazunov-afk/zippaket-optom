@@ -133,7 +133,7 @@ function status_color(string $s): string {
                     <td>
                         <?= $o['payment_method'] === 'online' ? 'Картой' : 'По счёту' ?>
                         <?php if ($o['payment_method'] === 'invoice'): ?>
-                            <br><a class="muted" href="/invoice.php?order=<?= urlencode($o['order_number']) ?>" target="_blank">счёт</a>
+                            <br><a class="muted" href="/invoice.php?order=<?= urlencode($o['order_number']) ?>&t=<?= urlencode($o['access_token'] ?? '') ?>" target="_blank">счёт</a>
                         <?php endif; ?>
                         <?php if (!empty($o['payment_status'])): ?><br><span class="pm"><?= htmlspecialchars($o['payment_status']) ?></span><?php endif; ?>
                     </td>

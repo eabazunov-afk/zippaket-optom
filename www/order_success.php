@@ -2,8 +2,12 @@
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/order.php';
 $orderNumber = isset($_GET['order']) ? preg_replace('/[^A-Za-z0-9\-]/', '', $_GET['order']) : '';
+$token = isset($_GET['t']) ? preg_replace('/[^a-f0-9]/', '', $_GET['t']) : '';
 
 $order = $orderNumber !== '' ? order_get_by_number($orderNumber) : null;
+// Защита от IDOR: детали заказа показываем только при валидном токене.
+$valid = order_token_valid($order, $token);
+if (!$valid) { $order = null; }
 $orderStatus = $order['status'] ?? '';
 // Текст статуса для покупателя.
 $statusText = [
@@ -32,13 +36,13 @@ $statusText = [
         <section class="catalog-section"><div class="container" style="text-align:center;padding:40px 0">
             <i class="fas <?= $statusText[2] ?>" style="font-size:3rem;color:<?= $statusText[1] ?>"></i>
             <h1>Заказ оформлен</h1>
-            <?php if ($orderNumber): ?>
+            <?php if ($valid && $orderNumber): ?>
                 <p>Номер заказа: <b><?= htmlspecialchars($orderNumber) ?></b></p>
             <?php endif; ?>
             <p><?= htmlspecialchars($statusText[0]) ?></p>
             <?php if ($order && ($order['payment_method'] ?? '') === 'invoice'): ?>
                 <p style="color:var(--z-text-2,#64748b)">Для оплаты по счёту скачайте счёт и оплатите по реквизитам. После поступления оплаты менеджер подтвердит заказ.</p>
-                <a href="/invoice.php?order=<?= urlencode($orderNumber) ?>" class="btn btn-primary" target="_blank"><i class="fas fa-file-invoice"></i> Скачать счёт</a>
+                <a href="/invoice.php?order=<?= urlencode($orderNumber) ?>&t=<?= urlencode($token) ?>" class="btn btn-primary" target="_blank"><i class="fas fa-file-invoice"></i> Скачать счёт</a>
                 <a href="/katalog_zip_paketov" class="btn btn-outline">Продолжить покупки</a>
             <?php else: ?>
                 <a href="/katalog_zip_paketov" class="btn btn-primary">Продолжить покупки</a>

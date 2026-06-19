@@ -17,19 +17,22 @@ function order_create(array $checkoutData, array $lines): array
         $countStmt = $db->query("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()");
         $seq = (int)$countStmt->fetchColumn() + 1;
         $orderNo = order_number($seq);
+        // Непредсказуемый токен доступа к заказу/счёту (защита от IDOR по номеру).
+        $accessToken = bin2hex(random_bytes(16));
 
         $stmt = $db->prepare("INSERT INTO orders
-            (order_number, status, customer_type, customer_name, phone, email,
+            (order_number, access_token, status, customer_type, customer_name, phone, email,
              company_name, inn, kpp, legal_address, needs_invoice,
              delivery_method, delivery_address, comment, payment_method,
              items_total, total)
             VALUES
-            (:order_number, 'pending_payment', :customer_type, :customer_name, :phone, :email,
+            (:order_number, :access_token, 'pending_payment', :customer_type, :customer_name, :phone, :email,
              :company_name, :inn, :kpp, :legal_address, :needs_invoice,
              :delivery_method, :delivery_address, :comment, :payment_method,
              :items_total, :total)");
         $stmt->execute([
             ':order_number' => $orderNo,
+            ':access_token' => $accessToken,
             ':customer_type' => $checkoutData['customer_type'],
             ':customer_name' => $checkoutData['customer_name'],
             ':phone' => $checkoutData['phone'],
@@ -63,7 +66,7 @@ function order_create(array $checkoutData, array $lines): array
         }
 
         $db->commit();
-        return ['ok' => true, 'order_id' => $orderId, 'order_number' => $orderNo, 'total' => $totals['items_total']];
+        return ['ok' => true, 'order_id' => $orderId, 'order_number' => $orderNo, 'access_token' => $accessToken, 'total' => $totals['items_total']];
     } catch (Throwable $e) {
         if ($db->inTransaction()) { $db->rollBack(); }
         error_log('order_create error: ' . $e->getMessage());
@@ -87,6 +90,15 @@ function order_get_by_number(string $orderNumber): ?array
     $stmt->execute([$orderNumber]);
     $row = $stmt->fetch();
     return $row ?: null;
+}
+
+/** Проверка токена доступа к заказу (защита от IDOR), constant-time. */
+function order_token_valid(?array $order, string $token): bool
+{
+    if ($order === null || empty($order['access_token']) || $token === '') {
+        return false;
+    }
+    return hash_equals((string)$order['access_token'], $token);
 }
 
 /** Позиции заказа (order_items). */
