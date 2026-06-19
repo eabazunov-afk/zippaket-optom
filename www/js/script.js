@@ -82,21 +82,10 @@ class OfferCart {
     }
     
     updateCartBadge() {
-        // Создаем или обновляем бейдж корзины
-        let badge = document.querySelector('.cart-badge');
-        if (!badge) {
-            badge = document.createElement('div');
-            badge.className = 'cart-badge';
-            badge.title = 'Открыть корзину';
-            document.body.appendChild(badge);
-        }
-        
-        const totalItems = this.items.reduce((sum, item) => sum + item.quantity / 1000, 0);
-        badge.textContent = totalItems > 9 ? '9+' : Math.round(totalItems);
-        badge.style.display = this.items.length > 0 ? 'flex' : 'none';
-        
-        // Добавляем обработчик клика по бейджу
-        badge.onclick = () => this.showCartModal();
+        // Плавающий офферный бейдж ОТКЛЮЧЁН: на сайте единая серверная корзина
+        // (счётчик в шапке, .js-cart-counter). Убираем дубль, если он где-то остался.
+        const old = document.querySelector('.cart-badge');
+        if (old) { old.remove(); }
     }
     
     animateButton(button) {

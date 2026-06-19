@@ -66,11 +66,11 @@ if ($quick) {
                     </div>
 
                     <div class="quick-view-actions">
-                        <button class="btn btn-primary add-to-cart"
+                        <button class="btn btn-primary js-cart-add"
                                 data-id="<?= $product['id'] ?>"
                                 data-name="<?= htmlspecialchars($product['full_name']) ?>"
                                 data-price="<?= $product['price_rub'] ?>">
-                            <i class="fas fa-shopping-cart"></i> Добавить в заявку
+                            <i class="fas fa-shopping-cart"></i> В корзину
                         </button>
                         <a href="/product/<?= $product['id'] ?>" class="btn btn-outline">
                             <i class="fas fa-eye"></i> Подробнее

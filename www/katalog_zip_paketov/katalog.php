@@ -558,11 +558,11 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
             <div class="compact-name"><?= htmlspecialchars($offer['short_name'] ?: $offer['full_name']) ?></div>
             <div class="compact-price"><?= $price ?> ₽/шт</div>
             <div class="compact-stock">В наличии: <?= number_format($offer['stock_quantity'], 0, ',', ' ') ?> шт</div>
-            <button class="btn btn-primary compact-btn add-to-cart" 
+            <button class="btn btn-primary compact-btn js-cart-add" 
                     data-id="<?= $offer['id'] ?>"
                     data-name="<?= htmlspecialchars($offer['full_name']) ?>"
                     data-price="<?= $offer['price_rub'] ?>">
-                <i class="fas fa-shopping-cart"></i> В заявку
+                <i class="fas fa-shopping-cart"></i> В корзину
             </button>
         </div>
         <?php endforeach; ?>
@@ -585,11 +585,11 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
             <div class="compact-name"><?= htmlspecialchars($product['short_name'] ?: $product['full_name']) ?></div>
             <div class="compact-price"><?= $price ?> ₽/шт</div>
             <div class="compact-stock">В наличии: <?= number_format($product['stock_quantity'], 0, ',', ' ') ?> шт</div>
-            <button class="btn btn-outline compact-btn add-to-cart" 
+            <button class="btn btn-outline compact-btn js-cart-add" 
                     data-id="<?= $product['id'] ?>"
                     data-name="<?= htmlspecialchars($product['full_name']) ?>"
                     data-price="<?= $product['price_rub'] ?>">
-                <i class="fas fa-shopping-cart"></i> В заявку
+                <i class="fas fa-shopping-cart"></i> В корзину
             </button>
         </div>
         <?php endforeach; ?>
@@ -713,11 +713,11 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
                                     </div>
                                     
                                     <div class="product-actions">
-                                        <button class="btn btn-primary btn-sm add-to-cart" 
+                                        <button class="btn btn-primary btn-sm js-cart-add" 
                                                 data-id="<?= $product['id'] ?>"
                                                 data-name="<?= htmlspecialchars($product['full_name']) ?>"
                                                 data-price="<?= $product['price_rub'] ?>">
-                                            <i class="fas fa-shopping-cart"></i> В заявку
+                                            <i class="fas fa-shopping-cart"></i> В корзину
                                         </button>
                                         <button class="btn btn-outline btn-sm1 quick-view" 
                                                 data-id="<?= $product['id'] ?>">
