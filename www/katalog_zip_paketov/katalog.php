@@ -843,6 +843,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
                 <div class="form-group">
                     <textarea name="message" placeholder="Комментарий (необязательно)" rows="3"></textarea>
                 </div>
+                <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank">согласие на обработку персональных данных</a></label>
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-phone"></i> Заказать звонок
                 </button>

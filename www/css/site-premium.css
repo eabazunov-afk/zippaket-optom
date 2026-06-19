@@ -55,6 +55,16 @@ body.zlock {
 body.zlock ::selection { background: var(--z-mint); color: var(--z-bg); }
 .z-tnum { font-variant-numeric: tabular-nums; }
 
+/* Чекбокс согласия на обработку ПДн (152-ФЗ) — на всех формах */
+.z-consent, .pdn-consent {
+    display: flex; align-items: flex-start; gap: 8px; font-size: 13px;
+    color: var(--z-text-2); line-height: 1.45; margin: 6px 0 14px; cursor: pointer;
+}
+.z-consent input[type="checkbox"], .pdn-consent input[type="checkbox"] {
+    margin: 3px 0 0; width: 16px; height: 16px; flex: none; accent-color: var(--z-mint);
+}
+.z-consent a, .pdn-consent a { color: var(--z-mint); }
+
 /* ===== ОБЩАЯ ШАПКА (единая тёмная на всех страницах) ===== */
 .top-bar {
     background: var(--z-bg-2);

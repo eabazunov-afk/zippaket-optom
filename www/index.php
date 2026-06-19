@@ -394,8 +394,8 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                             <input type="email" name="email" placeholder="Email">
                             <textarea name="message" placeholder="Размер, материал, тираж" rows="3"></textarea>
                             <input type="hidden" id="recaptchaToken" name="recaptcha_token">
+                            <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">согласие на обработку персональных данных</a></label>
                             <button type="submit" class="z-btn z-btn-gold z-shine"><i class="ph ph-paper-plane-tilt"></i>Получить расчёт</button>
-                            <p class="note">Нажимая кнопку, вы соглашаетесь с <a href="/polconf.html" style="color:var(--z-mint)">политикой обработки персональных данных</a></p>
                         </form>
                     </div>
                 </div>
@@ -530,6 +530,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     <div class="form-group">
                         <textarea name="message" placeholder="Комментарий (необязательно)" rows="3"></textarea>
                     </div>
+                    <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank">согласие на обработку персональных данных</a></label>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-phone"></i> Заказать звонок
                     </button>

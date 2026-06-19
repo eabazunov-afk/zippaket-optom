@@ -309,6 +309,11 @@ function handleSaveLead() {
     if (!recaptcha_verify($data['recaptcha_token'] ?? '', '')) {
         throw new Exception('Проверка безопасности не пройдена. Обновите страницу и попробуйте снова.');
     }
+
+    // 152-ФЗ: явное согласие на обработку ПДн обязательно
+    if (empty($data['pdn_consent'])) {
+        throw new Exception('Необходимо согласие на обработку персональных данных');
+    }
     
     // Собираем параметры
     $parameters = [];

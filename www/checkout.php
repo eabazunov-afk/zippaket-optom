@@ -26,6 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lines = cart_session_lines();
         if (!recaptcha_verify($_POST['recaptcha_token'] ?? '', 'checkout')) {
             $errors['_'] = 'Проверка безопасности не пройдена. Обновите страницу и попробуйте снова.';
+        } elseif (empty($_POST['pdn_consent'])) {
+            $errors['_'] = 'Подтвердите согласие на обработку персональных данных.';
         } elseif (empty($lines)) {
             $errors['_'] = 'Корзина пуста';
         } elseif (!$v['ok']) {
@@ -163,8 +165,8 @@ function old_val(array $old, string $k): string { return htmlspecialchars((strin
                     <?php if (!empty($errors['payment_method'])): ?><small style="color:#dc2626"><?= htmlspecialchars($errors['payment_method']) ?></small><?php endif; ?>
 
                     <div style="margin:14px 0;font-size:1.1rem">К оплате: <b><?= pv_format_price($totals['items_total']) ?></b></div>
+                    <label class="pdn-consent"><input type="checkbox" name="pdn_consent" value="1" <?= !empty($old['pdn_consent']) ? 'checked' : '' ?> required> Я даю <a href="/polconf.html" target="_blank">согласие на обработку персональных данных</a></label>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Оформить заказ</button>
-                    <p style="font-size:0.8rem;color:#94a3b8;margin-top:8px">Нажимая кнопку, вы соглашаетесь с <a href="/polconf.html">политикой конфиденциальности</a>.</p>
                 </form>
             <?php endif; ?>
         </div></section>
