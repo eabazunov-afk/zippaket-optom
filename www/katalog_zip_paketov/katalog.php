@@ -553,7 +553,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         <div class="compact-card special">
             <div class="compact-badge">🔥 ХИТ</div>
             <div class="compact-image">
-                <img src="<?= htmlspecialchars($offer['image_url']) ?>" alt="<?= htmlspecialchars($offer['full_name']) ?>">
+                <img src="<?= htmlspecialchars(pv_product_image($offer)) ?>" alt="<?= htmlspecialchars($offer['full_name']) ?>" loading="lazy">
             </div>
             <div class="compact-name"><?= htmlspecialchars($offer['short_name'] ?: $offer['full_name']) ?></div>
             <div class="compact-price"><?= $price ?> ₽/шт</div>
@@ -580,7 +580,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         ?>
         <div class="compact-card">
             <div class="compact-image">
-                <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['full_name']) ?>">
+                <img src="<?= htmlspecialchars(pv_product_image($product)) ?>" alt="<?= htmlspecialchars($product['full_name']) ?>">
             </div>
             <div class="compact-name"><?= htmlspecialchars($product['short_name'] ?: $product['full_name']) ?></div>
             <div class="compact-price"><?= $price ?> ₽/шт</div>
@@ -652,7 +652,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
                                 </div>
                                 
                                 <div class="product-image">
-                                    <img src="<?= htmlspecialchars($product['image_url']) ?>" 
+                                    <img src="<?= htmlspecialchars(pv_product_image($product)) ?>" 
                                          alt="<?= htmlspecialchars($product['full_name']) ?>" 
                                          loading="lazy">
                                     <div class="product-type-icon">

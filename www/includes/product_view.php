@@ -2,6 +2,20 @@
 // Чистые функции форматирования товара для каталога/карточки. Без БД.
 require_once __DIR__ . '/cart_quantity.php';
 
+/**
+ * Премиум-изображение товара по категории/цвету (вместо низкокачественных CGI image_url).
+ * Слайдеры: матовый → eva.png, прозрачный → pvd.png. Грипперы → gripper.jpg.
+ */
+function pv_product_image(array $p): string
+{
+    $cat = (string)($p['category'] ?? '');
+    $color = (string)($p['color'] ?? '');
+    if (mb_stripos($cat, 'слайдер') !== false) {
+        return (mb_stripos($color, 'мат') !== false) ? '/images/eva.png' : '/images/pvd.png';
+    }
+    return '/images/gripper.jpg';
+}
+
 function pv_format_price(float $price): string
 {
     return number_format($price, 2, ',', ' ') . ' ₽';
