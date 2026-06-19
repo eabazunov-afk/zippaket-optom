@@ -2,6 +2,8 @@
 // Подключаем конфигурацию
 require_once 'includes/config.php';
 require_once 'includes/catalog_functions.php';
+// У главной свой cookie-баннер ниже — не дублируем общим из footer.php
+define('COOKIE_BANNER_RENDERED', true);
 
 // UTM трекер инициализируется в header.php
 if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {

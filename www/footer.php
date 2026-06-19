@@ -83,20 +83,17 @@
                                 <span>Московское время</span>
                             </div>
                         </div>
-                        <!-- ⚠️ ЗАГЛУШКА: реквизиты продавца — заменить в config (SELLER_*) -->
-                        <div class="contact-item">
-                            <i class="fas fa-building"></i>
-                            <div>
-                                <span><?= htmlspecialchars(SELLER_NAME) ?></span>
-                                <span>ИНН <?= htmlspecialchars(SELLER_INN) ?> · ОГРН <?= htmlspecialchars(SELLER_OGRN) ?></span>
-                                <span><?= htmlspecialchars(SELLER_ADDRESS) ?></span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
+        <!-- Реквизиты продавца — центрированной строкой (без переносов) -->
+        <!-- ⚠️ ЗАГЛУШКА: заменить в config (SELLER_*) -->
+        <div class="footer-requisites">
+            <?= htmlspecialchars(SELLER_NAME) ?> · ИНН <?= htmlspecialchars(SELLER_INN) ?> · ОГРН <?= htmlspecialchars(SELLER_OGRN) ?> · <?= htmlspecialchars(SELLER_ADDRESS) ?>
+        </div>
+
         <!-- Нижняя часть футера -->
         <div class="footer-bottom">
             <div class="footer-copyright">
@@ -126,3 +123,4 @@
         </div>
     </div>
 </footer>
+<?php include __DIR__ . '/includes/cookie_banner.php'; ?>

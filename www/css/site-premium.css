@@ -153,4 +153,16 @@ body.zlock .legal-req b { color: #fff; }
 }
 .main-footer .social-link:hover { color: var(--z-mint); border-color: var(--z-mint); transform: translateY(-2px); }
 .main-footer .footer-bottom { border-top: 1px solid var(--z-hairline); }
+/* Реквизиты — центрированной строкой, без кривых переносов */
+.main-footer .footer-requisites {
+    text-align: center;
+    color: var(--z-text-2);
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 16px 20px 4px;
+    border-top: 1px solid var(--z-hairline);
+    margin-top: 8px;
+}
+.main-footer .footer-legal { justify-content: center !important; flex-wrap: wrap; gap: 8px 18px; }
+.main-footer .footer-bottom { flex-wrap: wrap; gap: 12px; }
 .main-footer .payment-icons i { color: var(--z-text-3); }
