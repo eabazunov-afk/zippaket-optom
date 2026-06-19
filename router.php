@@ -11,6 +11,20 @@ $docroot = $_SERVER['DOCUMENT_ROOT'];
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = rawurldecode($uri);
 
+// DEV-шим: страницы админки используют относительные пути ('../includes/init.php'),
+// рассчитанные на Apache (cwd = каталог скрипта). Под php -S делаем chdir в /admin.
+if ($uri === '/admin' || $uri === '/admin/') { $uri = '/admin/index.php'; }
+if (preg_match('#^/admin/([A-Za-z0-9_\-]+\.php)$#', $uri, $am)) {
+    $af = $docroot . '/admin/' . $am[1];
+    if (is_file($af)) {
+        chdir($docroot . '/admin');
+        $_SERVER['SCRIPT_NAME'] = '/admin/' . $am[1];
+        $_SERVER['SCRIPT_FILENAME'] = $af;
+        require $af;
+        return true;
+    }
+}
+
 // Реальные существующие файлы (css/js/images/*.php) отдаём напрямую.
 $real = realpath($docroot . $uri);
 if ($uri !== '/' && $real !== false && is_file($real)) {
