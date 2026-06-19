@@ -188,13 +188,23 @@ body.zlock .site-wrapper { background: transparent; }
 @media (max-width: 640px) { .z-modal-box { width: calc(100% - 20px); margin: 16px auto 32px; } .z-modal-close { top: 8px; right: 8px; } }
 
 /* Тёмная тема виджета калькулятора внутри модалки */
+body.zlock .z-calc-host .calculator-section,
+body.zlock .z-calc-host .calculator-section .container,
 body.zlock .z-calc-host .calculator,
 body.zlock .z-calc-host .calculator-body,
 body.zlock .z-calc-host .calculator-form,
 body.zlock .z-calc-host .results-body,
-body.zlock .z-calc-host .results-footer { background: transparent !important; color: var(--z-text) !important; }
+body.zlock .z-calc-host .results-footer { background: transparent !important; color: var(--z-text) !important; box-shadow: none !important; }
+body.zlock .z-calc-host .calculator-header {
+    background: linear-gradient(135deg, var(--z-mint-deep) 0%, #086e6e 100%) !important;
+    border-radius: 16px;
+}
+body.zlock .z-calc-host .calculator-header .section-title,
+body.zlock .z-calc-host .calculator-header h2,
+body.zlock .z-calc-host .calculator-header p { color: #eafffb !important; }
 body.zlock .z-calc-host .section-title,
 body.zlock .z-calc-host h2, body.zlock .z-calc-host h3 { color: #fff !important; }
+body.zlock .z-calc-host .results-header { background: var(--z-surface-2) !important; }
 body.zlock .z-calc-host .section-subtitle,
 body.zlock .z-calc-host label,
 body.zlock .z-calc-host .result-label,
@@ -239,8 +249,13 @@ body.zlock .seo-products-section { background: var(--z-bg-2) !important; }
 body.zlock .seo-category-card,
 body.zlock .seo-products-section [style*="background: white"] { background: var(--z-surface) !important; border-color: var(--z-hairline) !important; color: var(--z-text) !important; box-shadow: var(--z-shadow-sm) !important; }
 body.zlock .seo-products-section h3 { color: #fff !important; }
-body.zlock .seo-product-link { color: var(--z-text) !important; font-weight: 500; }
-body.zlock .seo-product-link:hover { color: var(--z-mint) !important; }
+body.zlock .seo-product-link {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text) !important;
+    font-weight: 500;
+}
+body.zlock .seo-product-link:hover { background: rgba(95,227,208,.12) !important; border-color: var(--z-mint) !important; color: var(--z-mint) !important; }
 body.zlock .seo-products-section p { color: #C9D8EC !important; }
 
 /* ===========================================================================
