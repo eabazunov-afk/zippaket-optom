@@ -216,3 +216,44 @@ body.zlock [style*="background: #fff"] {
     background: var(--z-surface) !important;
     color: var(--z-text) !important;
 }
+
+/* ---- Легаси-страницы (с логотипом и т.п.): тёмная унификация ---- */
+body.zlock .gallery-section,
+body.zlock .seo-products-section,
+body.zlock .production-section,
+body.zlock [style*="#f8fafc"],
+body.zlock [style*="#f1f5f9"],
+body.zlock [style*="#f9fafb"] { background: var(--z-bg-2) !important; }
+
+body.zlock .advantage-card,
+body.zlock .step,
+body.zlock .feature1,
+body.zlock .telegram-feature,
+body.zlock .calc-card,
+body.zlock .seo-category-card,
+body.zlock .setting-option {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .advantage-card h3,
+body.zlock .step-content h3,
+body.zlock .feature1 h3,
+body.zlock .section-header h2,
+body.zlock .size-value { color: #fff !important; }
+body.zlock .advantage-card p,
+body.zlock .step-content p,
+body.zlock .price-label,
+body.zlock .size-thickness,
+body.zlock .feature1 p,
+body.zlock .section-subtitle,
+body.zlock .setting-info p { color: var(--z-text-2) !important; }
+body.zlock .price-value { color: var(--z-mint) !important; }
+body.zlock .advantage-icon,
+body.zlock .step-number,
+body.zlock .telegram-icon {
+    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important;
+    color: var(--z-bg) !important;
+}
+body.zlock .product-tag { background: rgba(255,176,32,.16) !important; color: var(--z-gold) !important; }
