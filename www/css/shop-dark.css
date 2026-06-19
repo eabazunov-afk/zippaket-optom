@@ -135,8 +135,36 @@ body.zlock .form-group textarea {
     border-radius: 12px;
 }
 body.zlock .form-error, body.zlock .error { color: #ff8a8a !important; }
-body.zlock #companyFields { border-color: var(--z-hairline-strong) !important; }
+body.zlock #companyFields { border: 1px dashed var(--z-hairline-strong) !important; background: rgba(255,255,255,.02); border-radius: 12px; }
 body.zlock .form-note { color: var(--z-text-3) !important; }
+body.zlock .form-group > label,
+body.zlock .field-label { display: block; font-weight: 600; color: var(--z-text-2) !important; margin-bottom: 8px; }
+
+/* Опции «кто оформляет» и «способ оплаты» — карточки вместо плывущих строк */
+body.zlock .ctype-options, body.zlock .pay-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+@media (max-width: 480px) { body.zlock .pay-options, body.zlock .ctype-options { grid-template-columns: 1fr; } }
+body.zlock .ctype-opt, body.zlock .pay-opt {
+    display: flex; align-items: center; gap: 11px; margin: 0; padding: 13px 15px;
+    border: 1px solid var(--z-hairline-strong); border-radius: 14px; background: var(--z-surface-2);
+    cursor: pointer; transition: border-color .2s var(--z-ease), background .2s var(--z-ease), box-shadow .2s var(--z-ease);
+}
+body.zlock .pay-opt { align-items: flex-start; }
+body.zlock .ctype-opt input, body.zlock .pay-opt input { accent-color: var(--z-mint); width: 17px; height: 17px; flex: none; margin: 0; }
+body.zlock .pay-opt input { margin-top: 3px; }
+body.zlock .ctype-opt > i, body.zlock .pay-ic { color: var(--z-mint); font-size: 19px; flex: none; }
+body.zlock .ctype-opt:hover, body.zlock .pay-opt:hover { border-color: rgba(95,227,208,.5); }
+body.zlock .ctype-opt:has(input:checked), body.zlock .pay-opt:has(input:checked) {
+    border-color: var(--z-mint); background: rgba(95,227,208,.10); box-shadow: inset 0 0 0 1px var(--z-mint);
+}
+body.zlock .pay-txt { display: flex; flex-direction: column; gap: 3px; line-height: 1.25; }
+body.zlock .pay-txt b { color: #fff; font-size: 15px; }
+body.zlock .pay-txt small { color: var(--z-text-3); font-size: 11px; }
+body.zlock .pay-brands { display: flex; gap: 7px; font-size: 17px; color: var(--z-text-2); }
+body.zlock .pay-brands .fa-cc-visa { color: #5b78ff; }
+body.zlock .pay-brands .fa-cc-mastercard { color: #eb001b; }
+body.zlock .pay-brands .fa-cc-mir { color: #0f9d58; }
+body.zlock .pay-opt.disabled { opacity: .45; pointer-events: none; }
+body.zlock .pay-opt:has(input:checked) .pay-brands { color: var(--z-text); }
 
 /* ---- Кнопки ---- */
 body.zlock .btn-primary {

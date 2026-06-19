@@ -103,9 +103,10 @@ function old_val(array $old, string $k): string { return htmlspecialchars((strin
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
                     <input type="hidden" name="recaptcha_token" id="checkoutRecaptchaToken">
 
-                    <div style="display:flex;gap:8px;margin-bottom:14px">
-                        <label><input type="radio" name="customer_type" value="individual" <?= (($old['customer_type'] ?? 'individual') === 'individual') ? 'checked' : '' ?>> Физлицо</label>
-                        <label><input type="radio" name="customer_type" value="company" <?= (($old['customer_type'] ?? '') === 'company') ? 'checked' : '' ?>> Юрлицо</label>
+                    <label class="field-label">Кто оформляет</label>
+                    <div class="ctype-options">
+                        <label class="ctype-opt"><input type="radio" name="customer_type" value="individual" <?= (($old['customer_type'] ?? 'individual') === 'individual') ? 'checked' : '' ?>><i class="fas fa-user"></i><span>Физлицо</span></label>
+                        <label class="ctype-opt"><input type="radio" name="customer_type" value="company" <?= (($old['customer_type'] ?? '') === 'company') ? 'checked' : '' ?>><i class="fas fa-building"></i><span>Юрлицо</span></label>
                     </div>
 
                     <div class="form-group"><input type="text" name="customer_name" placeholder="Имя *" value="<?= old_val($old,'customer_name') ?>"></div>
@@ -138,9 +139,26 @@ function old_val(array $old, string $k): string { return htmlspecialchars((strin
                     <div class="form-group"><textarea name="comment" placeholder="Комментарий" rows="2"><?= old_val($old,'comment') ?></textarea></div>
 
                     <div class="form-group">
-                        <label>Оплата:</label>
-                        <label><input type="radio" name="payment_method" value="online" <?= (($old['payment_method'] ?? 'online')==='online')?'checked':'' ?>> Картой онлайн</label>
-                        <label id="invoiceOpt" style="opacity:.5"><input type="radio" name="payment_method" value="invoice" <?= (($old['payment_method'] ?? '')==='invoice')?'checked':'' ?>> По счёту (для юрлиц)</label>
+                        <label class="field-label">Способ оплаты</label>
+                        <div class="pay-options">
+                            <label class="pay-opt">
+                                <input type="radio" name="payment_method" value="online" <?= (($old['payment_method'] ?? 'online')==='online')?'checked':'' ?>>
+                                <span class="pay-ic"><i class="fas fa-credit-card"></i></span>
+                                <span class="pay-txt">
+                                    <b>Картой онлайн</b>
+                                    <span class="pay-brands"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-mir"></i><i class="fas fa-mobile-screen-button"></i></span>
+                                    <small>Visa · Mastercard · МИР · СБП</small>
+                                </span>
+                            </label>
+                            <label class="pay-opt" id="invoiceOpt">
+                                <input type="radio" name="payment_method" value="invoice" <?= (($old['payment_method'] ?? '')==='invoice')?'checked':'' ?>>
+                                <span class="pay-ic"><i class="fas fa-file-invoice-dollar"></i></span>
+                                <span class="pay-txt">
+                                    <b>По счёту</b>
+                                    <small>Для юрлиц · оплата по реквизитам</small>
+                                </span>
+                            </label>
+                        </div>
                     </div>
                     <?php if (!empty($errors['payment_method'])): ?><small style="color:#dc2626"><?= htmlspecialchars($errors['payment_method']) ?></small><?php endif; ?>
 
@@ -162,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function sync() {
     var isCompany = document.querySelector('input[name="customer_type"]:checked').value === 'company';
     company.style.display = isCompany ? 'block' : 'none';
-    invoiceOpt.style.opacity = isCompany ? '1' : '.5';
+    invoiceOpt.classList.toggle('disabled', !isCompany);
     if (invoiceRadio) invoiceRadio.disabled = !isCompany;
     if (!isCompany && invoiceRadio && invoiceRadio.checked) {
       document.querySelector('input[name="payment_method"][value="online"]').checked = true;
