@@ -360,3 +360,46 @@ body.zlock .seo-products-section li,
 body.zlock .seo-products-section div { color: var(--z-text-2) !important; }
 body.zlock .seo-products-section i[class*="fa-"] { color: var(--z-mint) !important; }
 body.zlock .seo-products-section [style*="border-top"] { border-top-color: var(--z-hairline) !important; }
+
+/* Финальный CTA «Запросить коммерческое предложение» (.offer-cta) — синий
+   градиент → dark glass. Текст внутри уже белый. Telegram-блок (иконка, кнопка
+   «Запустить бота», бейдж «Или») оставляем фирменно-синим как акцент бренда. */
+body.zlock .offer-cta {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+}
+body.zlock .offer-cta:before {
+    background: radial-gradient(circle, rgba(95,227,208,.08) 0%, transparent 70%) !important;
+}
+body.zlock .offer-cta .cta-content h3,
+body.zlock .offer-cta .telegram-info h4 { color: #fff !important; }
+body.zlock .offer-cta .cta-content > p,
+body.zlock .offer-cta .benefit span,
+body.zlock .offer-cta .telegram-info p,
+body.zlock .offer-cta .telegram-feature,
+body.zlock .offer-cta .telegram-note { color: var(--z-text-2) !important; }
+body.zlock .offer-cta .benefit {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+}
+body.zlock .offer-cta .benefit i { color: var(--z-mint) !important; }
+body.zlock .offer-cta .telegram-offer { border-top-color: var(--z-hairline) !important; }
+/* Кнопка «Запросить КП» (btn-primary внутри offer-cta) → золотой premium-CTA */
+body.zlock .offer-cta .btn-primary {
+    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%) !important;
+    color: #2a1c00 !important; border: none !important;
+}
+body.zlock .offer-cta .btn-outline { border-color: var(--z-hairline-strong) !important; color: var(--z-text) !important; }
+body.zlock .offer-cta .btn-outline:hover { background: var(--z-surface-2) !important; color: #fff !important; }
+
+/* Геро-секция (с логотипом): синий видео-оверлей → тёмно-навигаторный с мятным
+   свечением. Текст в геро белый — на тёмном читается отлично. */
+body.zlock .video-overlay {
+    background:
+        radial-gradient(1100px 480px at 82% -12%, rgba(10,143,143,.30), transparent 60%),
+        linear-gradient(135deg, rgba(7,14,24,.86) 0%, rgba(7,14,24,.94) 100%) !important;
+}
+body.zlock .hero-video-bg,
+body.zlock .hero-video-bg:not(:has(.hero-video[src])) {
+    background: linear-gradient(135deg, var(--z-bg-2) 0%, var(--z-bg) 100%) !important;
+}
