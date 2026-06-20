@@ -133,6 +133,11 @@ body.zlock .legal-req b { color: #fff; }
     background: var(--z-bg-2);
     border-top: 1px solid var(--z-hairline);
     color: var(--z-text-2);
+    /* На главной фоновый .z-veil (position:fixed) — сплошной --z-bg у низа экрана.
+       Футер рендерится вне .z-content (z-index:2), поэтому вуаль накрывала его и
+       «гасила» текст (особенно нижнюю строку). Поднимаем футер над вуалью. */
+    position: relative;
+    z-index: 2;
 }
 .main-footer .footer-title, .main-footer .logo-subtitle, .main-footer .logo-text { color: var(--z-text); }
 .main-footer .footer-description,
