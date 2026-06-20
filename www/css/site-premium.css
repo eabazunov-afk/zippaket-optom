@@ -122,8 +122,11 @@ body.zlock .legal-req b { color: #fff; }
 .mobile-menu-header { border-bottom: 1px solid var(--z-hairline); }
 .mobile-nav-link { color: var(--z-text-2); }
 .mobile-nav-link i { color: var(--z-mint); }
+.mobile-contacts { background: var(--z-surface); border: 1px solid var(--z-hairline); }
 .mobile-contact-item { color: var(--z-text-2); }
 .mobile-contact-item a, .mobile-contact-item strong { color: var(--z-text); }
+.mobile-contact-item span { color: var(--z-text-2); }
+.mobile-contact-item i { color: var(--z-mint); }
 
 /* ===== ОБЩИЙ ФУТЕР (единый тёмный) ===== */
 .main-footer {

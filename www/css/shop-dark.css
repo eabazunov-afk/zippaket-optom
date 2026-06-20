@@ -12,6 +12,21 @@ body.zlock .catalog-header-section,
 body.zlock .catalog-page,
 body.zlock section { background: transparent; }
 
+/* Каталог/товар/корзина наследуют премиум-токены (--pm-*), но их текстовые цвета
+   тёмные (рассчитаны на светлые карточки). На тёмном фоне body.zlock текст,
+   завязанный на --pm-text (напр. .compact-name, .compact-stock), сливался с
+   тёмной карточкой. Ремапим текстовые токены премиума под тёмную тему — это
+   чинит весь наследуемый текст разом, а не точечно. */
+body.zlock {
+    --pm-text: var(--z-text);
+    --pm-text-muted: var(--z-text-2);
+    --pm-border: var(--z-hairline);
+}
+/* Каталог — компактные карточки: явные цвета (на случай инлайнов/специфичности) */
+body.zlock .compact-name { color: #fff !important; }
+body.zlock .compact-price { color: var(--z-mint) !important; }
+body.zlock .compact-stock { color: var(--z-text-2) !important; }
+
 /* Заголовки/текст */
 /* Единая премиум-типографика на страницах магазина (убираем разнобой с Inter).
    Иконочные шрифты (i.fas/.ph) НЕ трогаем. */
