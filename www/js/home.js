@@ -23,6 +23,7 @@
     }
 
     function reveal(el) {
+        if (el.classList.contains('z-in')) return;   // идемпотентно: без повторной анимации счётчиков
         el.classList.add('z-in');
         var bar = el.querySelector('[data-bar]');
         if (bar) setTimeout(function () { bar.style.width = (parseFloat(bar.getAttribute('data-bar')) || 0) + '%'; }, 260);
@@ -31,17 +32,40 @@
     }
 
     function initReveal() {
-        var els = document.querySelectorAll('[data-reveal]');
+        var els = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
         if (!('IntersectionObserver' in window)) {
-            for (var i = 0; i < els.length; i++) reveal(els[i]);
+            els.forEach(reveal);
             return;
         }
         var io = new IntersectionObserver(function (entries) {
             entries.forEach(function (e) {
-                if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); }
+                if (e.isIntersecting) { io.unobserve(e.target); reveal(e.target); }
             });
         }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
         els.forEach(function (el) { io.observe(el); });
+
+        // Подстраховка от «пропавшего» текста: при быстром скролле или переходе
+        // по #якорю IntersectionObserver может не зафиксировать пересечение, и
+        // элемент навсегда остаётся при opacity:0. Sweep гарантированно показывает
+        // всё, что уже находится в зоне видимости или прокручено мимо.
+        function sweep() {
+            var vh = window.innerHeight || document.documentElement.clientHeight;
+            document.querySelectorAll('[data-reveal]:not(.z-in)').forEach(function (el) {
+                // Полный vh (а не 0.92): иначе элемент, чей верх попал в нижние 8%
+                // экрана у самого низа страницы, не показать — доскроллить уже некуда.
+                if (el.getBoundingClientRect().top < vh) { io.unobserve(el); reveal(el); }
+            });
+        }
+        var ticking = false;
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(function () { ticking = false; sweep(); });
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll);
+        window.addEventListener('load', sweep);
+        sweep(); // первичный проход: above-the-fold + переход по #anchor
     }
 
     function pad(n) { return String(n).padStart(2, '0'); }
