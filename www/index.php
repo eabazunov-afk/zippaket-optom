@@ -52,6 +52,9 @@ $zThicknesses = $zCatalog->getThicknesses();
 // Хиты продаж — витрина под hero (hero использует $zHits[0]['min_order_qty']).
 $zHits = home_pick_hits($zCatalog->getPopularProducts(12), 8);
 
+// Новинки — секция после «Хитов».
+$zNew = home_pick_new($zCatalog->getNewProducts(8), 4);
+
 /** Фото слайдера по цвету: матовый → eva, прозрачный → pvd. */
 function z_slider_img(array $r): string {
     return (mb_stripos((string)$r['color'], 'мат') !== false) ? '/images/eva.png' : '/images/pvd.png';
@@ -233,6 +236,20 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <?php endforeach; ?>
                     </div>
                     <div class="z-center"><a href="/katalog_zip_paketov/" class="z-btn z-btn-ghost">Весь каталог →</a></div>
+                </div>
+            </section>
+            <?php endif; ?>
+
+            <!-- ===== НОВИНКИ ===== -->
+            <?php if ($zNew): ?>
+            <section class="z-sec z-new" id="new" data-reveal>
+                <div class="z-wrap">
+                    <div class="z-sec-head z-center"><h2>Новинки</h2></div>
+                    <div class="z-prod-grid">
+                        <?php foreach ($zNew as $r): ?>
+                            <?= z_card($r, mb_stripos((string)$r['category'], 'слайдер') !== false, $zGripperMax ?: 1) ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </section>
             <?php endif; ?>
