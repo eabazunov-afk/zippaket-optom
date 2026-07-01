@@ -80,9 +80,9 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
             <span class="z-prod-ico"><i class="ph ph-package"></i></span>
         </div>
         <div class="z-prices z-tnum">
-            <div class="row"><span>Опт от 300к</span><span class="p-main"><?= home_price($base, 0.82) ?> ₽/шт</span></div>
-            <div class="row"><span>Опт от 20к</span><span class="p-sec"><?= home_price($base, 0.92) ?> ₽/шт</span></div>
-            <div class="row"><span>Розница от 3к</span><span class="p-sec"><?= home_price($base, 1.0) ?> ₽/шт</span></div>
+            <?php foreach (home_tiers() as $t): ?>
+                <div class="row"><span><?= htmlspecialchars($t['label']) ?></span><span class="<?= htmlspecialchars($t['class']) ?>"><?= home_price($base, $t['mult']) ?> ₽/шт</span></div>
+            <?php endforeach; ?>
         </div>
         <div class="z-stock<?= $low ? ' low' : '' ?>">
             <div class="lbl"><span><i class="ph ph-warehouse"></i>В наличии: <span class="z-tnum"><?= $stockLabel ?></span> шт</span><?= $low ? '<span class="low-tag">мало</span>' : '' ?></div>

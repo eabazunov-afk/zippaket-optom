@@ -63,6 +63,13 @@ define('YOOKASSA_API_URL', 'https://api.yookassa.ru/v3');
 // Код НДС для чека 54-ФЗ: 1=без НДС, 2=0%, 3=10%, 4=20%, 5=10/110, 6=20/120
 define('YOOKASSA_VAT_CODE', 1);
 
+// Оптовая градация цен: множитель к базовой price_rub. Порядок = порядок вывода.
+define('WHOLESALE_TIERS', [
+    ['label' => 'Опт от 300к', 'mult' => 0.82, 'class' => 'p-main'],
+    ['label' => 'Опт от 20к',  'mult' => 0.92, 'class' => 'p-sec'],
+    ['label' => 'Розница от 3к','mult' => 1.0,  'class' => 'p-sec'],
+]);
+
 // Настройки безопасности
 define('SESSION_NAME', 'ZIP_SESSION');
 define('SESSION_LIFETIME', 86400);

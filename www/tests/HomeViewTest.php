@@ -36,4 +36,13 @@ class HomeViewTest extends TestCase
         ];
         $this->assertSame([3, 2, 1], array_column(home_pick_hits($p, 3), 'id'));
     }
+
+    public function testTiersFallbackShape(): void
+    {
+        $tiers = home_tiers();
+        $this->assertNotEmpty($tiers);
+        $this->assertArrayHasKey('mult', $tiers[0]);
+        $this->assertArrayHasKey('label', $tiers[0]);
+        $this->assertArrayHasKey('class', $tiers[0]);
+    }
 }
