@@ -45,6 +45,10 @@ $zGripperMax = $zGrippersTop ? (int)$zGrippersTop[0]['stock_quantity'] : 1;
 // Порог «мало» — по абсолютному остатку (а не относительному), чтобы бестселлеры не помечались ложно.
 define('Z_LOW_STOCK', 100000);
 
+// Толщины для селекта поиска-подбора в hero (из БД).
+$zCatalog = $zCatalog ?? new Catalog();
+$zThicknesses = $zCatalog->getThicknesses();
+
 /** Фото слайдера по цвету: матовый → eva, прозрачный → pvd. */
 function z_slider_img(array $r): string {
     return (mb_stripos((string)$r['color'], 'мат') !== false) ? '/images/eva.png' : '/images/pvd.png';
@@ -168,15 +172,31 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     <div>
                         <div class="z-badge" data-reveal><i class="ph ph-seal-check"></i><span>Производитель №1 в России</span></div>
                         <h1 class="z-h1" data-reveal>Производство <span class="z-grad">ZIP-пакетов</span><br>на заказ от 1 дня</h1>
-                        <p class="z-hero-sub" data-reveal>Расчёт стоимости за 10 минут — напрямую от производителя со скидкой до 30%. Собственное производство, любой тираж, гарантия качества.</p>
-                        <div class="z-cta-row" data-reveal>
-                            <a href="#calculator" class="z-btn z-btn-gold z-shine"><i class="ph ph-calculator"></i>Рассчитать стоимость</a>
-                            <a href="/katalog_zip_paketov/" class="z-btn z-btn-glass"><i class="ph ph-package"></i>Весь каталог</a>
+                        <p class="z-hero-sub" data-reveal>ZIP-пакеты оптом от производителя со склада в РФ. Минимальная партия, наличие, отгрузка от 1 дня, работа с НДС.</p>
+                        <div class="z-hero-trust" data-reveal>
+                            <span>✔ Мин. партия от <?= (int)($zHits[0]['min_order_qty'] ?? 1000) ?> шт</span>
+                            <span>✔ В наличии на складе</span>
+                            <span>✔ Документы, НДС</span>
+                            <span>✔ Отгрузка от 1 дня</span>
                         </div>
-                        <div class="z-checks" data-reveal>
-                            <div class="z-check"><i class="ph ph-check-circle"></i>Бесплатные образцы</div>
-                            <div class="z-check"><i class="ph ph-check-circle"></i>Доставка по РФ</div>
-                            <div class="z-check"><i class="ph ph-check-circle"></i>Гарантия качества</div>
+                        <form class="z-hero-search" action="/katalog_zip_paketov/" method="get" role="search" data-reveal>
+                            <input type="text" name="search" class="z-hs-input" placeholder="Размер (25x30), «zip-lock» или артикул" aria-label="Поиск пакетов">
+                            <select name="type" class="z-hs-select" aria-label="Тип замка">
+                                <option value="">Любой тип</option>
+                                <option value="slider">Слайдер</option>
+                                <option value="ziplock">ZIP-LOCK (гриппер)</option>
+                            </select>
+                            <select name="thickness" class="z-hs-select" aria-label="Толщина">
+                                <option value="">Толщина</option>
+                                <?php foreach ($zThicknesses as $t): ?>
+                                    <option value="<?= (int)$t ?>"><?= (int)$t ?> мкм</option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button type="submit" class="z-btn z-btn-accent z-hs-submit">Найти</button>
+                        </form>
+                        <div class="z-hero-cta" data-reveal>
+                            <a href="/price.php" class="z-btn z-btn-gold">Скачать прайс</a>
+                            <a href="#leadForm" class="z-btn z-btn-glass js-rfq" data-rfq="hero">Запросить КП</a>
                         </div>
                     </div>
                     <div class="z-hero-visual" data-reveal>

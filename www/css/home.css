@@ -65,6 +65,27 @@ body.zlock .site-wrapper { background: transparent; }
 .z-check { display: flex; align-items: center; gap: 9px; color: var(--z-text-2); font-size: 14.5px; font-weight: 500; }
 .z-check i { color: var(--z-mint); }
 
+/* ---- HERO: маркеры доверия (B2B опт) ---- */
+.z-hero-trust { display: flex; flex-wrap: wrap; gap: 12px 22px; margin: 0 0 26px; }
+.z-hero-trust span { display: inline-flex; align-items: center; gap: 6px; color: var(--z-text-2); font-size: 14.5px; font-weight: 600; white-space: nowrap; }
+
+/* ---- HERO: поиск-подбор (GET → каталог) ---- */
+.z-hero-search { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; margin: 0 0 24px; max-width: 620px; }
+.z-hs-input, .z-hs-select { background: var(--z-surface-2); border: 1px solid var(--z-hairline-strong); border-radius: var(--z-radius-sm); color: #fff; font-family: var(--font-body); font-size: 15px; padding: 14px 16px; transition: border-color .2s var(--z-ease), box-shadow .2s var(--z-ease); }
+.z-hs-input { flex: 1 1 240px; min-width: 0; }
+.z-hs-select { flex: 0 1 auto; cursor: pointer; }
+.z-hs-input::placeholder { color: var(--z-text-2); }
+.z-hs-input:focus, .z-hs-select:focus { outline: none; border-color: var(--z-mint); box-shadow: 0 0 0 3px rgba(95, 227, 208, .18); }
+.z-hs-select option { background: var(--z-bg-2); color: #fff; }
+.z-hs-submit { flex: 0 0 auto; padding-top: 14px; padding-bottom: 14px; }
+
+/* ---- HERO: акцентная кнопка «Найти» (золотой акцент) ---- */
+.z-btn-accent { background: linear-gradient(135deg, var(--z-gold), #e89c14); color: #2a1c00; box-shadow: var(--z-glow-gold); }
+.z-btn-accent:hover { transform: translateY(-2px); box-shadow: 0 22px 50px rgba(255, 176, 32, .42); }
+
+/* ---- HERO: ряд CTA ---- */
+.z-hero-cta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+
 .z-hero-visual { position: relative; height: 520px; }
 .z-glow { position: absolute; left: 50%; top: 50%; width: 340px; height: 340px; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(95, 227, 208, .5), transparent 65%); filter: blur(22px); animation: zGlow 7s ease-in-out infinite; }
 .z-hero-card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 360px; height: 432px; border-radius: 24px; overflow: hidden; border: 1px solid var(--z-hairline-strong); box-shadow: var(--z-shadow-lg), inset 0 1px 0 rgba(255, 255, 255, .3); animation: zFloatA 8s ease-in-out infinite; }
@@ -328,6 +349,10 @@ body.zlock .seo-products-section p { color: #C9D8EC !important; }
     .z-prod-grid { grid-template-columns: 1fr; }
     .z-contact { grid-template-columns: 1fr; padding: 28px; }
     .z-cta-row .z-btn { flex: 1 1 100%; justify-content: center; }
+    .z-hero-search { flex-direction: column; align-items: stretch; }
+    .z-hs-input, .z-hs-select, .z-hs-submit { flex: 1 1 100%; width: 100%; justify-content: center; }
+    .z-hero-cta { flex-direction: column; }
+    .z-hero-cta .z-btn { flex: 1 1 100%; justify-content: center; }
     .z-hero-visual { height: 400px; }
     .z-floatcard { transform: scale(.86); }
 }
