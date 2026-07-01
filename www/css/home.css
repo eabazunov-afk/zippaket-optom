@@ -69,6 +69,11 @@ body.zlock .site-wrapper { background: transparent; }
 .z-hero-trust { display: flex; flex-wrap: wrap; gap: 12px 22px; margin: 0 0 26px; }
 .z-hero-trust span { display: inline-flex; align-items: center; gap: 6px; color: var(--z-text-2); font-size: 14.5px; font-weight: 600; white-space: nowrap; }
 
+/* ---- Полоса опт-условий (под hero) ---- */
+.z-opt-terms { display: flex; flex-wrap: wrap; gap: 12px 26px; justify-content: center; align-items: center; padding: 16px 24px; border: 1px solid var(--z-hairline-strong); border-radius: var(--z-pill); background: var(--z-surface-2); }
+.z-opt-terms span { display: inline-flex; align-items: center; gap: 8px; color: var(--z-text-2); font-size: 15px; font-weight: 600; }
+@media (max-width: 640px) { .z-opt-terms { gap: 10px 16px; padding: 14px 16px; border-radius: 16px; } .z-opt-terms span { font-size: 13.5px; } }
+
 /* ---- HERO: поиск-подбор (GET → каталог) ---- */
 .z-hero-search { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; margin: 0 0 24px; max-width: 620px; }
 .z-hs-input, .z-hs-select { background: var(--z-surface-2); border: 1px solid var(--z-hairline-strong); border-radius: var(--z-radius-sm); color: #fff; font-family: var(--font-body); font-size: 15px; padding: 14px 16px; transition: border-color .2s var(--z-ease), box-shadow .2s var(--z-ease); }

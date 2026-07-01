@@ -222,6 +222,18 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                 </div>
             </section>
 
+            <!-- ===== ПОЛОСА ОПТ-УСЛОВИЙ ===== -->
+            <section class="z-section" style="padding-top:0">
+                <div class="z-wrap">
+                    <div class="z-opt-terms" data-reveal>
+                        <span>✔ Мин. заказ от <?= (int)($zHits[0]['min_order_qty'] ?? 1000) ?> шт</span>
+                        <span>✔ Скидки от объёма: −8% от 20 000 · −18% от 300 000</span>
+                        <span>✔ Доставка по РФ · документы, НДС</span>
+                        <span>✔ Отгрузка от 1 дня</span>
+                    </div>
+                </div>
+            </section>
+
             <!-- ===== ХИТЫ ПРОДАЖ ===== -->
             <?php if ($zHits): ?>
             <section class="z-sec z-hits" id="hits" data-reveal>
@@ -478,9 +490,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <div>
                             <h2 class="z-h2" style="font-size:clamp(26px,3.6vw,38px);margin-bottom:16px">Получите расчёт и образец бесплатно</h2>
                             <p style="font-size:16px;line-height:1.6;color:var(--z-text-2);margin-bottom:30px">Оставьте контакты — менеджер свяжется в течение 10 минут в рабочее время.</p>
-                            <a href="tel:+79203465067" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-phone"></i></span><span><small>Телефон</small><b>+7 (920) 346-50-67</b></span></a>
+                            <a href="tel:<?= preg_replace('/[^0-9+]/', '', SUPPORT_PHONE) ?>" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-phone"></i></span><span><small>Телефон</small><b><?= htmlspecialchars(SUPPORT_PHONE) ?></b></span></a>
                             <a href="https://t.me/zlock_sales_bot" target="_blank" rel="noopener noreferrer" class="z-contact-link"><span class="ic" style="background:rgba(34,158,217,.16);color:#5FB9E8"><i class="ph ph-telegram-logo"></i></span><span><small>Telegram</small><b>@zlock_sales_bot</b></span></a>
-                            <a href="mailto:ZTR37@Bk.ru" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-envelope-simple"></i></span><span><small>Email</small><b>ZTR37@Bk.ru</b></span></a>
+                            <a href="mailto:<?= htmlspecialchars(ADMIN_EMAIL) ?>" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-envelope-simple"></i></span><span><small>Email</small><b><?= htmlspecialchars(ADMIN_EMAIL) ?></b></span></a>
                         </div>
                         <form id="leadForm" class="z-form">
                             <input type="text" name="name" placeholder="Ваше имя *" required>
