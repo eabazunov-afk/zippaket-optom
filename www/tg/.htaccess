@@ -1,0 +1,11 @@
+# Запрет прямого доступа к логам/отладке Telegram-бота (.txt/.log/.json),
+# .php (bot.php/webhook) остаются доступными.
+<FilesMatch "\.(txt|log|json|users)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

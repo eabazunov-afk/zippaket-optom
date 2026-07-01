@@ -1,0 +1,420 @@
+/* ===========================================================================
+   shop-dark.css — единая тёмная тема для страниц магазина
+   (каталог, товар, корзина, checkout, успех). Использует токены site-premium.css.
+   Подключать ПОСЛЕ style.css / catalog.css / premium.css.
+   Префикс body.zlock даёт нужную специфичность поверх инлайн-стилей каталога.
+   =========================================================================== */
+
+body.zlock .main-content,
+body.zlock .site-wrapper,
+body.zlock .catalog-section,
+body.zlock .catalog-header-section,
+body.zlock .catalog-page,
+body.zlock section { background: transparent; }
+
+/* Каталог/товар/корзина наследуют премиум-токены (--pm-*), но их текстовые цвета
+   тёмные (рассчитаны на светлые карточки). На тёмном фоне body.zlock текст,
+   завязанный на --pm-text (напр. .compact-name, .compact-stock), сливался с
+   тёмной карточкой. Ремапим текстовые токены премиума под тёмную тему — это
+   чинит весь наследуемый текст разом, а не точечно. */
+body.zlock {
+    --pm-text: var(--z-text);
+    --pm-text-muted: var(--z-text-2);
+    --pm-border: var(--z-hairline);
+}
+/* Каталог — компактные карточки: явные цвета (на случай инлайнов/специфичности) */
+body.zlock .compact-name { color: #fff !important; }
+body.zlock .compact-price { color: var(--z-mint) !important; }
+body.zlock .compact-stock { color: var(--z-text-2) !important; }
+
+/* Заголовки/текст */
+/* Единая премиум-типографика на страницах магазина (убираем разнобой с Inter).
+   Иконочные шрифты (i.fas/.ph) НЕ трогаем. */
+body.zlock, body.zlock p, body.zlock a, body.zlock span, body.zlock div,
+body.zlock li, body.zlock td, body.zlock th, body.zlock label,
+body.zlock input, body.zlock select, body.zlock textarea, body.zlock button,
+body.zlock small, body.zlock b, body.zlock strong, body.zlock h5, body.zlock h6 {
+    font-family: var(--font-body) !important;
+}
+body.zlock h1, body.zlock h2, body.zlock h3, body.zlock h4,
+body.zlock .section-title, body.zlock .product-name, body.zlock .pm-total,
+body.zlock .pm-pagehead h1, body.zlock .current-price {
+    font-family: var(--font-display) !important;
+}
+body.zlock h1, body.zlock h2, body.zlock h3, body.zlock h4 { color: var(--z-text); }
+body.zlock p, body.zlock label, body.zlock small, body.zlock li, body.zlock span { color: var(--z-text-2); }
+body.zlock .section-title { color: #fff; }
+body.zlock .section-subtitle { color: var(--z-text-2); }
+body.zlock a { color: var(--z-mint); }
+
+/* Премиум-шапка страниц (.pm-pagehead) уже тёмная — оставляем */
+
+/* ---- Фильтры каталога ---- */
+body.zlock .compact-filters,
+body.zlock .filters-panel,
+body.zlock .catalog-filters {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .compact-filter-item {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text) !important;
+}
+body.zlock .compact-filter-item label,
+body.zlock .compact-filter-item span { color: var(--z-text-2) !important; }
+body.zlock select,
+body.zlock input[type="text"],
+body.zlock input[type="number"],
+body.zlock input[type="search"],
+body.zlock .filter-input,
+body.zlock .filter-select {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline-strong) !important;
+    color: var(--z-text) !important;
+}
+body.zlock select option { background: var(--z-bg-2); color: var(--z-text); }
+body.zlock input::placeholder, body.zlock textarea::placeholder { color: var(--z-text-3); }
+body.zlock input:focus, body.zlock select:focus, body.zlock textarea:focus {
+    border-color: var(--z-mint) !important;
+    box-shadow: 0 0 0 3px rgba(95, 227, 208, .22) !important;
+    outline: none;
+}
+
+/* ---- Карточки товара (каталог) ---- */
+body.zlock .product-card,
+body.zlock .compact-card,
+body.zlock .catalog-card,
+body.zlock .product-item {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+    color: var(--z-text) !important;
+}
+body.zlock .product-card:hover,
+body.zlock .compact-card:hover { border-color: rgba(95, 227, 208, .4) !important; box-shadow: var(--z-shadow) !important; }
+body.zlock .compact-card.special { border-color: rgba(255, 176, 32, .4) !important; }
+body.zlock .product-card .product-name,
+body.zlock .product-card h3,
+body.zlock .compact-card h3,
+body.zlock .product-title { color: #fff !important; }
+body.zlock .price, body.zlock .current-price, body.zlock .product-price { color: var(--z-mint) !important; }
+body.zlock .old-price { color: var(--z-text-3) !important; }
+body.zlock .spec-item,
+body.zlock .product-spec,
+body.zlock .badge {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text-2) !important;
+}
+body.zlock .spec-item i { color: var(--z-mint) !important; }
+
+/* Фото товара — светлая подложка под прозрачный PNG, но в тёмной рамке */
+body.zlock .product-card img,
+body.zlock .compact-card img,
+body.zlock .product-image img { background: #f3f6fb; border-radius: 12px; }
+
+/* ---- Страница товара ---- */
+body.zlock .product-page {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .product-page-image img { background: #f3f6fb !important; }
+body.zlock .breadcrumbs { color: var(--z-text-3); }
+body.zlock .breadcrumbs a { color: var(--z-mint); text-decoration: none; }
+body.zlock .breadcrumbs .separator { color: var(--z-hairline-strong); }
+body.zlock .breadcrumbs .current { color: var(--z-text-2); }
+body.zlock .stock-info.in-stock { color: var(--z-mint) !important; }
+body.zlock .stock-info.out-of-stock { color: var(--z-gold) !important; }
+body.zlock .pack-note { color: var(--z-text-3) !important; }
+body.zlock .price-unit { color: var(--z-text-2) !important; }
+
+/* ---- Корзина ---- */
+body.zlock .cart-table {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    border-radius: var(--z-radius);
+    overflow: hidden;
+}
+body.zlock .cart-table th { background: var(--z-surface-2) !important; color: var(--z-text-2) !important; }
+body.zlock .cart-table td { color: var(--z-text) !important; border-color: var(--z-hairline) !important; }
+body.zlock .cart-table tr { border-color: var(--z-hairline) !important; }
+body.zlock .cart-table img { background: #f3f6fb; border-radius: 8px; }
+body.zlock .pm-summary {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .pm-total { color: #fff !important; }
+@media (max-width: 640px) {
+    body.zlock .pm-summary { grid-template-columns: 1fr !important; }
+    body.zlock .pm-summary > div:last-child { text-align: left !important; }
+}
+
+/* ---- Checkout / формы ---- */
+body.zlock .form-group input,
+body.zlock .form-group select,
+body.zlock .form-group textarea {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline-strong) !important;
+    color: var(--z-text) !important;
+    border-radius: 12px;
+}
+body.zlock .form-error, body.zlock .error { color: #ff8a8a !important; }
+body.zlock #companyFields { border: 1px dashed var(--z-hairline-strong) !important; background: rgba(255,255,255,.02); border-radius: 12px; }
+body.zlock .form-note { color: var(--z-text-3) !important; }
+body.zlock .form-group > label,
+body.zlock .field-label { display: block; font-weight: 600; color: var(--z-text-2) !important; margin-bottom: 8px; }
+
+/* Опции «кто оформляет» и «способ оплаты» — карточки вместо плывущих строк */
+body.zlock .ctype-options, body.zlock .pay-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+@media (max-width: 480px) { body.zlock .pay-options, body.zlock .ctype-options { grid-template-columns: 1fr; } }
+body.zlock .ctype-opt, body.zlock .pay-opt {
+    display: flex; align-items: center; gap: 11px; margin: 0; padding: 13px 15px;
+    border: 1px solid var(--z-hairline-strong); border-radius: 14px; background: var(--z-surface-2);
+    cursor: pointer; transition: border-color .2s var(--z-ease), background .2s var(--z-ease), box-shadow .2s var(--z-ease);
+}
+body.zlock .pay-opt { align-items: flex-start; }
+body.zlock .ctype-opt input, body.zlock .pay-opt input { accent-color: var(--z-mint); width: 17px; height: 17px; flex: none; margin: 0; }
+body.zlock .pay-opt input { margin-top: 3px; }
+body.zlock .ctype-opt > i, body.zlock .pay-ic { color: var(--z-mint); font-size: 19px; flex: none; }
+body.zlock .ctype-opt:hover, body.zlock .pay-opt:hover { border-color: rgba(95,227,208,.5); }
+body.zlock .ctype-opt:has(input:checked), body.zlock .pay-opt:has(input:checked) {
+    border-color: var(--z-mint); background: rgba(95,227,208,.10); box-shadow: inset 0 0 0 1px var(--z-mint);
+}
+body.zlock .pay-txt { display: flex; flex-direction: column; gap: 3px; line-height: 1.25; }
+body.zlock .pay-txt b { color: #fff; font-size: 15px; }
+body.zlock .pay-txt small { color: var(--z-text-3); font-size: 11px; }
+body.zlock .pay-brands { display: flex; gap: 7px; font-size: 17px; color: var(--z-text-2); }
+body.zlock .pay-brands .fa-cc-visa { color: #5b78ff; }
+body.zlock .pay-brands .fa-cc-mastercard { color: #eb001b; }
+body.zlock .pay-brands .fa-cc-mir { color: #0f9d58; }
+body.zlock .pay-opt.disabled { opacity: .45; pointer-events: none; }
+body.zlock .pay-opt:has(input:checked) .pay-brands { color: var(--z-text); }
+
+/* ---- Кнопки ---- */
+body.zlock .btn-primary {
+    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important;
+    color: #06231f !important;
+    border: none !important;
+    box-shadow: var(--z-glow-mint) !important;
+}
+body.zlock .btn-primary:hover { transform: translateY(-2px); }
+body.zlock .btn-outline {
+    background: transparent !important;
+    border: 2px solid var(--z-mint-deep) !important;
+    color: var(--z-mint) !important;
+}
+
+/* ---- Пустые состояния / успех ---- */
+body.zlock .no-products {
+    background: var(--z-surface) !important;
+    border: 1px dashed var(--z-hairline-strong) !important;
+    color: var(--z-text-2) !important;
+}
+body.zlock .no-products i { color: var(--z-mint) !important; }
+body.zlock .pagination a,
+body.zlock .pagination span {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text-2) !important;
+}
+body.zlock .pagination .active,
+body.zlock .pagination a:hover { background: rgba(95, 227, 208, .14) !important; color: var(--z-mint) !important; border-color: var(--z-mint) !important; }
+
+/* Спецпредложения/секции с белым фоном из inline-стилей — гасим */
+body.zlock [style*="background: white"],
+body.zlock [style*="background:#fff"],
+body.zlock [style*="background: #fff"] {
+    background: var(--z-surface) !important;
+    color: var(--z-text) !important;
+}
+
+/* ---- Легаси-страницы (с логотипом и т.п.): тёмная унификация ---- */
+body.zlock .gallery-section,
+body.zlock .seo-products-section,
+body.zlock .production-section,
+body.zlock [style*="#f8fafc"],
+body.zlock [style*="#f1f5f9"],
+body.zlock [style*="#f9fafb"] { background: var(--z-bg-2) !important; }
+
+body.zlock .advantage-card,
+body.zlock .step,
+body.zlock .feature1,
+body.zlock .telegram-feature,
+body.zlock .calc-card,
+body.zlock .seo-category-card,
+body.zlock .setting-option {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .advantage-card h3,
+body.zlock .step-content h3,
+body.zlock .feature1 h3,
+body.zlock .section-header h2,
+body.zlock .size-value { color: #fff !important; }
+body.zlock .advantage-card p,
+body.zlock .step-content p,
+body.zlock .price-label,
+body.zlock .size-thickness,
+body.zlock .feature1 p,
+body.zlock .section-subtitle,
+body.zlock .setting-info p { color: var(--z-text-2) !important; }
+body.zlock .price-value { color: var(--z-mint) !important; }
+body.zlock .advantage-icon,
+body.zlock .step-number,
+body.zlock .telegram-icon {
+    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important;
+    color: var(--z-bg) !important;
+}
+body.zlock .product-tag { background: rgba(255,176,32,.16) !important; color: var(--z-gold) !important; }
+
+/* ===== Страница «с логотипом» (zip_lock_logo): тёмная унификация легаси-секций ===== */
+/* Спецпредложение «Пакеты с бегунком» */
+body.zlock .special-offer-section { background: var(--z-bg) !important; }
+body.zlock .special-offer-section:before,
+body.zlock .special-offer-section:after { display: none !important; }
+body.zlock .offer-category {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow) !important;
+}
+body.zlock .category-header { border-bottom-color: var(--z-hairline-strong) !important; }
+body.zlock .category-header h3 { color: #fff !important; }
+body.zlock .category-header h3 i { color: var(--z-mint) !important; }
+body.zlock .category-badge {
+    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%) !important;
+    color: #2a1c00 !important;
+}
+/* Карточки товара */
+body.zlock .product-offer-card {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow-sm) !important;
+}
+body.zlock .product-offer-card:hover { border-color: var(--z-mint) !important; }
+body.zlock .product-offer-card:before { display: none !important; }
+body.zlock .product-image-mini {
+    background: #fff !important;            /* белая подложка под фото товара — остаётся светлой */
+    border: 1px solid var(--z-hairline) !important;
+}
+body.zlock .offer-category:first-child .product-image-mini,
+body.zlock .offer-category:last-child .product-image-mini { border: 1px solid var(--z-hairline) !important; }
+body.zlock .product-image-mini::after { display: none !important; }
+body.zlock .product-size { border-bottom-color: var(--z-hairline) !important; }
+body.zlock .size-thickness { background: var(--z-surface) !important; color: var(--z-text-2) !important; }
+/* Прайс-строки */
+body.zlock .price-row { background: var(--z-surface) !important; }
+body.zlock .price-row:hover { background: rgba(95,227,208,.10) !important; }
+body.zlock .price-row:nth-child(1) .price-value { color: var(--z-gold) !important; }
+/* Запрос индивидуального размера */
+body.zlock .custom-size-request {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+}
+body.zlock .request-content h4 { color: #fff !important; }
+body.zlock .request-content p { color: var(--z-text-2) !important; }
+body.zlock .request-icon { background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important; color: var(--z-bg) !important; }
+
+/* Сравнение материалов EVA / ПВД */
+body.zlock .material-comparison,
+body.zlock .material-card {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+    box-shadow: var(--z-shadow) !important;
+}
+body.zlock .material-card .product-image-container { background: #fff !important; border-radius: var(--z-radius-sm); }
+body.zlock .material-header h3 { color: #fff !important; }
+body.zlock .material-divider .divider-text {
+    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important;
+    color: var(--z-bg) !important;
+}
+body.zlock .material-price { border-top-color: var(--z-hairline) !important; }
+body.zlock .material-price .price-value { color: var(--z-mint) !important; }
+
+/* Галерея примеров печати — карточки с inline background:white уже гасятся выше; правим текст */
+body.zlock .gallery-section h3 { color: #fff !important; }
+body.zlock .gallery-section p { color: var(--z-text-2) !important; }
+
+/* CTA-секция: синий градиент → мятный премиум */
+body.zlock .cta-section {
+    background: linear-gradient(135deg, var(--z-mint-deep) 0%, #06303a 100%) !important;
+    border-top: 1px solid var(--z-hairline) !important;
+    border-bottom: 1px solid var(--z-hairline) !important;
+}
+body.zlock .cta-content h2 { color: #fff !important; }
+body.zlock .cta-content p { color: rgba(234,242,251,.88) !important; }
+
+/* Секция контактов + форма заявки */
+body.zlock .contact-section { background: var(--z-bg) !important; }
+body.zlock .contact-form h2, body.zlock .contact-info h2, body.zlock .contact-details h4 { color: #fff !important; }
+body.zlock .contact-form > p, body.zlock .form-note, body.zlock .contact-details p { color: var(--z-text-2) !important; }
+body.zlock .contact-icon {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-mint) !important;
+}
+body.zlock .contact-details a { color: var(--z-mint) !important; }
+body.zlock .social-link {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+    color: var(--z-text-2) !important;
+}
+body.zlock .social-link:hover { background: var(--z-mint) !important; color: var(--z-bg) !important; }
+
+/* SEO-блок внизу: inline color:var(--dark) на тёмном фоне → перебиваем */
+body.zlock .seo-products-section h2,
+body.zlock .seo-products-section h3,
+body.zlock .seo-products-section h4 { color: #fff !important; }
+body.zlock .seo-products-section p,
+body.zlock .seo-products-section li,
+body.zlock .seo-products-section div { color: var(--z-text-2) !important; }
+body.zlock .seo-products-section i[class*="fa-"] { color: var(--z-mint) !important; }
+body.zlock .seo-products-section [style*="border-top"] { border-top-color: var(--z-hairline) !important; }
+
+/* Финальный CTA «Запросить коммерческое предложение» (.offer-cta) — синий
+   градиент → dark glass. Текст внутри уже белый. Telegram-блок (иконка, кнопка
+   «Запустить бота», бейдж «Или») оставляем фирменно-синим как акцент бренда. */
+body.zlock .offer-cta {
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline) !important;
+}
+body.zlock .offer-cta:before {
+    background: radial-gradient(circle, rgba(95,227,208,.08) 0%, transparent 70%) !important;
+}
+body.zlock .offer-cta .cta-content h3,
+body.zlock .offer-cta .telegram-info h4 { color: #fff !important; }
+body.zlock .offer-cta .cta-content > p,
+body.zlock .offer-cta .benefit span,
+body.zlock .offer-cta .telegram-info p,
+body.zlock .offer-cta .telegram-feature,
+body.zlock .offer-cta .telegram-note { color: var(--z-text-2) !important; }
+body.zlock .offer-cta .benefit {
+    background: var(--z-surface-2) !important;
+    border: 1px solid var(--z-hairline) !important;
+}
+body.zlock .offer-cta .benefit i { color: var(--z-mint) !important; }
+body.zlock .offer-cta .telegram-offer { border-top-color: var(--z-hairline) !important; }
+/* Кнопка «Запросить КП» (btn-primary внутри offer-cta) → золотой premium-CTA */
+body.zlock .offer-cta .btn-primary {
+    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%) !important;
+    color: #2a1c00 !important; border: none !important;
+}
+body.zlock .offer-cta .btn-outline { border-color: var(--z-hairline-strong) !important; color: var(--z-text) !important; }
+body.zlock .offer-cta .btn-outline:hover { background: var(--z-surface-2) !important; color: #fff !important; }
+
+/* Геро-секция (с логотипом): синий видео-оверлей → тёмно-навигаторный с мятным
+   свечением. Текст в геро белый — на тёмном читается отлично. */
+body.zlock .video-overlay {
+    background:
+        radial-gradient(1100px 480px at 82% -12%, rgba(10,143,143,.30), transparent 60%),
+        linear-gradient(135deg, rgba(7,14,24,.86) 0%, rgba(7,14,24,.94) 100%) !important;
+}
+body.zlock .hero-video-bg,
+body.zlock .hero-video-bg:not(:has(.hero-video[src])) {
+    background: linear-gradient(135deg, var(--z-bg-2) 0%, var(--z-bg) 100%) !important;
+}

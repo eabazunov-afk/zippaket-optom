@@ -14,6 +14,7 @@
                     Ведущий производитель ZIP-пакетов в России. 
                     Собственное производство, высокое качество, индивидуальный подход.
                 </p>
+                <!-- ⚠️ ЗАГЛУШКА: ссылки соцсетей — подставить реальные URL -->
                 <div class="footer-social">
                     <a href="#" class="social-link" aria-label="WhatsApp">
                         <i class="fab fa-whatsapp"></i>
@@ -33,29 +34,29 @@
             <div class="footer-links">
                 <div class="footer-column">
                     <h4 class="footer-title">Компания</h4>
-                    <a href="#advantages" class="footer-link">Преимущества</a>
-                    <a href="#production" class="footer-link">Производство</a>
-                    <a href="#calculator" class="footer-link">Калькулятор</a>
-                    <a href="#contact" class="footer-link">Контакты</a>
+                    <a href="/katalog_zip_paketov/" class="footer-link">Каталог</a>
+                    <a href="/index.php#materials" class="footer-link">Материалы</a>
+                    <a href="/index.php#calculator" class="footer-link">Калькулятор</a>
+                    <a href="/index.php#contact" class="footer-link">Контакты</a>
                     <a href="/admin/" class="footer-link" target="_blank">Админ-панель</a>
                 </div>
                 
                 <div class="footer-column">
                     <h4 class="footer-title">Продукция</h4>
-                    <a href="#catalog" class="footer-link">ZIP-Lock пакеты</a>
-                    <a href="#catalog" class="footer-link">Stand-Up пакеты</a>
-                    <a href="#catalog" class="footer-link">Вакуумные пакеты</a>
-                    <a href="#catalog" class="footer-link">Пакеты с ручкой</a>
-                    <a href="#catalog" class="footer-link">Индивидуальный заказ</a>
+                    <a href="/katalog_zip_paketov/" class="footer-link">Весь каталог</a>
+                    <a href="/katalog_zip_paketov/" class="footer-link">Пакеты-слайдеры</a>
+                    <a href="/katalog_zip_paketov/" class="footer-link">ZIP-Lock пакеты</a>
+                    <a href="/zip_paket_s_logotipom" class="footer-link">Пакеты с логотипом</a>
+                    <a href="/index.php#calculator" class="footer-link">Индивидуальный заказ</a>
                 </div>
                 
                 <div class="footer-column">
                     <h4 class="footer-title">Услуги</h4>
-                    <a href="#" class="footer-link">Дизайн упаковки</a>
-                    <a href="#" class="footer-link">Печать любой сложности</a>
-                    <a href="#" class="footer-link">Доставка по РФ</a>
-                    <a href="#" class="footer-link">Консультация технолога</a>
-                    <a href="#" class="footer-link">Бесплатные образцы</a>
+                    <a href="/zip_paket_s_logotipom" class="footer-link">Дизайн упаковки</a>
+                    <a href="/zip_paket_s_logotipom" class="footer-link">Печать любой сложности</a>
+                    <a href="/dostavka-i-oplata.php" class="footer-link">Доставка по РФ</a>
+                    <a href="/index.php#contact" class="footer-link">Консультация технолога</a>
+                    <a href="/index.php#contact" class="footer-link">Бесплатные образцы</a>
                 </div>
                 
                 <div class="footer-column">
@@ -64,28 +65,21 @@
                         <div class="contact-item">
                             <i class="fas fa-phone"></i>
                             <div>
-                                <a href="tel:+78001234567">8 (800) 123-45-67</a>
-                                <span>Бесплатный звонок</span>
+                                <a href="tel:<?= preg_replace('/[^0-9+]/','', SELLER_PHONE) ?>"><?= htmlspecialchars(SELLER_PHONE) ?></a>
+                                <span>Звонок по России</span>
                             </div>
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-envelope"></i>
                             <div>
-                                <a href="mailto:info@zip.na4u.ru">info@zip.na4u.ru</a>
+                                <a href="mailto:<?= htmlspecialchars(SELLER_EMAIL) ?>"><?= htmlspecialchars(SELLER_EMAIL) ?></a>
                                 <span>Электронная почта</span>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div>
-                                <span>г. Москва, ул. Промышленная, 12</span>
-                                <span>Самовывоз возможен</span>
                             </div>
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-clock"></i>
                             <div>
-                                <span>Пн-Пт: 9:00-18:00</span>
+                                <span><?= htmlspecialchars(SELLER_WORKHOURS) ?></span>
                                 <span>Московское время</span>
                             </div>
                         </div>
@@ -94,6 +88,12 @@
             </div>
         </div>
         
+        <!-- Реквизиты продавца — центрированной строкой (без переносов) -->
+        <!-- ⚠️ ЗАГЛУШКА: заменить в config (SELLER_*) -->
+        <div class="footer-requisites">
+            <?= htmlspecialchars(SELLER_NAME) ?> · ИНН <?= htmlspecialchars(SELLER_INN) ?> · ОГРН <?= htmlspecialchars(SELLER_OGRN) ?> · <?= htmlspecialchars(SELLER_ADDRESS) ?>
+        </div>
+
         <!-- Нижняя часть футера -->
         <div class="footer-bottom">
             <div class="footer-copyright">
@@ -101,9 +101,12 @@
             </div>
             
             <div class="footer-legal">
-                <a href="#" class="legal-link">Политика конфиденциальности</a>
-                <a href="#" class="legal-link">Пользовательское соглашение</a>
-                <a href="#" class="legal-link">Карта сайта</a>
+                <a href="/polconf.html" class="legal-link">Политика конфиденциальности</a>
+                <a href="/oferta.php" class="legal-link">Публичная оферта</a>
+                <a href="/dostavka-i-oplata.php" class="legal-link">Доставка и оплата</a>
+                <a href="/vozvrat.php" class="legal-link">Возврат и обмен</a>
+                <a href="/cookie-policy.php" class="legal-link">Cookie</a>
+                <a href="/kontakty.php" class="legal-link">Контакты</a>
             </div>
             
             <div class="footer-payment">
@@ -120,3 +123,4 @@
         </div>
     </div>
 </footer>
+<?php include __DIR__ . '/includes/cookie_banner.php'; ?>

@@ -1,95 +1,69 @@
 <?php
-// get_company_full.php - Полные данные для счета
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+// Поиск реквизитов по ИНН (api-fns.ru) — ВНУТРЕННИЙ инструмент, только для авторизованных
+// администраторов. Ключ ФНС — из config (FNS_API_KEY), не в коде. Без CORS *.
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../admin/includes/security_config.php';
+require_once __DIR__ . '/../admin/includes/auth.php';
+require_once __DIR__ . '/../admin/includes/permissions.php';
 
-$key = '54c1347f40d246e882893ccfe2e1fe1c56d8653f';
-$inn = $_GET['inn'] ?? '';
-$type = $_GET['type'] ?? 'auto'; // auto, ip, ooo
+checkAdminAuth();
 
-if (!$inn) {
-    die(json_encode(['error' => 'Нет ИНН']));
+header('Content-Type: application/json; charset=utf-8');
+
+if (empty($_SESSION['admin_id'])) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Доступ запрещён'], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
-// Очищаем ИНН
-$inn = preg_replace('/[^0-9]/', '', $inn);
+$key = defined('FNS_API_KEY') ? FNS_API_KEY : '';
+if ($key === '' || strpos($key, 'ВАШ_') === 0) {
+    http_response_code(503);
+    echo json_encode(['error' => 'Ключ ФНС не настроен'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-// Формируем запрос к API ФНС
-$url = "https://api-fns.ru/api/egr?req=" . urlencode($inn) . "&key=" . urlencode($key);
-$response = file_get_contents($url);
-$data = json_decode($response, true);
+$inn = preg_replace('/[^0-9]/', '', $_GET['inn'] ?? '');
+$type = $_GET['type'] ?? 'auto';
+
+if (strlen($inn) !== 10 && strlen($inn) !== 12) {
+    echo json_encode(['error' => 'Некорректный ИНН'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// Запрос к ФНС через curl с таймаутом
+$url = 'https://api-fns.ru/api/egr?req=' . urlencode($inn) . '&key=' . urlencode($key);
+$ch = curl_init($url);
+curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10]);
+$response = curl_exec($ch);
+curl_close($ch);
+$data = $response ? json_decode($response, true) : null;
 
 if (!$data || !isset($data['items'][0])) {
-    die(json_encode(['error' => 'Организация не найдена']));
+    echo json_encode(['error' => 'Организация не найдена'], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 $company = $data['items'][0];
 $isIp = isset($company['ИП']);
-$entity = $isIp ? $company['ИП'] : $company['ЮЛ'];
+$entity = $isIp ? $company['ИП'] : ($company['ЮЛ'] ?? []);
 
-// Проверяем соответствие типу
-if ($type == 'ip' && !$isIp) {
-    die(json_encode(['error' => 'Это не ИП']));
-}
-if ($type == 'ooo' && $isIp) {
-    die(json_encode(['error' => 'Это не ООО']));
-}
+if ($type === 'ip' && !$isIp) { echo json_encode(['error' => 'Это не ИП'], JSON_UNESCAPED_UNICODE); exit; }
+if ($type === 'ooo' && $isIp) { echo json_encode(['error' => 'Это не ООО'], JSON_UNESCAPED_UNICODE); exit; }
 
-// Формируем полные данные для счета
 $result = [
     'type' => $isIp ? 'ИП' : 'ООО',
-    'inn' => $isIp ? $entity['ИННФЛ'] : $entity['ИНН'],
+    'inn' => $isIp ? ($entity['ИННФЛ'] ?? '') : ($entity['ИНН'] ?? ''),
     'kpp' => $entity['КПП'] ?? '',
-    'ogrn' => $isIp ? $entity['ОГРНИП'] : $entity['ОГРН'],
+    'ogrn' => $isIp ? ($entity['ОГРНИП'] ?? '') : ($entity['ОГРН'] ?? ''),
     'ogrn_date' => $entity['ДатаОГРН'] ?? '',
-    'name_full' => $isIp ? $entity['ФИОПолн'] : $entity['НаимПолнЮЛ'],
-    'name_short' => $isIp ? $entity['ФИО'] : $entity['НаимСокрЮЛ'],
+    'name_full' => $isIp ? ($entity['ФИОПолн'] ?? '') : ($entity['НаимПолнЮЛ'] ?? ''),
+    'name_short' => $isIp ? ($entity['ФИО'] ?? '') : ($entity['НаимСокрЮЛ'] ?? ''),
     'status' => $entity['Статус'] ?? '',
     'address' => $entity['Адрес']['АдресПолн'] ?? $entity['АдресПолн'] ?? '',
-    'address_details' => [
-        'index' => $entity['Адрес']['Индекс'] ?? '',
-        'region' => $entity['Адрес']['АдресДетали']['Регион']['Наим'] ?? '',
-        'city' => $entity['Адрес']['АдресДетали']['Город']['Наим'] ?? $entity['Адрес']['АдресДетали']['НаселенныйПункт']['Наим'] ?? '',
-        'street' => $entity['Адрес']['АдресДетали']['Улица']['Наим'] ?? '',
-        'house' => $entity['Адрес']['АдресДетали']['Дом'] ?? ''
-    ],
     'director' => $entity['Руководитель']['ФИОПолн'] ?? '',
     'director_position' => $entity['Руководитель']['Должн'] ?? '',
-    'registration_date' => $entity['ДатаРег'] ?? '',
-    'okpo' => $entity['КодыСтат']['ОКПО'] ?? '',
-    'oktmo' => $entity['КодыСтат']['ОКТМО'] ?? '',
-    'okfs' => $entity['КодыСтат']['ОКФС'] ?? '',
-    'okogu' => $entity['КодыСтат']['ОКОГУ'] ?? '',
-    'okopf' => $entity['КодОКОПФ'] ?? '',
-    'okopf_name' => $entity['ОКОПФ'] ?? '',
-    'capital' => $entity['Капитал']['СумКап'] ?? '',
-    'phone' => $entity['Контакты']['Телефон'] ?? '',
-    'email' => $entity['Контакты']['Email'] ?? '',
-    'website' => $entity['Контакты']['Сайт'] ?? '',
-    
-    // Дополнительные данные, которых нет в ФНС (заполняются вручную)
-    'bank' => [
-        'name' => '',
-        'bik' => '',
-        'account' => '',
-        'corr_account' => ''
-    ],
-    'invoice' => [
-        'number' => '',
-        'date' => date('Y-m-d'),
-        'items' => []
-    ]
+    'kpp_present' => !empty($entity['КПП']),
 ];
 
-// Добавляем учредителей если есть
-if (!empty($entity['Учредители'])) {
-    $result['founders'] = $entity['Учредители'];
-}
-
-// Добавляем виды деятельности если есть
-if (!empty($entity['ОКВЭД'])) {
-    $result['okved'] = $entity['ОКВЭД'];
-}
-
 echo json_encode($result, JSON_UNESCAPED_UNICODE);
-?>

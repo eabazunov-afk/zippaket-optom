@@ -95,6 +95,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/catalog.css">
     <link rel="stylesheet" href="/css/premium.css">
+    <link rel="stylesheet" href="/css/shop-dark.css">
 
     <style>
         /* Компактные фильтры для ПК */
@@ -304,7 +305,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         }
     </style>
 </head>
-<body class="premium">
+<body class="premium zlock">
     <div class="site-wrapper">
         <!-- Header -->
         <?php include __DIR__ . '/../header.php'; ?>
@@ -552,16 +553,16 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         <div class="compact-card special">
             <div class="compact-badge">🔥 ХИТ</div>
             <div class="compact-image">
-                <img src="<?= htmlspecialchars($offer['image_url']) ?>" alt="<?= htmlspecialchars($offer['full_name']) ?>">
+                <img src="<?= htmlspecialchars(pv_product_image($offer)) ?>" alt="<?= htmlspecialchars($offer['full_name']) ?>" loading="lazy">
             </div>
             <div class="compact-name"><?= htmlspecialchars($offer['short_name'] ?: $offer['full_name']) ?></div>
             <div class="compact-price"><?= $price ?> ₽/шт</div>
             <div class="compact-stock">В наличии: <?= number_format($offer['stock_quantity'], 0, ',', ' ') ?> шт</div>
-            <button class="btn btn-primary compact-btn add-to-cart" 
+            <button class="btn btn-primary compact-btn js-cart-add" 
                     data-id="<?= $offer['id'] ?>"
                     data-name="<?= htmlspecialchars($offer['full_name']) ?>"
                     data-price="<?= $offer['price_rub'] ?>">
-                <i class="fas fa-shopping-cart"></i> В заявку
+                <i class="fas fa-shopping-cart"></i> В корзину
             </button>
         </div>
         <?php endforeach; ?>
@@ -579,16 +580,16 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         ?>
         <div class="compact-card">
             <div class="compact-image">
-                <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['full_name']) ?>">
+                <img src="<?= htmlspecialchars(pv_product_image($product)) ?>" alt="<?= htmlspecialchars($product['full_name']) ?>">
             </div>
             <div class="compact-name"><?= htmlspecialchars($product['short_name'] ?: $product['full_name']) ?></div>
             <div class="compact-price"><?= $price ?> ₽/шт</div>
             <div class="compact-stock">В наличии: <?= number_format($product['stock_quantity'], 0, ',', ' ') ?> шт</div>
-            <button class="btn btn-outline compact-btn add-to-cart" 
+            <button class="btn btn-outline compact-btn js-cart-add" 
                     data-id="<?= $product['id'] ?>"
                     data-name="<?= htmlspecialchars($product['full_name']) ?>"
                     data-price="<?= $product['price_rub'] ?>">
-                <i class="fas fa-shopping-cart"></i> В заявку
+                <i class="fas fa-shopping-cart"></i> В корзину
             </button>
         </div>
         <?php endforeach; ?>
@@ -651,7 +652,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
                                 </div>
                                 
                                 <div class="product-image">
-                                    <img src="<?= htmlspecialchars($product['image_url']) ?>" 
+                                    <img src="<?= htmlspecialchars(pv_product_image($product)) ?>" 
                                          alt="<?= htmlspecialchars($product['full_name']) ?>" 
                                          loading="lazy">
                                     <div class="product-type-icon">
@@ -712,11 +713,11 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
                                     </div>
                                     
                                     <div class="product-actions">
-                                        <button class="btn btn-primary btn-sm add-to-cart" 
+                                        <button class="btn btn-primary btn-sm js-cart-add" 
                                                 data-id="<?= $product['id'] ?>"
                                                 data-name="<?= htmlspecialchars($product['full_name']) ?>"
                                                 data-price="<?= $product['price_rub'] ?>">
-                                            <i class="fas fa-shopping-cart"></i> В заявку
+                                            <i class="fas fa-shopping-cart"></i> В корзину
                                         </button>
                                         <button class="btn btn-outline btn-sm1 quick-view" 
                                                 data-id="<?= $product['id'] ?>">
@@ -842,6 +843,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
                 <div class="form-group">
                     <textarea name="message" placeholder="Комментарий (необязательно)" rows="3"></textarea>
                 </div>
+                <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank">согласие на обработку персональных данных</a></label>
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-phone"></i> Заказать звонок
                 </button>

@@ -43,7 +43,8 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     
     <!-- Стили -->
     <link rel="stylesheet" href="/css/style.css">
-    
+    <link rel="stylesheet" href="/css/shop-dark.css">
+
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -68,7 +69,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     }
     </script>
 </head>
-<body>
+<body class="zlock">
     <div class="site-wrapper">
         <!-- Header -->
         <?php include 'header.php'; ?>
@@ -250,7 +251,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                         <div class="product-tag">
                             <i class="fas fa-print"></i> Печать 1-2 цвета
                         </div>
-                        <button class="btn btn-primary btn-block add-to-cart" data-product-id="slider-logo-30-35" data-size="30*35" data-type="slider-logo">
+                        <button class="btn btn-primary btn-block" onclick="window.location.href='/index.php#calculator'" data-product-id="slider-logo-30-35" data-size="30*35" data-type="slider-logo">
                             <i class="fas fa-shopping-cart"></i>
                             Добавить в заявку
                         </button>
@@ -285,7 +286,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                         <div class="product-tag">
                             <i class="fas fa-print"></i> Печать 1-2 цвета
                         </div>
-                        <button class="btn btn-primary btn-block add-to-cart" data-product-id="slider-logo-35-45" data-size="35*45" data-type="slider-logo">
+                        <button class="btn btn-primary btn-block" onclick="window.location.href='/index.php#calculator'" data-product-id="slider-logo-35-45" data-size="35*45" data-type="slider-logo">
                             <i class="fas fa-shopping-cart"></i>
                             Добавить в заявку
                         </button>
@@ -320,7 +321,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                         <div class="product-tag">
                             <i class="fas fa-print"></i> Печать до 4 цветов
                         </div>
-                        <button class="btn btn-primary btn-block add-to-cart" data-product-id="slider-logo-40-50" data-size="40*50" data-type="slider-logo">
+                        <button class="btn btn-primary btn-block" onclick="window.location.href='/index.php#calculator'" data-product-id="slider-logo-40-50" data-size="40*50" data-type="slider-logo">
                             <i class="fas fa-shopping-cart"></i>
                             Добавить в заявку
                         </button>

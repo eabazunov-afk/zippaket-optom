@@ -30,6 +30,16 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     <?php if ($product): ?>
     <meta name="description" content="<?= htmlspecialchars($product['meta_description'] ?: $product['full_name']) ?>">
     <link rel="canonical" href="https://zippaket-optom.ru/product/<?= (int)$product['id'] ?>">
+    <?php
+        $ogImg = (mb_stripos((string)$product['category'], 'слайдер') !== false)
+            ? ((mb_stripos((string)$product['color'], 'мат') !== false) ? '/images/eva.png' : '/images/pvd.png')
+            : '/images/gripper.jpg';
+    ?>
+    <meta property="og:title" content="<?= htmlspecialchars($product['full_name']) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($product['meta_description'] ?: $product['full_name']) ?>">
+    <meta property="og:type" content="product">
+    <meta property="og:url" content="https://zippaket-optom.ru/product/<?= (int)$product['id'] ?>">
+    <meta property="og:image" content="https://zippaket-optom.ru<?= htmlspecialchars($ogImg) ?>">
     <?php endif; ?>
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,6 +48,8 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/catalog.css">
     <link rel="stylesheet" href="/css/premium.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/shop-dark.css">
     <?php if ($product):
         $stock = pv_stock_status((int)$product['stock_quantity']);
         $ld = [
@@ -73,7 +85,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     </script>
     <?php endif; ?>
 </head>
-<body class="premium">
+<body class="premium zlock">
     <div class="site-wrapper">
         <?php include __DIR__ . '/header.php'; ?>
         <main class="main-content">
@@ -99,21 +111,39 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                 </div>
             </div></div>
 
+            <?php
+                // Материал по цвету; похожие товары той же категории
+                $material = (mb_stripos((string)$product['color'], 'мат') !== false) ? 'EVA (матовый)'
+                          : ((mb_stripos((string)$product['color'], 'прозр') !== false) ? 'ПВД (прозрачный)' : '');
+                $isSlider = mb_stripos((string)$product['category'], 'слайдер') !== false;
+                $heroImg = $isSlider
+                    ? ((mb_stripos((string)$product['color'], 'мат') !== false) ? '/images/eva.png' : '/images/pvd.png')
+                    : '/images/gripper.jpg';
+                $related = [];
+                try {
+                    $rel = $catalog->getProducts(['category' => $product['category']], 1, 6);
+                    $relList = $rel['products'] ?? (is_array($rel) ? $rel : []);
+                    foreach ($relList as $rp) {
+                        if ((int)$rp['id'] !== (int)$product['id']) { $related[] = $rp; }
+                        if (count($related) >= 4) break;
+                    }
+                } catch (Throwable $e) {}
+            ?>
             <section class="catalog-section"><div class="container">
-                <div class="product-page" style="display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start">
-                    <div class="product-page-image" style="flex:1 1 320px;max-width:420px">
-                        <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['full_name']) ?>" style="width:100%;border-radius:16px;background:#f8fafc;padding:20px">
+                <div class="product-page" style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+                    <div class="product-page-image" style="flex:1 1 320px;max-width:440px">
+                        <img src="<?= htmlspecialchars($heroImg) ?>" alt="<?= htmlspecialchars($product['full_name']) ?>" style="width:100%;border-radius:16px;display:block">
                     </div>
                     <div class="product-page-info" style="flex:2 1 360px">
                         <h1 style="margin-top:0"><?= htmlspecialchars($product['full_name']) ?></h1>
-                        <div class="product-specs" style="margin:14px 0">
-                            <?php if ($size): ?><span class="spec-item"><i class="fas fa-ruler"></i> <?= $size ?></span><?php endif; ?>
+                        <div class="product-specs" style="margin:14px 0;display:flex;gap:8px;flex-wrap:wrap">
+                            <?php if ($size): ?><span class="spec-item"><i class="fas fa-ruler-combined"></i> <?= $size ?></span><?php endif; ?>
                             <?php if (!empty($product['thickness'])): ?><span class="spec-item"><i class="fas fa-layer-group"></i> <?= (int)$product['thickness'] ?> мкм</span><?php endif; ?>
                             <?php if (!empty($product['color'])): ?><span class="spec-item"><i class="fas fa-palette"></i> <?= htmlspecialchars($product['color']) ?></span><?php endif; ?>
                         </div>
-                        <div class="product-pricing" style="margin:14px 0">
+                        <div class="product-pricing z-tnum" style="margin:16px 0">
                         <?php if ($hasPrice): ?>
-                            <span class="current-price" style="font-size:1.8rem;font-weight:800"><?= pv_format_price($priceVal) ?></span>
+                            <span class="current-price" style="font-size:2rem;font-weight:800"><?= pv_format_price($priceVal) ?></span>
                             <span class="price-unit">/ шт</span>
                         <?php else: ?>
                             <span class="current-price" style="font-size:1.4rem;font-weight:800">Цена по запросу</span>
@@ -123,7 +153,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                             <i class="fas <?= $stock['in_stock'] ? 'fa-check-circle' : 'fa-clock' ?>"></i>
                             <?= $stock['label'] ?><?= $stock['count_label'] ? ': ' . $stock['count_label'] : '' ?>
                         </div>
-                        <div class="pack-note" style="color:#64748b;font-size:0.9rem;margin-bottom:14px">
+                        <div class="pack-note" style="font-size:0.9rem;margin-bottom:16px">
                             <?= htmlspecialchars(pv_pack_note($minQty, $qtyStep)) ?><?= !empty($product['pack_label']) ? ' (' . htmlspecialchars($product['pack_label']) . ')' : '' ?>
                         </div>
                         <div class="product-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -140,8 +170,61 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                                 <i class="fas fa-calculator"></i> С логотипом? Рассчитать
                             </a>
                         </div>
+                        <!-- Блок доверия -->
+                        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid var(--z-hairline,#e6ecf3)">
+                            <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--z-text-2,#64748b)"><i class="fas fa-industry" style="color:var(--z-mint,#0A8F8F)"></i> Своё производство</span>
+                            <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--z-text-2,#64748b)"><i class="fas fa-truck" style="color:var(--z-mint,#0A8F8F)"></i> Доставка по РФ</span>
+                            <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--z-text-2,#64748b)"><i class="fas fa-gift" style="color:var(--z-mint,#0A8F8F)"></i> Бесплатный образец</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Характеристики -->
+                <div class="z-glass" style="padding:24px 26px;margin-top:26px;max-width:680px">
+                    <h2 class="z-h3" style="margin:0 0 14px;font-size:1.25rem">Характеристики</h2>
+                    <table style="width:100%;border-collapse:collapse;font-size:14px">
+                        <?php
+                        $specs = array_filter([
+                            'Размер' => $size,
+                            'Толщина' => !empty($product['thickness']) ? (int)$product['thickness'] . ' мкм' : '',
+                            'Цвет' => $product['color'] ?? '',
+                            'Материал' => $material,
+                            'Упаковка' => pv_pack_note($minQty, $qtyStep),
+                            'Категория' => $product['category'] ?? '',
+                        ]);
+                        foreach ($specs as $k => $v): ?>
+                        <tr>
+                            <td style="padding:9px 0;color:var(--z-text-2,#64748b);width:40%;border-bottom:1px solid var(--z-hairline,#eef2f6)"><?= htmlspecialchars($k) ?></td>
+                            <td style="padding:9px 0;font-weight:600;border-bottom:1px solid var(--z-hairline,#eef2f6)"><?= htmlspecialchars((string)$v) ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </table>
+                </div>
+
+                <!-- Похожие товары -->
+                <?php if ($related): ?>
+                <h2 class="z-h2" style="margin:40px 0 20px;font-size:1.6rem">Похожие товары</h2>
+                <div class="z-prod-grid">
+                    <?php foreach ($related as $rp):
+                        $rprice = (float)$rp['price_rub'];
+                        $rimg = (mb_stripos((string)$rp['category'],'слайдер')!==false)
+                            ? ((mb_stripos((string)$rp['color'],'мат')!==false)?'/images/eva.png':'/images/pvd.png') : '/images/gripper.jpg';
+                    ?>
+                    <article class="z-prod z-lift">
+                        <a href="/product/<?= (int)$rp['id'] ?>" style="text-decoration:none;color:inherit">
+                            <div class="z-prod-photo"><img src="<?= htmlspecialchars($rimg) ?>" alt="" loading="lazy"></div>
+                            <div class="z-prod-size" style="font-size:18px"><?= htmlspecialchars($rp['short_name'] ?: $rp['full_name']) ?></div>
+                        </a>
+                        <div class="z-prices z-tnum" style="margin-top:12px">
+                            <div class="row"><span>Цена</span><span class="p-main"><?= number_format($rprice,2,',',' ') ?> ₽/шт</span></div>
+                        </div>
+                        <button class="z-add js-cart-add" data-id="<?= (int)$rp['id'] ?>" data-name="<?= htmlspecialchars($rp['full_name']) ?>" data-price="<?= htmlspecialchars((string)$rprice) ?>" data-min="<?= (int)($rp['min_order_qty'] ?? 1) ?>" data-step="<?= (int)($rp['qty_step'] ?? 1) ?>">
+                            <i class="fas fa-shopping-cart"></i> В корзину
+                        </button>
+                    </article>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div></section>
         <?php endif; ?>
         </main>

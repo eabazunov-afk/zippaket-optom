@@ -9,7 +9,8 @@ require_once __DIR__ . '/YooKassaGateway.php';
 function payment_gateway(): PaymentGateway
 {
     $apiUrl = defined('YOOKASSA_API_URL') ? YOOKASSA_API_URL : 'https://api.yookassa.ru/v3';
-    return new YooKassaGateway(YOOKASSA_SHOP_ID, YOOKASSA_SECRET_KEY, $apiUrl);
+    $vat = defined('YOOKASSA_VAT_CODE') ? (int)YOOKASSA_VAT_CODE : 1;
+    return new YooKassaGateway(YOOKASSA_SHOP_ID, YOOKASSA_SECRET_KEY, $apiUrl, null, $vat);
 }
 
 /** Настроен ли шлюз (есть непустые креды). */

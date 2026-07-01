@@ -9,6 +9,9 @@ require_once dirname(__FILE__) . '/functions.php';
 define('RECAPTCHA_SITE_KEY', 'ВАШ_RECAPTCHA_SITE_KEY');
 define('RECAPTCHA_SECRET_KEY', 'ВАШ_RECAPTCHA_SECRET_KEY');
 
+// Ключ api-fns.ru (поиск реквизитов по ИНН для счетов) — только из админ-инструмента.
+define('FNS_API_KEY', 'ВАШ_FNS_API_KEY');
+
 // Настройки времени
 date_default_timezone_set('Europe/Moscow');
 
@@ -35,7 +38,21 @@ define('DB_PASS', 'ПАРОЛЬ_БАЗЫ');
 define('SITE_NAME', 'ZIP-Пакеты оптом по всей России');
 define('SITE_URL', 'https://zippaket-optom.ru/');
 define('ADMIN_EMAIL', 'info@zip-site.ru');
-define('SUPPORT_PHONE', '8 (800) 123-45-67');
+define('SUPPORT_PHONE', '+7 (920) 346-50-67');
+
+// Реквизиты продавца — обязательны (ЗоЗПП, счёт юрлицам). Заполнить реальными.
+define('SELLER_NAME', 'ООО «Ваша компания»');
+define('SELLER_INN', 'ВАШ_ИНН');
+define('SELLER_OGRN', 'ВАШ_ОГРН');
+define('SELLER_KPP', 'ВАШ_КПП');
+define('SELLER_ADDRESS', 'Юридический адрес');
+define('SELLER_WORKHOURS', 'Пн–Пт: 9:00–18:00');
+define('SELLER_PHONE', '+7 (___) ___-__-__');
+define('SELLER_EMAIL', 'info@example.ru');
+define('SELLER_BANK', 'Банк');
+define('SELLER_ACCOUNT', 'Расчётный счёт');
+define('SELLER_CORR', 'Корр. счёт');
+define('SELLER_BIK', 'БИК');
 
 // Платёжный шлюз (ЮKassa) — План 4.
 // shopId+secretKey берутся из ЛК ЮKassa (тестовый магазин — для разработки).
@@ -43,6 +60,8 @@ define('SUPPORT_PHONE', '8 (800) 123-45-67');
 define('YOOKASSA_SHOP_ID', 'ВАШ_YOOKASSA_SHOP_ID');
 define('YOOKASSA_SECRET_KEY', 'ВАШ_YOOKASSA_SECRET_KEY');
 define('YOOKASSA_API_URL', 'https://api.yookassa.ru/v3');
+// Код НДС для чека 54-ФЗ: 1=без НДС, 2=0%, 3=10%, 4=20%, 5=10/110, 6=20/120
+define('YOOKASSA_VAT_CODE', 1);
 
 // Настройки безопасности
 define('SESSION_NAME', 'ZIP_SESSION');

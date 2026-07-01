@@ -20,19 +20,25 @@
   }
   document.addEventListener('DOMContentLoaded', function () {
     post({ action: 'get' }).then(function (d) { if (d.success) refreshCounter(d.count); });
-    document.querySelectorAll('.js-cart-add').forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        var id = btn.dataset.id;
-        var qtyInput = document.getElementById('qty');
-        var qty = qtyInput ? qtyInput.value : (btn.dataset.min || 1);
-        post({ action: 'add', id: id, qty: qty, csrf_token: csrf() }).then(function (d) {
-          if (d.success) {
-            refreshCounter(d.count);
-            if (typeof ym !== 'undefined') { ym(106644271, 'reachGoal', 'add_to_cart'); }
-          }
-        });
-      });
+  });
+  // Делегирование: работает и для статичных, и для динамически добавленных кнопок (quick-view).
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.js-cart-add') : null;
+    if (!btn) return;
+    e.preventDefault();
+    var id = btn.dataset.id;
+    if (!id) return;
+    var qtyInput = document.getElementById('qty');
+    var qty = qtyInput ? qtyInput.value : (btn.dataset.min || 1);
+    post({ action: 'add', id: id, qty: qty, csrf_token: csrf() }).then(function (d) {
+      if (d.success) {
+        refreshCounter(d.count);
+        if (typeof ym !== 'undefined') { ym(106644271, 'reachGoal', 'add_to_cart'); }
+        btn.classList.add('added');
+        var html = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Добавлено';
+        setTimeout(function () { btn.classList.remove('added'); btn.innerHTML = html; }, 1500);
+      }
     });
   });
 })();

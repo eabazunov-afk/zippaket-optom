@@ -1,13 +1,32 @@
 # Включаем модуль перенаправления
 RewriteEngine On
 
+# Кастомная страница 404
+ErrorDocument 404 /404.php
+
 # Базовый URL
 RewriteBase /
 
 # Ваша существующая CSP политика
 <IfModule mod_headers.c>
     Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-56n51Te25XL0G2sWAhTNzQFSoGTQjPEfyN6b9PCjP94=' https://www.google.com https://www.gstatic.com;"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # HSTS — включать только когда сайт полностью на HTTPS
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 </IfModule>
+
+# Запрет прямого доступа к логам/дампам/бэкапам по всему сайту (api.php .php — не затрагивается)
+<FilesMatch "\.(log|sql|gz|tgz|bak|sql\.gz)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
 
 # Перенаправление с zip_paket_s_logotipom на файл zip_lock_logo.php
 RewriteRule ^zip_paket_s_logotipom/?$ zip_lock_logo.php [L,QSA]

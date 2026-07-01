@@ -31,15 +31,9 @@ if (file_exists(__DIR__ . '/utm_tracker.php')) {
 }
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-// Обработка OPTIONS запроса для CORS
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+// CORS '*' убран намеренно: лид-эндпоинт принимает запросы только с нашего домена
+// (браузер блокирует cross-origin JSON-fetch без Allow-Origin) — меньше спама/CSRF.
+require_once __DIR__ . '/recaptcha.php';
 
 // Упрощенный обработчик ошибок
 function handleError($message, $code = 500) {
@@ -309,6 +303,16 @@ function handleSaveLead() {
     // Валидация email если указан
     if (!empty($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
         throw new Exception('Укажите корректный email адрес');
+    }
+
+    // Анти-бот: проверка reCAPTCHA (токен приходит из формы, см. js/script.js)
+    if (!recaptcha_verify($data['recaptcha_token'] ?? '', '')) {
+        throw new Exception('Проверка безопасности не пройдена. Обновите страницу и попробуйте снова.');
+    }
+
+    // 152-ФЗ: явное согласие на обработку ПДн обязательно
+    if (empty($data['pdn_consent'])) {
+        throw new Exception('Необходимо согласие на обработку персональных данных');
     }
     
     // Собираем параметры
