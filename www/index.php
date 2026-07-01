@@ -107,6 +107,7 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
             <i class="ph ph-shopping-cart-simple"></i>В корзину
         </button>
         <button type="button" class="z-btn z-btn-ghost js-rfq" data-rfq="card" data-id="<?= (int)$r['id'] ?>" data-name="<?= htmlspecialchars($r['full_name']) ?>">Запросить КП</button>
+        <button type="button" class="z-btn z-btn-accent js-quick" data-id="<?= (int)$r['id'] ?>" data-name="<?= htmlspecialchars($r['full_name']) ?>" data-min="<?= (int)($r['min_order_qty'] ?? 1) ?>">Быстрый заказ</button>
     </article>
     <?php
     return ob_get_clean();
@@ -441,6 +442,22 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                                 ?>
                             </div>
                         </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== БЫСТРЫЙ ЗАКАЗ В 1 КЛИК (мини-модалка, тёмная тема) ===== -->
+            <div class="z-modal" id="quickModal" aria-hidden="true" data-id="" data-name="" data-min="1">
+                <div class="z-modal-overlay" data-quick-close></div>
+                <div class="z-modal-box z-quick-box" role="dialog" aria-modal="true" aria-label="Быстрый заказ">
+                    <button class="z-modal-close" type="button" data-quick-close aria-label="Закрыть"><i class="fas fa-times"></i></button>
+                    <div class="z-glass" style="padding:clamp(20px,3vw,32px)">
+                        <div class="z-eyebrow">Быстрый заказ</div>
+                        <h3 class="z-h3 js-quick-title" style="margin:6px 0 8px">Заказ в 1 клик</h3>
+                        <p style="margin:0 0 16px;color:var(--z-text-3)">Оставьте телефон — перезвоним и оформим заказ за минуту.</p>
+                        <input type="tel" class="js-quick-phone" placeholder="Ваш телефон" autocomplete="tel"
+                               style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-size:16px;margin-bottom:14px">
+                        <button type="button" class="z-btn z-btn-gold z-shine js-quick-submit" style="width:100%"><i class="ph ph-paper-plane-tilt"></i>Заказать</button>
                     </div>
                 </div>
             </div>
