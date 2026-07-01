@@ -16,7 +16,6 @@ function order_create(array $checkoutData, array $lines): array
 
         $countStmt = $db->query("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()");
         $seq = (int)$countStmt->fetchColumn() + 1;
-        $orderNo = order_number($seq);
         // Непредсказуемый токен доступа к заказу/счёту (защита от IDOR по номеру).
         $accessToken = bin2hex(random_bytes(16));
 
@@ -30,8 +29,8 @@ function order_create(array $checkoutData, array $lines): array
              :company_name, :inn, :kpp, :legal_address, :needs_invoice,
              :delivery_method, :delivery_address, :comment, :payment_method,
              :items_total, :total)");
-        $stmt->execute([
-            ':order_number' => $orderNo,
+        $params = [
+            ':order_number' => '', // проставляется в цикле ниже
             ':access_token' => $accessToken,
             ':customer_type' => $checkoutData['customer_type'],
             ':customer_name' => $checkoutData['customer_name'],
@@ -48,7 +47,27 @@ function order_create(array $checkoutData, array $lines): array
             ':payment_method' => $checkoutData['payment_method'],
             ':items_total' => $totals['items_total'],
             ':total' => $totals['items_total'],
-        ]);
+        ];
+
+        // Гонка номеров: при параллельных заказах COUNT+1 у двух запросов совпадает
+        // → второй INSERT падает дубликатом uq_order_number. В InnoDB duplicate-key
+        // откатывает лишь оператор (не транзакцию), поэтому берём следующий seq и
+        // повторяем. order_number — единственный UNIQUE на orders, значит 1062 здесь
+        // всегда именно о номере.
+        $orderNo = '';
+        for ($attempt = 0; ; $attempt++) {
+            $orderNo = order_number($seq + $attempt);
+            $params[':order_number'] = $orderNo;
+            try {
+                $stmt->execute($params);
+                break;
+            } catch (PDOException $e) {
+                if ($attempt < 25 && (int)($e->errorInfo[1] ?? 0) === 1062) {
+                    continue; // номер занят параллельным заказом — пробуем следующий
+                }
+                throw $e;
+            }
+        }
         $orderId = (int)$db->lastInsertId();
 
         $itemStmt = $db->prepare("INSERT INTO order_items

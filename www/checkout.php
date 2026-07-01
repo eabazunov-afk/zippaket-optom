@@ -69,7 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$lines = cart_session_lines();
+// На POST с ошибкой валидации $lines уже посчитан выше — не гоняем каталог по БД
+// повторно. На GET и на невалидном CSRF (где $lines не считался) — считаем сейчас.
+$lines = $lines ?? cart_session_lines();
 $totals = cart_totals($lines);
 $csrf = generateCsrfToken();
 function old_val(array $old, string $k): string { return htmlspecialchars((string)($old[$k] ?? '')); }
