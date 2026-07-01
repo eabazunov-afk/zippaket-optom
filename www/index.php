@@ -458,6 +458,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <input type="tel" class="js-quick-phone" placeholder="Ваш телефон" autocomplete="tel"
                                style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-size:16px;margin-bottom:14px">
                         <button type="button" class="z-btn z-btn-gold z-shine js-quick-submit" style="width:100%"><i class="ph ph-paper-plane-tilt"></i>Заказать</button>
+                        <p style="margin:10px 0 0;font-size:12px;color:var(--z-text-3)">Нажимая «Заказать», вы соглашаетесь с <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">обработкой персональных данных</a></p>
                     </div>
                 </div>
             </div>
