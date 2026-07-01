@@ -2,6 +2,7 @@
 // Подключаем конфигурацию
 require_once 'includes/config.php';
 require_once 'includes/catalog_functions.php';
+require_once __DIR__ . '/includes/home_view.php';
 // У главной свой cookie-баннер ниже — не дублируем общим из footer.php
 define('COOKIE_BANNER_RENDERED', true);
 
@@ -44,16 +45,6 @@ $zGripperMax = $zGrippersTop ? (int)$zGrippersTop[0]['stock_quantity'] : 1;
 // Порог «мало» — по абсолютному остатку (а не относительному), чтобы бестселлеры не помечались ложно.
 define('Z_LOW_STOCK', 100000);
 
-/** Ценовые уровни из price_rub: розница, опт 20к (−8%), опт 300к (−18%). */
-function z_price(float $base, float $mult): string {
-    return number_format($base * $mult, 2, ',', ' ');
-}
-/** Размер из мм в «25 × 30 см». */
-function z_size(?int $w, ?int $h): string {
-    $f = function ($mm) { $cm = $mm / 10; return rtrim(rtrim(number_format($cm, 1, '.', ''), '0'), '.'); };
-    if (!$w || !$h) return '';
-    return $f($w) . ' × ' . $f($h) . ' см';
-}
 /** Фото слайдера по цвету: матовый → eva, прозрачный → pvd. */
 function z_slider_img(array $r): string {
     return (mb_stripos((string)$r['color'], 'мат') !== false) ? '/images/eva.png' : '/images/pvd.png';
@@ -65,7 +56,7 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
     $stock = (int)$r['stock_quantity'];
     $fill = max(10, min(100, (int)round($stock / max(1, $maxStock) * 100)));
     $low = $stock < Z_LOW_STOCK;
-    $size = z_size($r['width'] !== null ? (int)$r['width'] : null, $r['height'] !== null ? (int)$r['height'] : null);
+    $size = home_size($r['width'] !== null ? (int)$r['width'] : null, $r['height'] !== null ? (int)$r['height'] : null);
     $mk = $r['thickness'] ? ((int)$r['thickness'] . ' мкм') : 'стандарт';
     $name = htmlspecialchars($r['short_name'] ?: $r['full_name']);
 
@@ -89,9 +80,9 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
             <span class="z-prod-ico"><i class="ph ph-package"></i></span>
         </div>
         <div class="z-prices z-tnum">
-            <div class="row"><span>Опт от 300к</span><span class="p-main"><?= z_price($base, 0.82) ?> ₽/шт</span></div>
-            <div class="row"><span>Опт от 20к</span><span class="p-sec"><?= z_price($base, 0.92) ?> ₽/шт</span></div>
-            <div class="row"><span>Розница от 3к</span><span class="p-sec"><?= z_price($base, 1.0) ?> ₽/шт</span></div>
+            <div class="row"><span>Опт от 300к</span><span class="p-main"><?= home_price($base, 0.82) ?> ₽/шт</span></div>
+            <div class="row"><span>Опт от 20к</span><span class="p-sec"><?= home_price($base, 0.92) ?> ₽/шт</span></div>
+            <div class="row"><span>Розница от 3к</span><span class="p-sec"><?= home_price($base, 1.0) ?> ₽/шт</span></div>
         </div>
         <div class="z-stock<?= $low ? ' low' : '' ?>">
             <div class="lbl"><span><i class="ph ph-warehouse"></i>В наличии: <span class="z-tnum"><?= $stockLabel ?></span> шт</span><?= $low ? '<span class="low-tag">мало</span>' : '' ?></div>
