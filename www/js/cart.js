@@ -19,7 +19,9 @@
     }).then(function (r) { return r.json(); });
   }
   document.addEventListener('DOMContentLoaded', function () {
-    post({ action: 'get' }).then(function (d) { if (d.success) refreshCounter(d.count); });
+    post({ action: 'get' })
+      .then(function (d) { if (d.success) refreshCounter(d.count); })
+      .catch(function () { /* сеть/JSON недоступны — счётчик оставляем как есть */ });
   });
   // Делегирование: работает и для статичных, и для динамически добавленных кнопок (quick-view).
   document.addEventListener('click', function (e) {
@@ -39,6 +41,11 @@
         btn.innerHTML = '<i class="fas fa-check"></i> Добавлено';
         setTimeout(function () { btn.classList.remove('added'); btn.innerHTML = html; }, 1500);
       }
+    }).catch(function () {
+      // Сбой сети/ответа: коротко сообщаем и возвращаем кнопку в исходное состояние.
+      var html = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Ошибка сети';
+      setTimeout(function () { btn.innerHTML = html; }, 1800);
     });
   });
 })();
