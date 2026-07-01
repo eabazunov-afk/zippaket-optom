@@ -106,6 +106,7 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
                 data-step="<?= (int)($r['qty_step'] ?? 1) ?>">
             <i class="ph ph-shopping-cart-simple"></i>В корзину
         </button>
+        <button type="button" class="z-btn z-btn-ghost js-rfq" data-rfq="card" data-id="<?= (int)$r['id'] ?>" data-name="<?= htmlspecialchars($r['full_name']) ?>">Запросить КП</button>
     </article>
     <?php
     return ob_get_clean();
@@ -499,6 +500,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                             <input type="tel" name="phone" placeholder="Телефон *" required>
                             <input type="email" name="email" placeholder="Email">
                             <textarea name="message" placeholder="Размер, материал, тираж" rows="3"></textarea>
+                            <input type="hidden" name="type" value="contact_form">
                             <input type="hidden" id="recaptchaToken" name="recaptcha_token">
                             <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">согласие на обработку персональных данных</a></label>
                             <button type="submit" class="z-btn z-btn-gold z-shine"><i class="ph ph-paper-plane-tilt"></i>Получить расчёт</button>
@@ -652,6 +654,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <script src="/js/script.js"></script>
     <script src="/js/cart.js"></script>
     <script src="/js/home.js"></script>
+    <script src="/js/rfq.js" defer></script>
 
     <script>
     // Инициализация reCAPTCHA
