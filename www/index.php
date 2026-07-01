@@ -238,7 +238,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
 
             <!-- ===== ХИТЫ ПРОДАЖ ===== -->
             <?php if ($zHits): ?>
-            <section class="z-sec z-hits" id="hits" data-reveal>
+            <section class="z-section z-hits" id="hits" data-reveal>
                 <div class="z-wrap">
                     <div class="z-sec-head z-center">
                         <h2>Хиты продаж</h2>
@@ -256,7 +256,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
 
             <!-- ===== НОВИНКИ ===== -->
             <?php if ($zNew): ?>
-            <section class="z-sec z-new" id="new" data-reveal>
+            <section class="z-section z-new" id="new" data-reveal>
                 <div class="z-wrap">
                     <div class="z-sec-head z-center"><h2>Новинки</h2></div>
                     <div class="z-prod-grid">

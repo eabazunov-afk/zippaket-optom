@@ -36,6 +36,7 @@ body.zlock .site-wrapper { background: transparent; }
 .z-lead { font-size: 19px; line-height: 1.6; color: var(--z-text-2); }
 .z-center { text-align: center; }
 .z-sec-head { max-width: 720px; margin: 0 auto 44px; }
+.z-sec-sub { color: var(--z-text-2); font-size: 16px; margin: 10px 0 0; }
 
 /* ---- Кнопки ---- */
 .z-btn { display: inline-flex; align-items: center; gap: 10px; border-radius: var(--z-pill); font-family: var(--font-body); font-weight: 700; font-size: 16px; padding: 16px 28px; text-decoration: none; cursor: pointer; border: none; transition: transform .2s var(--z-ease), box-shadow .2s var(--z-ease); }
@@ -44,6 +45,8 @@ body.zlock .site-wrapper { background: transparent; }
 .z-btn-gold:hover { transform: translateY(-2px); box-shadow: 0 22px 50px rgba(255, 176, 32, .42); }
 .z-btn-glass { background: var(--z-surface-2); color: #fff; border: 1px solid var(--z-hairline-strong); }
 .z-btn-glass:hover { transform: translateY(-2px); border-color: var(--z-mint); }
+.z-btn-ghost { background: transparent; color: var(--z-text); border: 1px solid var(--z-hairline-strong); }
+.z-btn-ghost:hover { transform: translateY(-2px); border-color: var(--z-mint); color: var(--z-mint); }
 .z-btn-tg { background: var(--z-tg); color: #fff; box-shadow: 0 14px 34px rgba(34, 158, 217, .4); }
 .z-btn-tg:hover { transform: translateY(-2px); }
 .z-shine { position: relative; overflow: hidden; }
