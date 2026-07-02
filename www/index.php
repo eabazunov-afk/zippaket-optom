@@ -3,6 +3,7 @@
 require_once 'includes/config.php';
 require_once 'includes/catalog_functions.php';
 require_once __DIR__ . '/includes/home_view.php';
+require_once __DIR__ . '/includes/reviews.php';
 // У главной свой cookie-баннер ниже — не дублируем общим из footer.php
 define('COOKIE_BANNER_RENDERED', true);
 
@@ -463,35 +464,31 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                 </div>
             </div>
 
-            <!-- ===== ОТЗЫВЫ / ДОВЕРИЕ (⚠️ ЗАГЛУШКИ — заменить на реальные) ===== -->
+            <!-- ===== ОТЗЫВЫ / ДОВЕРИЕ ===== -->
             <section class="z-section">
                 <div class="z-wrap">
                     <div class="z-sec-head z-center" data-reveal>
                         <div class="z-eyebrow">Отзывы</div>
                         <h2 class="z-h2">Нам доверяют оптовые покупатели</h2>
                     </div>
+                    <?php $reviews = reviews_approved(6); ?>
+                    <?php if ($reviews): ?>
                     <div class="z-adv-grid">
-                        <?php
-                        // ⚠️ ЗАГЛУШКИ отзывов — заменить на реальные (имя, компания, текст)
-                        $reviews = [
-                            ['Алексей М.', 'оптовый покупатель', 'Заказывали партию слайдеров под фасовку — приехало в срок, качество отличное. Менеджер на связи, пересчитал цену под наш объём.'],
-                            ['ООО «Пример»', 'производство продуктов', 'Берём грипперы регулярно. Удобно, что можно по счёту для юрлица. Цена на объём приятная.'],
-                            ['Ирина К.', 'маркетплейс-селлер', 'Нужна была упаковка с печатью — сделали образец бесплатно, потом тираж. Рекомендую.'],
-                        ];
-                        foreach ($reviews as $r): ?>
+                        <?php foreach ($reviews as $r): ?>
                         <div class="z-card z-lift" data-reveal>
-                            <div style="color:var(--z-gold);margin-bottom:10px;font-size:14px">★★★★★</div>
-                            <p style="margin:0 0 16px"><?= htmlspecialchars($r[2]) ?></p>
+                            <div style="color:var(--z-gold);margin-bottom:10px;font-size:14px"><?= review_stars((int)$r['rating']) ?></div>
+                            <p style="margin:0 0 16px"><?= htmlspecialchars($r['body']) ?></p>
                             <div style="display:flex;align-items:center;gap:12px">
                                 <span class="z-ico" style="width:42px;height:42px;font-size:18px;margin:0"><i class="ph ph-user"></i></span>
                                 <div>
-                                    <div style="font-weight:700;color:#fff"><?= htmlspecialchars($r[0]) ?></div>
-                                    <div style="font-size:13px;color:var(--z-text-3)"><?= htmlspecialchars($r[1]) ?></div>
+                                    <div style="font-weight:700;color:var(--z-text)"><?= htmlspecialchars($r['author_name']) ?></div>
+                                    <div style="font-size:13px;color:var(--z-text-3)"><?= htmlspecialchars((string)($r['author_role'] ?? '')) ?></div>
                                 </div>
                             </div>
                         </div>
                         <?php endforeach; ?>
                     </div>
+                    <?php endif; ?>
                     <!-- Гарантии / сертификаты -->
                     <div class="z-glass" style="margin-top:24px;padding:22px 26px;display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:center" data-reveal>
                         <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-shield-check" style="color:var(--z-mint);font-size:20px"></i> Сертифицированные материалы EVA/ПВД</span>
