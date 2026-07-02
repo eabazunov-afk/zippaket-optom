@@ -29,8 +29,8 @@ body.zlock .site-wrapper { background: transparent; }
 
 /* ---- Типографика ---- */
 .z-eyebrow { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--z-mint); font-weight: 700; margin-bottom: 14px; }
-.z-h1 { font-family: var(--font-display); font-size: clamp(38px, 6vw, 64px); line-height: 1.03; font-weight: 700; letter-spacing: -1.5px; color: #fff; text-wrap: balance; }
-.z-h2 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 44px); line-height: 1.08; font-weight: 700; letter-spacing: -1px; color: #fff; text-wrap: balance; }
+.z-h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 38px); line-height: 1.1; font-weight: 600; letter-spacing: -0.5px; color: var(--z-text); text-wrap: balance; }
+.z-h2 { font-family: var(--font-display); font-size: clamp(22px, 3vw, 28px); line-height: 1.12; font-weight: 600; letter-spacing: -0.4px; color: var(--z-text); text-wrap: balance; }
 .z-h3 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #fff; }
 .z-grad { background: linear-gradient(120deg, var(--z-mint), var(--z-mint-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .z-lead { font-size: 19px; line-height: 1.6; color: var(--z-text-2); }
