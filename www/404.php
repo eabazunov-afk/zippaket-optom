@@ -1,4 +1,9 @@
-<?php http_response_code(404); $pageTitle = 'Страница не найдена'; require __DIR__ . '/includes/page_head.php'; ?>
+<?php
+http_response_code(404);
+$pageTitle = 'Страница не найдена';
+$pageRobots = 'noindex, follow';
+require __DIR__ . '/includes/page_head.php';
+?>
 
 <div class="z-center" style="padding:20px 0 40px">
     <div style="font-family:var(--font-display);font-size:clamp(72px,14vw,140px);font-weight:700;line-height:1;color:var(--z-mint)">404</div>

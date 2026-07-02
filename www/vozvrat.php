@@ -1,4 +1,9 @@
-<?php $pageTitle = 'Возврат и обмен'; require __DIR__ . '/includes/page_head.php'; ?>
+<?php
+$pageTitle = 'Возврат и обмен';
+$pageDescription = 'Возврат и обмен ZIP-пакетов: право на отказ от товара по ст. 26.1 ЗоЗПП, сроки и порядок возврата денежных средств при оптовой покупке в ZLOCK.';
+$pageCanonical = 'https://zippaket-optom.ru/vozvrat.php';
+require __DIR__ . '/includes/page_head.php';
+?>
 
 <div class="legal-stub"><i class="fas fa-circle-info"></i> Условия составлены в соответствии со ст. 26.1 Закона РФ «О защите прав потребителей» и Правилами продажи дистанционным способом (ПП РФ № 2463). Материал носит информационный характер.</div>
 

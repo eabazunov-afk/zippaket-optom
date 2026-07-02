@@ -1,4 +1,9 @@
-<?php $pageTitle = 'Доставка и оплата'; require __DIR__ . '/includes/page_head.php'; ?>
+<?php
+$pageTitle = 'Доставка и оплата';
+$pageDescription = 'Доставка ZIP-пакетов оптом по всей России: транспортные компании, курьер, самовывоз. Оплата картой и по счёту с НДС для юридических лиц и ИП.';
+$pageCanonical = 'https://zippaket-optom.ru/dostavka-i-oplata.php';
+require __DIR__ . '/includes/page_head.php';
+?>
 
 <div class="legal-stub"><i class="fas fa-circle-info"></i> Общие условия. Конкретные тарифы и сроки доставки уточняйте у менеджера при оформлении.</div>
 

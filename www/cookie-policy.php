@@ -1,4 +1,9 @@
-<?php $pageTitle = 'Политика использования cookie'; require __DIR__ . '/includes/page_head.php'; ?>
+<?php
+$pageTitle = 'Политика использования cookie';
+$pageDescription = 'Политика использования cookie на сайте ZLOCK: какие файлы cookie мы собираем, для чего они нужны и как управлять ими в настройках браузера.';
+$pageCanonical = 'https://zippaket-optom.ru/cookie-policy.php';
+require __DIR__ . '/includes/page_head.php';
+?>
 
 <div class="legal-stub"><i class="fas fa-circle-info"></i> Информация об использовании cookie на сайте.</div>
 
