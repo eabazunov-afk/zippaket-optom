@@ -499,6 +499,29 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                 </div>
             </section>
 
+            <!-- ===== КЕЙСЫ ОТГРУЗОК + ЛОГОТИПЫ КЛИЕНТОВ ===== -->
+            <?php $tm = require __DIR__ . '/data/testimonials.php'; if (!empty($tm['cases'])): ?>
+            <section class="z-section z-cases" data-reveal>
+                <div class="z-wrap">
+                    <div class="z-sec-head z-center"><div class="z-eyebrow">Кейсы</div><h2 class="z-h2">Отгрузки клиентам</h2></div>
+                    <div class="z-adv-grid">
+                        <?php foreach ($tm['cases'] as $c): ?>
+                        <div class="z-card z-lift">
+                            <div style="font-weight:800;color:var(--z-mint);font-size:22px"><?= htmlspecialchars($c['result']) ?></div>
+                            <div style="font-weight:700;color:var(--z-text);margin:6px 0"><?= htmlspecialchars($c['company']) ?></div>
+                            <p style="margin:0;color:var(--z-text-2)"><?= htmlspecialchars($c['detail']) ?></p>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php if (!empty($tm['logos'])): ?>
+                    <div class="z-glass" style="margin-top:24px;padding:20px;display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:center" data-reveal>
+                        <?php foreach ($tm['logos'] as $logo): ?><img src="<?= htmlspecialchars($logo) ?>" alt="Клиент" loading="lazy" style="height:38px;opacity:.8"><?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </section>
+            <?php endif; ?>
+
             <!-- ===== КОНТАКТЫ + ФОРМА (бэкенд #leadForm сохранён) ===== -->
             <section id="contact" class="z-section">
                 <div class="z-wrap">
