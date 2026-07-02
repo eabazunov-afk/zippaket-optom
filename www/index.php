@@ -132,6 +132,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zippaket-optom.ru/">
     <meta property="og:image" content="https://zippaket-optom.ru/images/og-image.jpg">
+    <link rel="canonical" href="https://zippaket-optom.ru/">
     <meta name="yandex-verification" content="300261c5f186d190">
 
     <!-- Favicon -->
