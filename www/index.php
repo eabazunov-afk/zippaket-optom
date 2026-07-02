@@ -4,6 +4,7 @@ require_once 'includes/config.php';
 require_once 'includes/catalog_functions.php';
 require_once __DIR__ . '/includes/home_view.php';
 require_once __DIR__ . '/includes/reviews.php';
+require_once __DIR__ . '/includes/faq.php';
 // У главной свой cookie-баннер ниже — не дублируем общим из footer.php
 define('COOKIE_BANNER_RENDERED', true);
 
@@ -521,6 +522,23 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                 </div>
             </section>
             <?php endif; ?>
+
+            <!-- ===== FAQ ПО ОПТУ + schema.org разметка ===== -->
+            <?php $faq = require __DIR__ . '/data/faq.php'; ?>
+            <?= faq_jsonld($faq) ?>
+            <section class="z-section z-faq" data-reveal>
+                <div class="z-wrap">
+                    <div class="z-sec-head z-center"><div class="z-eyebrow">Вопросы</div><h2 class="z-h2">Частые вопросы опта</h2></div>
+                    <div class="z-faq-list">
+                        <?php foreach ($faq as $f): ?>
+                        <details class="z-card" style="margin-bottom:10px">
+                            <summary style="cursor:pointer;font-weight:700;color:var(--z-text)"><?= htmlspecialchars($f['q']) ?></summary>
+                            <p style="margin:10px 0 0;color:var(--z-text-2)"><?= htmlspecialchars($f['a']) ?></p>
+                        </details>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </section>
 
             <!-- ===== КОНТАКТЫ + ФОРМА (бэкенд #leadForm сохранён) ===== -->
             <section id="contact" class="z-section">
