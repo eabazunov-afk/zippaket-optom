@@ -2853,8 +2853,8 @@ select.form-control option {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(29, 78, 216, 0.9);
-    color: white;
+    background: rgba(26, 23, 18, 0.94);
+    color: var(--z-on-ink);
     z-index: 9999;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
@@ -2927,13 +2927,14 @@ select.form-control option {
 }
 
 .cookie-actions .btn-primary {
-    background: #4CAF50;
-    border-color: #4CAF50;
+    background: var(--z-gold);
+    border-color: var(--z-gold);
+    color: #231A08;
 }
 
 .cookie-actions .btn-primary:hover {
-    background: #45a049;
-    border-color: #45a049;
+    background: var(--z-gold-2);
+    border-color: var(--z-gold-2);
 }
 
 .cookie-actions .btn-outline {
@@ -2950,12 +2951,12 @@ select.form-control option {
 .cookie-actions .btn-link {
     background: transparent;
     border: none;
-    color: #93c5fd;
+    color: var(--z-on-ink-acc);
     text-decoration: underline;
 }
 
 .cookie-actions .btn-link:hover {
-    color: #bfdbfe;
+    color: var(--z-mint-deep);
     text-decoration: none;
 }
 
