@@ -1,12 +1,12 @@
 /* ===== БАЗОВЫЕ СТИЛИ ===== */
 :root {
-    /* Цвета */
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --primary-light: #60a5fa;
-    --secondary: #059669;
-    --accent: #f59e0b;
-    --dark: #111827;
+    /* Цвета — легаси-имена привязаны к токенам светлой темы A3 (бронза) */
+    --primary: var(--z-mint);
+    --primary-dark: var(--z-mint-2);
+    --primary-light: var(--z-mint-deep);
+    --secondary: var(--z-mint-2);
+    --accent: var(--z-gold);
+    --dark: var(--z-text);
     --gray-900: #1f2937;
     --gray-800: #374151;
     --gray-700: #4b5563;
@@ -4007,8 +4007,15 @@ input:disabled + .slider {
     margin-right: 0.25rem;
 }
 .text-gradient {
-    background: linear-gradient(135deg, #60a5fa 0%, #34d399 100%);
+    background: linear-gradient(135deg, var(--z-mint-deep) 0%, var(--z-gold) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
+/* Видео-hero (лендинг «С логотипом») — тёмный «момент», текст светлый (on-ink) */
+.hero-section .hero-title,
+.hero-section .hero-badge,
+.hero-section .feature,
+.hero-section .feature span { color: var(--z-on-ink); }
+.hero-section .hero-description { color: var(--z-on-ink-2); }
+.hero-section .hero-badge { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16); }
