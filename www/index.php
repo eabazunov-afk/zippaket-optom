@@ -153,9 +153,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <!-- JSON-LD -->
     <?php
     // Телефон — из константы SUPPORT_PHONE (без хардкода).
-    // Адрес НЕ выводим: SELLER_ADDRESS сейчас плейсхолдер («Юридический адрес»),
-    // а фиктивный/непроверенный PostalAddress вредит SEO.
-    // TODO: владелец даёт реальный адрес → добавить PostalAddress и апгрейд до LocalBusiness.
+    // Адрес — только город (Москва): консистентно с zip_lock_logo.php, invoice.php и
+    // timezone Europe/Moscow. Улицу НЕ выводим: SELLER_ADDRESS — плейсхолдер, а фиктивный
+    // street-адрес вредит SEO. TODO: владелец даёт реальный адрес → полный PostalAddress + LocalBusiness.
     $orgJsonLd = [
         '@context'     => 'https://schema.org',
         '@type'        => 'Organization',
@@ -163,6 +163,11 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
         'url'          => 'https://zippaket-optom.ru/',
         'logo'         => 'https://zippaket-optom.ru/images/logo.png',
         'description'  => 'Производство ZIP-пакетов на заказ',
+        'address'      => [
+            '@type'          => 'PostalAddress',
+            'addressLocality' => 'Москва',
+            'addressCountry'  => 'RU',
+        ],
         'contactPoint' => [
             '@type'             => 'ContactPoint',
             'telephone'         => SUPPORT_PHONE,
