@@ -6,41 +6,49 @@
    =========================================================================== */
 
 :root {
-    /* Поверхности (тонированный near-black navy, не чистый чёрный) */
-    --z-bg: #070E18;
-    --z-bg-2: #0A1422;
-    --z-surface: rgba(255, 255, 255, 0.045);
-    --z-surface-2: rgba(255, 255, 255, 0.07);
-    --z-hairline: rgba(255, 255, 255, 0.09);
-    --z-hairline-strong: rgba(255, 255, 255, 0.16);
+    /* === Светлая тема A3 «Бронза / тихая роскошь» === */
+    /* Поверхности (тёплая нейтральная бумага, не стерильно-белое) */
+    --z-bg: #F4F2EC;
+    --z-bg-2: #FBFAF6;
+    --z-surface: #FFFFFF;
+    --z-surface-2: #F3EFE3;
+    --z-hairline: rgba(26, 23, 18, 0.11);
+    --z-hairline-strong: rgba(26, 23, 18, 0.18);
 
-    /* Текст */
-    --z-text: #EAF2FB;
-    --z-text-2: #A9C0DA;
-    --z-text-3: #7E94B0;
+    /* Текст (ink) */
+    --z-text: #1A1712;
+    --z-text-2: #5B5347;
+    --z-text-3: #948B7B;
 
-    /* Акценты — один мятный + один золотой CTA */
-    --z-mint: #5FE3D0;
-    --z-mint-2: #34D3BE;
-    --z-mint-deep: #0A8F8F;
-    --z-gold: #FFB020;
-    --z-gold-2: #FFCB63;
-    --z-tg: #229ED9;
+    /* Акцент — бронза (интерактив) + бронзовый CTA. Имена mint/gold сохранены. */
+    --z-mint: #9A7B2E;        /* иконки/активное/акцент-фон */
+    --z-mint-2: #7C6122;      /* тёмный бронз — текст-ссылки (контраст AA) */
+    --z-mint-deep: #C6A24E;   /* светлый бронз — акценты на тёмных панелях */
+    --z-gold: #C6A24E;        /* CTA верх градиента */
+    --z-gold-2: #9A7B2E;      /* CTA низ градиента */
+    --z-tg: #1B8FC4;
 
-    /* Тени — тонированы под фон (навигатор-сине-чёрные, не pure black) */
-    --z-shadow-sm: 0 6px 20px rgba(4, 10, 20, 0.45);
-    --z-shadow: 0 18px 44px rgba(4, 10, 20, 0.55);
-    --z-shadow-lg: 0 40px 90px rgba(2, 8, 18, 0.62);
-    --z-glow-mint: 0 16px 48px rgba(10, 143, 143, 0.30);
-    --z-glow-gold: 0 16px 40px rgba(255, 176, 32, 0.30);
+    /* Тёмные «акцент-моменты» (ink-панели на светлом: доверие, футер, CTA-бэнд) */
+    --z-ink: #1A1712;
+    --z-ink-2: #2A2620;
+    --z-on-ink: #EDE8DD;
+    --z-on-ink-2: #A99E88;
+    --z-on-ink-acc: #D8B65E;
 
-    --z-radius: 20px;
-    --z-radius-sm: 14px;
+    /* Тени — мягкие, тонированы под ink, не pure black */
+    --z-shadow-sm: 0 1px 2px rgba(26, 23, 18, 0.05);
+    --z-shadow: 0 1px 2px rgba(26, 23, 18, 0.05), 0 12px 30px rgba(26, 23, 18, 0.07);
+    --z-shadow-lg: 0 20px 50px rgba(26, 23, 18, 0.12);
+    --z-glow-mint: 0 12px 30px rgba(154, 123, 46, 0.22);
+    --z-glow-gold: 0 12px 30px rgba(198, 162, 78, 0.24);
+
+    --z-radius: 16px;
+    --z-radius-sm: 12px;
     --z-pill: 30px;
     --z-ease: cubic-bezier(.2, .7, .2, 1);
     --z-container: 1240px;
 
-    --font-display: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
