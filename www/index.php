@@ -151,17 +151,29 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <link rel="stylesheet" href="/css/home.css">
 
     <!-- JSON-LD -->
+    <?php
+    // Телефон — из константы SUPPORT_PHONE (без хардкода).
+    // Адрес НЕ выводим: SELLER_ADDRESS сейчас плейсхолдер («Юридический адрес»),
+    // а фиктивный/непроверенный PostalAddress вредит SEO.
+    // TODO: владелец даёт реальный адрес → добавить PostalAddress и апгрейд до LocalBusiness.
+    $orgJsonLd = [
+        '@context'     => 'https://schema.org',
+        '@type'        => 'Organization',
+        'name'         => 'ZLOCK - Производство zip пакетов оптом',
+        'url'          => 'https://zippaket-optom.ru/',
+        'logo'         => 'https://zippaket-optom.ru/images/logo.png',
+        'description'  => 'Производство ZIP-пакетов на заказ',
+        'contactPoint' => [
+            '@type'             => 'ContactPoint',
+            'telephone'         => SUPPORT_PHONE,
+            'contactType'       => 'sales',
+            'areaServed'        => 'RU',
+            'availableLanguage' => 'Russian',
+        ],
+    ];
+    ?>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "ZLOCK - Производство zip пакетов оптом",
-      "url": "https://zippaket-optom.ru/",
-      "logo": "https://zippaket-optom.ru/images/logo.png",
-      "description": "Производство ZIP-пакетов на заказ",
-      "address": { "@type": "PostalAddress", "addressLocality": "Москва", "addressCountry": "RU" },
-      "contactPoint": { "@type": "ContactPoint", "telephone": "+7 (920) 346-50-67", "contactType": "customer service", "availableLanguage": "Russian" }
-    }
+    <?= json_encode($orgJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
     </script>
 </head>
 <body class="zlock">
