@@ -496,6 +496,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-factory" style="color:var(--z-mint);font-size:20px"></i> Собственное производство</span>
                         <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-arrows-clockwise" style="color:var(--z-mint);font-size:20px"></i> Возврат по закону</span>
                         <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-receipt" style="color:var(--z-mint);font-size:20px"></i> Чек и закрывающие документы</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-file-text" style="color:var(--z-mint);font-size:20px"></i> Договор и счёт для юрлиц</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-percent" style="color:var(--z-mint);font-size:20px"></i> Работаем с НДС</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-gift" style="color:var(--z-mint);font-size:20px"></i> Образцы бесплатно</span>
                     </div>
                 </div>
             </section>
