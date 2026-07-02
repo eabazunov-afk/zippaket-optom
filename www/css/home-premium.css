@@ -8,12 +8,12 @@
 
 body.premium {
     /* Remap палитры style.css -> премиум (тёмная навигация, мята, золото) */
-    --primary: #0A8F8F;        /* акцент: мятно-бирюзовый */
+    --primary: var(--z-mint-2);        /* акцент: мятно-бирюзовый */
     --primary-dark: #077272;
-    --primary-light: #5FE3D0;
-    --secondary: #0B1F3A;      /* глубокий тёмно-синий */
-    --accent: #FFB020;         /* CTA/акция: золото */
-    --dark: #0B1F3A;
+    --primary-light: var(--z-mint);
+    --secondary: var(--z-ink);      /* глубокий тёмно-синий */
+    --accent: var(--z-gold);         /* CTA/акция: золото */
+    --dark: var(--z-ink);
 
     /* Премиум-тени */
     --shadow: 0 4px 16px rgba(11, 31, 58, 0.07);
@@ -36,21 +36,21 @@ body.premium .hero-section .video-overlay {
 body.premium .hero-badge {
     background: rgba(95, 227, 208, 0.14);
     border: 1px solid rgba(95, 227, 208, 0.45);
-    color: #5FE3D0;
+    color: var(--z-mint);
     backdrop-filter: blur(6px);
     border-radius: 40px;
 }
 body.premium .hero-title .text-gradient {
-    background: linear-gradient(135deg, #5FE3D0 0%, #8af0e2 100%);
+    background: linear-gradient(135deg, var(--z-mint) 0%, var(--z-mint-deep) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-body.premium .hero-features .feature i { color: #5FE3D0; }
+body.premium .hero-features .feature i { color: var(--z-mint); }
 
 /* Главный CTA hero — золотой (акция/конверсия) */
 body.premium .hero-actions .btn-primary {
-    background: linear-gradient(135deg, #FFB020 0%, #E0961A 100%);
+    background: linear-gradient(135deg, var(--z-gold) 0%, var(--z-gold-2) 100%);
     color: #3a2400;
     box-shadow: 0 10px 28px rgba(255, 176, 32, 0.32);
 }
@@ -72,7 +72,7 @@ body.premium .section-header .section-title::after {
     height: 4px;
     margin: 14px auto 0;
     border-radius: 4px;
-    background: linear-gradient(90deg, #5FE3D0, #0A8F8F);
+    background: linear-gradient(90deg, var(--z-mint), var(--z-mint-2));
 }
 
 /* --- Чередование фонов секций --- */
@@ -81,7 +81,7 @@ body.premium .contact-section {
     background: #F4F7FB;
 }
 body.premium .production-section {
-    background: linear-gradient(135deg, #0B1F3A 0%, #12345C 100%);
+    background: linear-gradient(135deg, var(--z-ink) 0%, var(--z-ink-2) 100%);
     color: #fff;
 }
 body.premium .production-section .section-title { color: #fff; }
@@ -112,7 +112,7 @@ body.premium .timer-display {
 
 /* --- CTA-секция --- */
 body.premium .cta-section {
-    background: linear-gradient(135deg, #0A8F8F 0%, #0B1F3A 100%);
+    background: linear-gradient(135deg, var(--z-mint-2) 0%, var(--z-ink) 100%);
 }
 
 /* --- Форма заявки --- */
@@ -128,12 +128,12 @@ body.premium .lead-form select {
 body.premium .lead-form input:focus,
 body.premium .lead-form textarea:focus,
 body.premium .lead-form select:focus {
-    border-color: #5FE3D0;
+    border-color: var(--z-mint);
     box-shadow: 0 0 0 3px rgba(95, 227, 208, 0.25);
 }
 
 /* --- SEO-блок --- */
 body.premium .seo-category-card {
     border-top-width: 4px !important;
-    border-top-color: #0A8F8F !important;
+    border-top-color: var(--z-mint-2) !important;
 }
