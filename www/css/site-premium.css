@@ -155,35 +155,35 @@ body.zlock .legal-req b { color: var(--z-text); }
 .main-footer .contact-item span { color: var(--z-on-ink-2); }
 .main-footer .footer-link:hover, .main-footer .legal-link:hover { color: var(--z-on-ink-acc); }
 .main-footer i { color: var(--z-on-ink-acc); }
-.main-footer .contact-item a { color: var(--z-text); }
-.main-footer .footer-link:hover, .main-footer .legal-link:hover, .main-footer .contact-item a:hover { color: var(--z-mint); }
-.main-footer .contact-item i { color: var(--z-mint); }
+.main-footer .contact-item a { color: var(--z-on-ink); }
+.main-footer .footer-link:hover, .main-footer .legal-link:hover, .main-footer .contact-item a:hover { color: var(--z-on-ink-acc); }
+.main-footer .contact-item i { color: var(--z-on-ink-acc); }
 .main-footer .logo-icon {
-    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep));
-    color: var(--z-bg);
+    background: linear-gradient(135deg, var(--z-mint-deep), var(--z-mint));
+    color: var(--z-ink);
 }
 .main-footer .footer-social .social-link,
 .main-footer .social-link {
-    background: var(--z-surface);
-    border: 1px solid var(--z-hairline);
-    color: var(--z-text-2);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--z-on-ink-2);
     transition: all .25s var(--z-ease);
 }
-.main-footer .social-link:hover { color: var(--z-mint); border-color: var(--z-mint); transform: translateY(-2px); }
-.main-footer .footer-bottom { border-top: 1px solid var(--z-hairline); }
+.main-footer .social-link:hover { color: var(--z-on-ink-acc); border-color: var(--z-on-ink-acc); transform: translateY(-2px); }
+.main-footer .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.08); }
 /* Реквизиты — центрированной строкой, без кривых переносов */
 .main-footer .footer-requisites {
     text-align: center;
-    color: var(--z-text-2);
+    color: var(--z-on-ink-2);
     font-size: 13px;
     line-height: 1.6;
     padding: 16px 20px 4px;
-    border-top: 1px solid var(--z-hairline);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     margin-top: 8px;
 }
 .main-footer .footer-legal { justify-content: center !important; flex-wrap: wrap; gap: 8px 18px; }
 .main-footer .footer-bottom { flex-wrap: wrap; gap: 12px; }
-.main-footer .payment-icons i { color: var(--z-text-3); }
+.main-footer .payment-icons i { color: var(--z-on-ink-2); }
 
 /* ===== ПЛАВАЮЩИЙ ВИДЖЕТ СВЯЗИ (FAB) ===== */
 /* Фиксирован внизу справа. z-index ниже cookie-баннера (9999), чтобы не перекрывать его. */
