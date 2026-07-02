@@ -18,7 +18,7 @@ $fabPhoneLabel = defined('SUPPORT_PHONE') ? SUPPORT_PHONE : '';
             <i class="ph ph-phone" aria-hidden="true"></i><span><?= htmlspecialchars($fabPhoneLabel) ?></span>
         </a>
         <?php endif; ?>
-        <a class="z-fab-item" href="#leadForm" role="menuitem">
+        <a class="z-fab-item" href="/#leadForm" role="menuitem">
             <i class="ph ph-phone-call" aria-hidden="true"></i><span>Заказать звонок</span>
         </a>
     </div>
