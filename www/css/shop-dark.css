@@ -197,7 +197,7 @@ body.zlock .pay-opt:has(input:checked) .pay-brands { color: var(--z-text); }
 /* ---- Кнопки ---- */
 body.zlock .btn-primary {
     background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep)) !important;
-    color: #06231f !important;
+    color: #231A08 !important;
     border: none !important;
     box-shadow: var(--z-glow-mint) !important;
 }
@@ -287,8 +287,8 @@ body.zlock .category-header { border-bottom-color: var(--z-hairline-strong) !imp
 body.zlock .category-header h3 { color: var(--z-text) !important; }
 body.zlock .category-header h3 i { color: var(--z-mint) !important; }
 body.zlock .category-badge {
-    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%) !important;
-    color: #2a1c00 !important;
+    background: linear-gradient(135deg, var(--z-gold) 0%, var(--z-gold-2) 100%) !important;
+    color: #231A08 !important;
 }
 /* Карточки товара */
 body.zlock .product-offer-card {
@@ -342,7 +342,7 @@ body.zlock .gallery-section p { color: var(--z-text-2) !important; }
 
 /* CTA-секция: синий градиент → мятный премиум */
 body.zlock .cta-section {
-    background: linear-gradient(135deg, var(--z-mint-deep) 0%, #06303a 100%) !important;
+    background: linear-gradient(135deg, var(--z-mint-deep) 0%, #7C6122 100%) !important;
     border-top: 1px solid var(--z-hairline) !important;
     border-bottom: 1px solid var(--z-hairline) !important;
 }
@@ -401,8 +401,8 @@ body.zlock .offer-cta .benefit i { color: var(--z-mint) !important; }
 body.zlock .offer-cta .telegram-offer { border-top-color: var(--z-hairline) !important; }
 /* Кнопка «Запросить КП» (btn-primary внутри offer-cta) → золотой premium-CTA */
 body.zlock .offer-cta .btn-primary {
-    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%) !important;
-    color: #2a1c00 !important; border: none !important;
+    background: linear-gradient(135deg, var(--z-gold) 0%, var(--z-gold-2) 100%) !important;
+    color: #231A08 !important; border: none !important;
 }
 body.zlock .offer-cta .btn-outline { border-color: var(--z-hairline-strong) !important; color: var(--z-text) !important; }
 body.zlock .offer-cta .btn-outline:hover { background: var(--z-surface-2) !important; color: var(--z-text) !important; }

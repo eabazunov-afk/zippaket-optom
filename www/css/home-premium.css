@@ -9,7 +9,7 @@
 body.premium {
     /* Remap палитры style.css -> премиум (тёмная навигация, мята, золото) */
     --primary: var(--z-mint-2);        /* акцент: мятно-бирюзовый */
-    --primary-dark: #077272;
+    --primary-dark: var(--z-mint-2);
     --primary-light: var(--z-mint);
     --secondary: var(--z-ink);      /* глубокий тёмно-синий */
     --accent: var(--z-gold);         /* CTA/акция: золото */
@@ -51,7 +51,7 @@ body.premium .hero-features .feature i { color: var(--z-mint); }
 /* Главный CTA hero — золотой (акция/конверсия) */
 body.premium .hero-actions .btn-primary {
     background: linear-gradient(135deg, var(--z-gold) 0%, var(--z-gold-2) 100%);
-    color: #3a2400;
+    color: #231A08;
     box-shadow: 0 10px 28px rgba(255, 176, 32, 0.32);
 }
 body.premium .hero-actions .btn-primary:hover {
@@ -78,7 +78,7 @@ body.premium .section-header .section-title::after {
 /* --- Чередование фонов секций --- */
 body.premium .special-offer-section,
 body.premium .contact-section {
-    background: #F4F7FB;
+    background: var(--z-bg);
 }
 body.premium .production-section {
     background: linear-gradient(135deg, var(--z-ink) 0%, var(--z-ink-2) 100%);
