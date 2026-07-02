@@ -150,6 +150,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/home.css">
 
+    <!-- Preload LCP hero image (above-the-fold) -->
+    <link rel="preload" as="image" href="/images/pvd.png" fetchpriority="high">
+
     <!-- JSON-LD -->
     <?php
     // Телефон — из константы SUPPORT_PHONE (без хардкода).
@@ -230,7 +233,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     <div class="z-hero-visual" data-reveal>
                         <div class="z-glow"></div>
                         <div class="z-hero-card">
-                            <img src="/images/pvd.png" alt="ZIP-пакет с бегунком">
+                            <img src="/images/pvd.png" alt="ZIP-пакет с бегунком" width="800" height="494" fetchpriority="high" loading="eager">
                             <div class="z-card-veil"></div>
                             <div class="z-hero-cap">
                                 <div class="z-chip-mint">ПВД · с бегунком</div>
@@ -728,9 +731,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
         </div><!-- /.z-content -->
     </div><!-- /.site-wrapper -->
 
-    <script src="/js/script.js"></script>
-    <script src="/js/cart.js"></script>
-    <script src="/js/home.js"></script>
+    <script src="/js/script.js" defer></script>
+    <script src="/js/cart.js" defer></script>
+    <script src="/js/home.js" defer></script>
     <script src="/js/rfq.js" defer></script>
 
     <script>
