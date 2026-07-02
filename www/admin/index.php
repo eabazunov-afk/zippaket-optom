@@ -229,6 +229,14 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
                 </div>
             </a>
 
+            <a href='/admin/reviews.php' class='menu-item'>
+                <div class='fa-icon'><i class="fas fa-star"></i></div>
+                <div class='menu-text'>
+                    <strong>Отзывы</strong>
+                    <p>Модерация отзывов клиентов</p>
+                </div>
+            </a>
+
             <a href='/admin/calculations.php' class='menu-item'>
                 <div class='fa-icon'><i class="fas fa-calculator"></i></div>
                 <div class='menu-text'>
