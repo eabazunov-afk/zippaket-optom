@@ -96,7 +96,7 @@ body.zlock .legal-req b { color: #fff; }
     position: sticky;
     top: 0;
     z-index: 200;
-    background: rgba(7, 14, 24, 0.78);
+    background: rgba(251, 250, 246, 0.82);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--z-hairline);
@@ -113,8 +113,8 @@ body.zlock .legal-req b { color: #fff; }
 
 /* Кнопка "Заказать звонок" → золотой премиум-CTA */
 .main-header .btn-primary, .z-btn-gold {
-    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%);
-    color: #2a1c00;
+    background: linear-gradient(135deg, var(--z-gold) 0%, var(--z-gold-2) 100%);
+    color: #231A08;
     border: none;
     border-radius: var(--z-pill);
     font-weight: 700;
@@ -138,21 +138,23 @@ body.zlock .legal-req b { color: #fff; }
 
 /* ===== ОБЩИЙ ФУТЕР (единый тёмный) ===== */
 .main-footer {
-    background: var(--z-bg-2);
-    border-top: 1px solid var(--z-hairline);
-    color: var(--z-text-2);
+    background: var(--z-ink);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--z-on-ink-2);
     /* На главной фоновый .z-veil (position:fixed) — сплошной --z-bg у низа экрана.
        Футер рендерится вне .z-content (z-index:2), поэтому вуаль накрывала его и
        «гасила» текст (особенно нижнюю строку). Поднимаем футер над вуалью. */
     position: relative;
     z-index: 2;
 }
-.main-footer .footer-title, .main-footer .logo-subtitle, .main-footer .logo-text { color: var(--z-text); }
+.main-footer .footer-title, .main-footer .logo-subtitle, .main-footer .logo-text { color: var(--z-on-ink); }
 .main-footer .footer-description,
 .main-footer .footer-link,
 .main-footer .legal-link,
 .main-footer .footer-copyright,
-.main-footer .contact-item span { color: var(--z-text-2); }
+.main-footer .contact-item span { color: var(--z-on-ink-2); }
+.main-footer .footer-link:hover, .main-footer .legal-link:hover { color: var(--z-on-ink-acc); }
+.main-footer i { color: var(--z-on-ink-acc); }
 .main-footer .contact-item a { color: var(--z-text); }
 .main-footer .footer-link:hover, .main-footer .legal-link:hover, .main-footer .contact-item a:hover { color: var(--z-mint); }
 .main-footer .contact-item i { color: var(--z-mint); }
