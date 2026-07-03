@@ -203,7 +203,7 @@ body.zlock .site-wrapper { background: transparent; }
 .z-tg-chips i { color: var(--z-mint); }
 
 /* виджет калькулятора — тёмная стеклянная карточка (единый стиль с сайтом) */
-.z-calc-host { background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); border: 1px solid var(--z-hairline); border-radius: 20px; padding: clamp(16px, 3vw, 32px); box-shadow: var(--z-shadow-lg); }
+.z-calc-host { background: var(--z-surface); border: 1px solid var(--z-hairline); border-radius: 20px; padding: clamp(16px, 3vw, 32px); box-shadow: var(--z-shadow-lg); }
 .z-calc-host .container { padding: 0; max-width: none; }
 
 /* Модальное окно — вписано по центру экрана (без скролла на обычных экранах) */
@@ -233,8 +233,25 @@ body.zlock .z-calc-host .calculator-header .section-title,
 body.zlock .z-calc-host .calculator-header h2,
 body.zlock .z-calc-host .calculator-header p { color: var(--z-text) !important; }
 body.zlock .z-calc-host .section-title,
-body.zlock .z-calc-host h2, body.zlock .z-calc-host h3 { color: #fff !important; }
+body.zlock .z-calc-host h2, body.zlock .z-calc-host h3 { color: var(--z-text) !important; }
 body.zlock .z-calc-host .results-header { background: var(--z-surface-2) !important; }
+/* Поля/подписи/результаты калькулятора — читаемые на светлой карточке */
+body.zlock .z-calc-host label,
+body.zlock .z-calc-host .form-label,
+body.zlock .z-calc-host .field-label { color: var(--z-text-2) !important; }
+body.zlock .z-calc-host input,
+body.zlock .z-calc-host select,
+body.zlock .z-calc-host .form-control {
+    background: var(--z-surface) !important;
+    color: var(--z-text) !important;
+    border: 1px solid var(--z-hairline-strong) !important;
+}
+body.zlock .z-calc-host input::placeholder { color: var(--z-text-3) !important; }
+body.zlock .z-calc-host .calculator-results { background: var(--z-surface-2) !important; border: 1px solid var(--z-hairline) !important; border-radius: 16px; }
+body.zlock .z-calc-host .result-item,
+body.zlock .z-calc-host .results-body * { color: var(--z-text) !important; }
+body.zlock .z-calc-host .result-price,
+body.zlock .z-calc-host .total-price { color: var(--z-mint-2) !important; }
 /* Альбомная компоновка: слева форма + кнопки действий, справа результат на всю
    высоту. Ключевое: results-footer (кнопки) уводим в левую колонку под форму —
    раньше он был третьим grid-элементом и занимал отдельную полноширинную строку
