@@ -11,20 +11,20 @@ $fabPhoneLabel = defined('SUPPORT_PHONE') ? SUPPORT_PHONE : '';
 <div class="z-fab" id="contactFab">
     <div class="z-fab-list" role="menu" aria-label="Связаться с нами">
         <a class="z-fab-item z-fab-tg" href="https://t.me/zlock_sales_bot" target="_blank" rel="noopener" role="menuitem">
-            <i class="ph ph-telegram-logo" aria-hidden="true"></i><span>Telegram</span>
+            <i class="fab fa-telegram" aria-hidden="true"></i><span>Telegram</span>
         </a>
         <?php if ($fabPhone !== ''): ?>
         <a class="z-fab-item" href="tel:<?= htmlspecialchars($fabPhone) ?>" role="menuitem">
-            <i class="ph ph-phone" aria-hidden="true"></i><span><?= htmlspecialchars($fabPhoneLabel) ?></span>
+            <i class="fas fa-phone" aria-hidden="true"></i><span><?= htmlspecialchars($fabPhoneLabel) ?></span>
         </a>
         <?php endif; ?>
         <a class="z-fab-item" href="/#leadForm" role="menuitem">
-            <i class="ph ph-phone-call" aria-hidden="true"></i><span>Заказать звонок</span>
+            <i class="fas fa-phone-volume" aria-hidden="true"></i><span>Заказать звонок</span>
         </a>
     </div>
     <button type="button" class="z-fab-toggle" aria-expanded="false" aria-controls="contactFab" aria-label="Связаться с нами">
-        <i class="ph ph-chats-circle z-fab-ic-open" aria-hidden="true"></i>
-        <i class="ph ph-x z-fab-ic-close" aria-hidden="true"></i>
+        <i class="fas fa-comments z-fab-ic-open" aria-hidden="true"></i>
+        <i class="fas fa-xmark z-fab-ic-close" aria-hidden="true"></i>
     </button>
 </div>
 <script>

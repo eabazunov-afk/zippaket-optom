@@ -66,7 +66,7 @@ function ra_old(array $old, string $k): string { return htmlspecialchars((string
         <main class="main-content">
             <section class="z-section">
                 <div class="z-wrap" style="max-width:560px;margin:0 auto">
-                    <div class="z-badge" style="margin-bottom:18px"><i class="ph ph-chat-circle-text"></i><span>Ваш отзыв</span></div>
+                    <div class="z-badge" style="margin-bottom:18px"><i class="fas fa-comment-dots"></i><span>Ваш отзыв</span></div>
                     <h1 class="z-h1" style="font-size:clamp(28px,4vw,40px)">Оставить отзыв</h1>
                     <p class="z-hero-sub" style="margin-bottom:26px">Расскажите о работе с нами — это помогает другим оптовикам и делает наш сервис лучше. Отзыв появится на сайте после модерации.</p>
 

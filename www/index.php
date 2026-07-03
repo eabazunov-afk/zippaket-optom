@@ -89,7 +89,7 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
                 <div class="z-prod-size"><?= htmlspecialchars($size ?: $name) ?></div>
                 <div class="z-prod-mk">толщина <?= htmlspecialchars($mk) ?></div>
             </div>
-            <span class="z-prod-ico"><i class="ph ph-package"></i></span>
+            <span class="z-prod-ico"><i class="fas fa-box"></i></span>
         </div>
         <div class="z-prices z-tnum">
             <?php foreach (home_tiers() as $t): ?>
@@ -97,7 +97,7 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
             <?php endforeach; ?>
         </div>
         <div class="z-stock<?= $low ? ' low' : '' ?>">
-            <div class="lbl"><span><i class="ph ph-warehouse"></i>В наличии: <span class="z-tnum"><?= $stockLabel ?></span> шт</span><?= $low ? '<span class="low-tag">мало</span>' : '' ?></div>
+            <div class="lbl"><span><i class="fas fa-warehouse"></i>В наличии: <span class="z-tnum"><?= $stockLabel ?></span> шт</span><?= $low ? '<span class="low-tag">мало</span>' : '' ?></div>
             <div class="z-bar"><i data-bar="<?= $fill ?>"></i></div>
         </div>
         <button class="z-add js-cart-add"
@@ -106,7 +106,7 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
                 data-price="<?= htmlspecialchars((string)$base) ?>"
                 data-min="<?= (int)($r['min_order_qty'] ?? 1) ?>"
                 data-step="<?= (int)($r['qty_step'] ?? 1) ?>">
-            <i class="ph ph-shopping-cart-simple"></i>В корзину
+            <i class="fas fa-cart-shopping"></i>В корзину
         </button>
         <button type="button" class="z-btn z-btn-ghost js-rfq" data-rfq="card" data-id="<?= (int)$r['id'] ?>" data-name="<?= htmlspecialchars($r['full_name']) ?>">Запросить КП</button>
         <button type="button" class="z-btn z-btn-accent js-quick" data-id="<?= (int)$r['id'] ?>" data-name="<?= htmlspecialchars($r['full_name']) ?>" data-min="<?= (int)($r['min_order_qty'] ?? 1) ?>">Быстрый заказ</button>
@@ -201,7 +201,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
             <section id="top" class="z-section">
                 <div class="z-wrap z-hero">
                     <div>
-                        <div class="z-badge" data-reveal><i class="ph ph-seal-check"></i><span>Производитель №1 в России</span></div>
+                        <div class="z-badge" data-reveal><i class="fas fa-circle-check"></i><span>Производитель №1 в России</span></div>
                         <h1 class="z-h1" data-reveal>Производство <span class="z-grad">ZIP-пакетов</span><br>на заказ от 1 дня</h1>
                         <p class="z-hero-sub" data-reveal>ZIP-пакеты оптом от производителя со склада в РФ. Минимальная партия, наличие, отгрузка от 1 дня, работа с НДС.</p>
                         <div class="z-hero-trust" data-reveal>
@@ -240,9 +240,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                                 <div style="font-weight:800;font-size:20px;color:#fff;line-height:1.2">Кристальная<br>прозрачность</div>
                             </div>
                         </div>
-                        <div class="z-floatcard z-f1"><span class="ic" style="background:rgba(255,176,32,.16);color:#FFB020"><i class="ph ph-tag"></i></span><div><small>Цена</small><b>от 0,35 ₽/шт</b></div></div>
-                        <div class="z-floatcard z-f2"><span class="ic" style="background:rgba(95,227,208,.16);color:#5FE3D0"><i class="ph ph-truck"></i></span><div><small>Доставка</small><b>1–3 дня по РФ</b></div></div>
-                        <div class="z-floatcard z-f3"><span class="ic" style="background:rgba(95,227,208,.16);color:#5FE3D0"><i class="ph ph-gift"></i></span><div><small>Образец</small><b>бесплатно</b></div></div>
+                        <div class="z-floatcard z-f1"><span class="ic" style="background:rgba(255,176,32,.16);color:#FFB020"><i class="fas fa-tag"></i></span><div><small>Цена</small><b>от 0,35 ₽/шт</b></div></div>
+                        <div class="z-floatcard z-f2"><span class="ic" style="background:rgba(95,227,208,.16);color:#5FE3D0"><i class="fas fa-truck"></i></span><div><small>Доставка</small><b>1–3 дня по РФ</b></div></div>
+                        <div class="z-floatcard z-f3"><span class="ic" style="background:rgba(95,227,208,.16);color:#5FE3D0"><i class="fas fa-gift"></i></span><div><small>Образец</small><b>бесплатно</b></div></div>
                     </div>
                 </div>
             </section>
@@ -342,14 +342,14 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <div class="z-mat-card z-lift" data-reveal>
                             <div class="z-mat-badge gold">Премиум</div>
                             <div class="z-mat-photo"><img src="/images/eva.png" alt="EVA матовый ZIP-пакет" loading="lazy"></div>
-                            <span class="z-ico"><i class="ph ph-snowflake"></i></span>
+                            <span class="z-ico"><i class="fas fa-snowflake"></i></span>
                             <h3 class="z-h3" style="font-size:26px">EVA — матовый</h3>
                             <p style="color:var(--z-text-2);margin:6px 0 0">Мягкий, благородный матовый эффект</p>
                             <div class="z-mat-list">
-                                <div><i class="ph ph-check"></i>Мягкий и гибкий</div>
-                                <div><i class="ph ph-check"></i>Устойчив к морозу</div>
-                                <div><i class="ph ph-check"></i>Прочный на разрыв</div>
-                                <div><i class="ph ph-check"></i>Матовая поверхность</div>
+                                <div><i class="fas fa-check"></i>Мягкий и гибкий</div>
+                                <div><i class="fas fa-check"></i>Устойчив к морозу</div>
+                                <div><i class="fas fa-check"></i>Прочный на разрыв</div>
+                                <div><i class="fas fa-check"></i>Матовая поверхность</div>
                             </div>
                             <div class="z-mat-price"><span style="font-size:13px;color:var(--z-text-2)">на 300к+ шт</span><span class="p z-tnum">от 1,5 ₽<small>/шт</small></span></div>
                         </div>
@@ -357,14 +357,14 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <div class="z-mat-card z-lift" data-reveal>
                             <div class="z-mat-badge mint">Популярный</div>
                             <div class="z-mat-photo"><img src="/images/pvd.png" alt="ПВД прозрачный ZIP-пакет" loading="lazy"></div>
-                            <span class="z-ico"><i class="ph ph-eye"></i></span>
+                            <span class="z-ico"><i class="fas fa-eye"></i></span>
                             <h3 class="z-h3" style="font-size:26px">ПВД — прозрачный</h3>
                             <p style="color:var(--z-text-2);margin:6px 0 0">Кристальная прозрачность и блеск</p>
                             <div class="z-mat-list">
-                                <div><i class="ph ph-check"></i>Кристальная прозрачность</div>
-                                <div><i class="ph ph-check"></i>Блестящая поверхность</div>
-                                <div><i class="ph ph-check"></i>Экономичный вариант</div>
-                                <div><i class="ph ph-check"></i>Идеальная видимость товара</div>
+                                <div><i class="fas fa-check"></i>Кристальная прозрачность</div>
+                                <div><i class="fas fa-check"></i>Блестящая поверхность</div>
+                                <div><i class="fas fa-check"></i>Экономичный вариант</div>
+                                <div><i class="fas fa-check"></i>Идеальная видимость товара</div>
                             </div>
                             <div class="z-mat-price"><span style="font-size:13px;color:var(--z-text-2)">на 300к+ шт</span><span class="p z-tnum">от 0,35 ₽<small>/шт</small></span></div>
                         </div>
@@ -376,13 +376,13 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
             <section id="products" class="z-section">
                 <div id="z-sale" data-end="<?= (int)$zSaleEnd ?>" class="z-wrap">
                     <div class="z-sec-head z-center" data-reveal>
-                        <div class="z-sale-badge"><i class="ph ph-lightning"></i>Специальная распродажа</div>
+                        <div class="z-sale-badge"><i class="fas fa-bolt"></i>Специальная распродажа</div>
                         <h2 class="z-h2">Пакеты по специальным ценам на объём</h2>
                         <p class="z-lead" style="margin-top:12px">Распродажа остатков производства. Количество ограничено!</p>
                     </div>
 
                     <div class="z-timer z-tnum" data-reveal>
-                        <span class="lead-lbl"><i class="ph ph-clock"></i>Предложение действует ещё:</span>
+                        <span class="lead-lbl"><i class="fas fa-clock"></i>Предложение действует ещё:</span>
                         <div class="z-tcell"><b id="t-days">00</b><small>дней</small></div>
                         <span class="z-tsep">:</span>
                         <div class="z-tcell"><b id="t-hours">00</b><small>часов</small></div>
@@ -398,20 +398,20 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <span class="z-tier">Розница от 3 000 шт</span>
                     </div>
 
-                    <h3 class="z-subhead" data-reveal><i class="ph ph-sliders-horizontal"></i>Слайдеры с бегунком<span class="z-tag gold">Хит продаж</span></h3>
+                    <h3 class="z-subhead" data-reveal><i class="fas fa-sliders"></i>Слайдеры с бегунком<span class="z-tag gold">Хит продаж</span></h3>
                     <div class="z-prod-grid">
                         <?php if ($zSlidersTop): foreach ($zSlidersTop as $r) echo z_card($r, true, $zSliderMax);
                         else: ?><p class="z-lead">Скоро в наличии.</p><?php endif; ?>
                     </div>
 
-                    <h3 class="z-subhead" data-reveal><i class="ph ph-lock-key"></i>ZIP-LOCK пакеты (грипперы)<span class="z-tag mint">Большой выбор</span></h3>
+                    <h3 class="z-subhead" data-reveal><i class="fas fa-lock"></i>ZIP-LOCK пакеты (грипперы)<span class="z-tag mint">Большой выбор</span></h3>
                     <div class="z-prod-grid" style="margin-bottom:0">
                         <?php if ($zGrippersTop): foreach ($zGrippersTop as $r) echo z_card($r, false, $zGripperMax);
                         else: ?><p class="z-lead">Скоро в наличии.</p><?php endif; ?>
                     </div>
 
                     <div class="z-center" style="margin-top:40px" data-reveal>
-                        <a href="/katalog_zip_paketov/" class="z-btn z-btn-gold z-shine"><i class="ph ph-storefront"></i>Открыть весь каталог<i class="ph ph-arrow-right"></i></a>
+                        <a href="/katalog_zip_paketov/" class="z-btn z-btn-gold z-shine"><i class="fas fa-store"></i>Открыть весь каталог<i class="fas fa-arrow-right"></i></a>
                         <p style="color:var(--z-text-2);margin-top:12px;font-size:14px">Более <?= count($zSliders) + count($zGrippers) ?> позиций · фильтры по размеру/толщине · оптовые цены</p>
                     </div>
                 </div>
@@ -432,19 +432,19 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                                     <div class="z-step"><span class="n">2</span><span>Указываете материал и тираж</span></div>
                                     <div class="z-step"><span class="n">3</span><span>Получаете расчёт и образец</span></div>
                                 </div>
-                                <a href="#calculator" class="z-btn z-btn-gold z-shine"><i class="ph ph-calculator"></i>Открыть калькулятор</a>
+                                <a href="#calculator" class="z-btn z-btn-gold z-shine"><i class="fas fa-calculator"></i>Открыть калькулятор</a>
                             </div>
                         </div>
                         <div class="z-tg-card">
-                            <span class="z-tg-ico"><i class="ph ph-telegram-logo"></i></span>
+                            <span class="z-tg-ico"><i class="fab fa-telegram"></i></span>
                             <h3 class="z-h3" style="font-size:25px;margin-bottom:12px">Мгновенный расчёт в Telegram</h3>
                             <p style="font-size:15.5px;line-height:1.6;color:#B7CCE3;margin-bottom:8px">Быстрее, чем через менеджера. Запустите бота и получите стоимость и КП в один клик.</p>
                             <div class="z-tg-chips">
-                                <div><i class="ph ph-lightning"></i>24/7</div>
-                                <div><i class="ph ph-robot"></i>Авторасчёт</div>
-                                <div><i class="ph ph-file-text"></i>КП в клик</div>
+                                <div><i class="fas fa-bolt"></i>24/7</div>
+                                <div><i class="fas fa-robot"></i>Авторасчёт</div>
+                                <div><i class="fas fa-file-lines"></i>КП в клик</div>
                             </div>
-                            <a href="https://t.me/zlock_sales_bot" target="_blank" rel="noopener noreferrer" class="z-btn z-btn-tg"><i class="ph ph-telegram-logo"></i>@zlock_sales_bot</a>
+                            <a href="https://t.me/zlock_sales_bot" target="_blank" rel="noopener noreferrer" class="z-btn z-btn-tg"><i class="fab fa-telegram"></i>@zlock_sales_bot</a>
                         </div>
                     </div>
 
@@ -480,7 +480,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <p style="margin:0 0 16px;color:var(--z-text-3)">Оставьте телефон — перезвоним и оформим заказ за минуту.</p>
                         <input type="tel" class="js-quick-phone" placeholder="Ваш телефон" autocomplete="tel"
                                style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-size:16px;margin-bottom:14px">
-                        <button type="button" class="z-btn z-btn-gold z-shine js-quick-submit" style="width:100%"><i class="ph ph-paper-plane-tilt"></i>Заказать</button>
+                        <button type="button" class="z-btn z-btn-gold z-shine js-quick-submit" style="width:100%"><i class="fas fa-paper-plane"></i>Заказать</button>
                         <p style="margin:10px 0 0;font-size:12px;color:var(--z-text-3)">Нажимая «Заказать», вы соглашаетесь с <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">обработкой персональных данных</a></p>
                     </div>
                 </div>
@@ -501,7 +501,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                             <div style="color:var(--z-gold);margin-bottom:10px;font-size:14px"><?= review_stars((int)$r['rating']) ?></div>
                             <p style="margin:0 0 16px"><?= htmlspecialchars($r['body']) ?></p>
                             <div style="display:flex;align-items:center;gap:12px">
-                                <span class="z-ico" style="width:42px;height:42px;font-size:18px;margin:0"><i class="ph ph-user"></i></span>
+                                <span class="z-ico" style="width:42px;height:42px;font-size:18px;margin:0"><i class="fas fa-user"></i></span>
                                 <div>
                                     <div style="font-weight:700;color:var(--z-text)"><?= htmlspecialchars($r['author_name']) ?></div>
                                     <div style="font-size:13px;color:var(--z-text-3)"><?= htmlspecialchars((string)($r['author_role'] ?? '')) ?></div>
@@ -513,13 +513,13 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     <?php endif; ?>
                     <!-- Гарантии / сертификаты -->
                     <div class="z-glass" style="margin-top:24px;padding:22px 26px;display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:center" data-reveal>
-                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-shield-check" style="color:var(--z-mint);font-size:20px"></i> Сертифицированные материалы EVA/ПВД</span>
-                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-factory" style="color:var(--z-mint);font-size:20px"></i> Собственное производство</span>
-                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-arrows-clockwise" style="color:var(--z-mint);font-size:20px"></i> Возврат по закону</span>
-                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-receipt" style="color:var(--z-mint);font-size:20px"></i> Чек и закрывающие документы</span>
-                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-file-text" style="color:var(--z-mint);font-size:20px"></i> Договор и счёт для юрлиц</span>
-                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-percent" style="color:var(--z-mint);font-size:20px"></i> Работаем с НДС</span>
-                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-gift" style="color:var(--z-mint);font-size:20px"></i> Образцы бесплатно</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="fas fa-shield-halved" style="color:var(--z-mint);font-size:20px"></i> Сертифицированные материалы EVA/ПВД</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="fas fa-industry" style="color:var(--z-mint);font-size:20px"></i> Собственное производство</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="fas fa-arrows-rotate" style="color:var(--z-mint);font-size:20px"></i> Возврат по закону</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="fas fa-receipt" style="color:var(--z-mint);font-size:20px"></i> Чек и закрывающие документы</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="fas fa-file-lines" style="color:var(--z-mint);font-size:20px"></i> Договор и счёт для юрлиц</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="fas fa-percent" style="color:var(--z-mint);font-size:20px"></i> Работаем с НДС</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="fas fa-gift" style="color:var(--z-mint);font-size:20px"></i> Образцы бесплатно</span>
                     </div>
                 </div>
             </section>
@@ -571,9 +571,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <div>
                             <h2 class="z-h2" style="font-size:clamp(26px,3.6vw,38px);margin-bottom:16px">Получите расчёт и образец бесплатно</h2>
                             <p style="font-size:16px;line-height:1.6;color:var(--z-text-2);margin-bottom:30px">Оставьте контакты — менеджер свяжется в течение 10 минут в рабочее время.</p>
-                            <a href="tel:<?= preg_replace('/[^0-9+]/', '', SUPPORT_PHONE) ?>" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-phone"></i></span><span><small>Телефон</small><b><?= htmlspecialchars(SUPPORT_PHONE) ?></b></span></a>
-                            <a href="https://t.me/zlock_sales_bot" target="_blank" rel="noopener noreferrer" class="z-contact-link"><span class="ic" style="background:rgba(34,158,217,.16);color:#5FB9E8"><i class="ph ph-telegram-logo"></i></span><span><small>Telegram</small><b>@zlock_sales_bot</b></span></a>
-                            <a href="mailto:<?= htmlspecialchars(ADMIN_EMAIL) ?>" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-envelope-simple"></i></span><span><small>Email</small><b><?= htmlspecialchars(ADMIN_EMAIL) ?></b></span></a>
+                            <a href="tel:<?= preg_replace('/[^0-9+]/', '', SUPPORT_PHONE) ?>" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="fas fa-phone"></i></span><span><small>Телефон</small><b><?= htmlspecialchars(SUPPORT_PHONE) ?></b></span></a>
+                            <a href="https://t.me/zlock_sales_bot" target="_blank" rel="noopener noreferrer" class="z-contact-link"><span class="ic" style="background:rgba(34,158,217,.16);color:#5FB9E8"><i class="fab fa-telegram"></i></span><span><small>Telegram</small><b>@zlock_sales_bot</b></span></a>
+                            <a href="mailto:<?= htmlspecialchars(ADMIN_EMAIL) ?>" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="fas fa-envelope"></i></span><span><small>Email</small><b><?= htmlspecialchars(ADMIN_EMAIL) ?></b></span></a>
                         </div>
                         <form id="leadForm" class="z-form">
                             <input type="text" name="name" placeholder="Ваше имя *" required>
@@ -583,7 +583,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                             <input type="hidden" name="type" value="contact_form">
                             <input type="hidden" id="recaptchaToken" name="recaptcha_token">
                             <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">согласие на обработку персональных данных</a></label>
-                            <button type="submit" class="z-btn z-btn-gold z-shine"><i class="ph ph-paper-plane-tilt"></i>Получить расчёт</button>
+                            <button type="submit" class="z-btn z-btn-gold z-shine"><i class="fas fa-paper-plane"></i>Получить расчёт</button>
                         </form>
                     </div>
                 </div>
@@ -598,18 +598,18 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     </div>
                     <div class="z-adv-grid" style="grid-template-columns:1fr 1fr">
                         <div class="z-card" data-reveal>
-                            <h3 class="z-h3" style="margin-bottom:14px"><i class="ph ph-sliders-horizontal" style="color:var(--z-mint)"></i> Пакеты с замком слайдер</h3>
+                            <h3 class="z-h3" style="margin-bottom:14px"><i class="fas fa-sliders" style="color:var(--z-mint)"></i> Пакеты с замком слайдер</h3>
                             <div style="display:flex;flex-direction:column;gap:8px">
                                 <?php foreach (array_slice($zSliders, 0, 10) as $r): ?>
-                                <a class="seo-product-link" href="/product/<?= (int)$r['id'] ?>" style="text-decoration:none"><i class="ph ph-check" style="color:var(--z-mint);margin-right:8px"></i><?= htmlspecialchars($r['short_name'] ?: $r['full_name']) ?></a>
+                                <a class="seo-product-link" href="/product/<?= (int)$r['id'] ?>" style="text-decoration:none"><i class="fas fa-check" style="color:var(--z-mint);margin-right:8px"></i><?= htmlspecialchars($r['short_name'] ?: $r['full_name']) ?></a>
                                 <?php endforeach; ?>
                             </div>
                         </div>
                         <div class="z-card" data-reveal>
-                            <h3 class="z-h3" style="margin-bottom:14px"><i class="ph ph-lock-key" style="color:var(--z-mint)"></i> Пакеты с замком ZIP-LOCK</h3>
+                            <h3 class="z-h3" style="margin-bottom:14px"><i class="fas fa-lock" style="color:var(--z-mint)"></i> Пакеты с замком ZIP-LOCK</h3>
                             <div style="display:flex;flex-direction:column;gap:8px">
                                 <?php foreach (array_slice($zGrippers, 0, 10) as $r): ?>
-                                <a class="seo-product-link" href="/product/<?= (int)$r['id'] ?>" style="text-decoration:none"><i class="ph ph-check" style="color:var(--z-mint);margin-right:8px"></i><?= htmlspecialchars($r['short_name'] ?: $r['full_name']) ?></a>
+                                <a class="seo-product-link" href="/product/<?= (int)$r['id'] ?>" style="text-decoration:none"><i class="fas fa-check" style="color:var(--z-mint);margin-right:8px"></i><?= htmlspecialchars($r['short_name'] ?: $r['full_name']) ?></a>
                                 <?php endforeach; ?>
                             </div>
                         </div>
