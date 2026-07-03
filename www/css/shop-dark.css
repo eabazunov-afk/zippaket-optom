@@ -243,9 +243,9 @@ body.zlock [style*="background: #fff"] {
 body.zlock .gallery-section,
 body.zlock .seo-products-section,
 body.zlock .production-section,
-body.zlock [style*="#f8fafc"],
-body.zlock [style*="#f1f5f9"],
-body.zlock [style*="#f9fafb"] { background: var(--z-bg-2) !important; }
+body.zlock [style*="#FBFAF6"],
+body.zlock [style*="#F3EFE3"],
+body.zlock [style*="#FBFAF6"] { background: var(--z-bg-2) !important; }
 
 body.zlock .advantage-card,
 body.zlock .step,
