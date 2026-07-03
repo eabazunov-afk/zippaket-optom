@@ -204,7 +204,7 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                                     <option value="<?= $sv ?>" <?= $sv === $st ? 'selected' : '' ?>><?= htmlspecialchars($sl) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <button class="btn btn-sm btn-primary" type="submit">OK</button>
+                            <button class="btn btn-sm btn-primary" type="submit" data-tooltip="Применить статус" aria-label="Применить статус"><i class="fas fa-check"></i></button>
                         </form>
                         <?php if ($isInvoicePending): ?>
                         <form class="inline" method="POST" style="margin-top:6px">

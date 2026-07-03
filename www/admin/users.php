@@ -965,21 +965,23 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                                                 data-email="<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                                 data-fullname="<?php echo htmlspecialchars($user['full_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                                 data-role="<?php echo htmlspecialchars($user['role'], ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-active="<?php echo $user['is_active']; ?>">
+                                                data-active="<?php echo $user['is_active']; ?>"
+                                                data-tooltip="Редактировать" aria-label="Редактировать">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             
                                             <?php if ($user['id'] != $current_user_id): ?>
                                                 <a href="?action=toggle_status&id=<?php echo $user['id']; ?>&csrf_token=<?php echo urlencode($_SESSION['csrf_token']); ?>" 
                                                    class="btn btn-sm <?php echo $user['is_active'] ? 'btn-warning' : 'btn-success'; ?>"
-                                                   title="<?php echo $user['is_active'] ? 'Деактивировать' : 'Активировать'; ?>">
+                                                   data-tooltip="<?php echo $user['is_active'] ? 'Деактивировать' : 'Активировать'; ?>"
+                                                   aria-label="<?php echo $user['is_active'] ? 'Деактивировать' : 'Активировать'; ?>">
                                                     <i class="fas fa-power-off"></i>
                                                 </a>
                                                 
                                                 <a href="?action=delete&id=<?php echo $user['id']; ?>&csrf_token=<?php echo urlencode($_SESSION['csrf_token']); ?>" 
                                                    class="btn btn-sm btn-danger"
                                                    onclick="return confirm('Удалить пользователя <?php echo addslashes($user['username']); ?>?')"
-                                                   title="Удалить">
+                                                   data-tooltip="Удалить" aria-label="Удалить">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             <?php endif; ?>
@@ -1213,7 +1215,7 @@ function showPasswordNotification(password) {
     
     notification.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <strong style="font-size: 16px;">🎉 Сгенерирован пароль!</strong>
+            <strong style="font-size: 16px;"><i class="fas fa-champagne-glasses"></i> Сгенерирован пароль!</strong>
             <button onclick="document.getElementById('passwordNotification').remove()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">&times;</button>
         </div>
         <div>

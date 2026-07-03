@@ -21,14 +21,14 @@ if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
 $db = getDbConnection();
 
 $trafficIcons = [
-    'paid_advertising' => '💸',
-    'seo' => '🔍',
-    'direct' => '🏠',
-    'social' => '👥',
-    'referral' => '🔗',
-    'email' => '✉️',
-    'telegram_bot' => '🤖',
-    'unknown' => '❓'
+    'paid_advertising' => '<i class="fas fa-bullhorn"></i>',
+    'seo' => '<i class="fas fa-magnifying-glass"></i>',
+    'direct' => '<i class="fas fa-house"></i>',
+    'social' => '<i class="fas fa-users"></i>',
+    'referral' => '<i class="fas fa-link"></i>',
+    'email' => '<i class="fas fa-envelope"></i>',
+    'telegram_bot' => '<i class="fas fa-robot"></i>',
+    'unknown' => '<i class="fas fa-circle-question"></i>'
 ];
 
 $trafficLabels = [
@@ -339,14 +339,14 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
             $trafficStats = $statsStmt->fetchAll();
             
             $trafficIcons = [
-                'paid_advertising' => '💸',
-                'seo' => '🔍',
-                'direct' => '🏠',
-                'social' => '👥',
-                'referral' => '🔗',
-                'email' => '✉️',
-                'telegram_bot' => '🤖',
-                'unknown' => '❓'
+                'paid_advertising' => '<i class="fas fa-bullhorn"></i>',
+                'seo' => '<i class="fas fa-magnifying-glass"></i>',
+                'direct' => '<i class="fas fa-house"></i>',
+                'social' => '<i class="fas fa-users"></i>',
+                'referral' => '<i class="fas fa-link"></i>',
+                'email' => '<i class="fas fa-envelope"></i>',
+                'telegram_bot' => '<i class="fas fa-robot"></i>',
+                'unknown' => '<i class="fas fa-circle-question"></i>'
             ];
             
             $trafficLabels = [
@@ -362,7 +362,7 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
             
             foreach ($trafficStats as $stat):
                 $type = $stat['traffic_type'] ?: 'unknown';
-                $icon = $trafficIcons[$type] ?? '❓';
+                $icon = $trafficIcons[$type] ?? '<i class="fas fa-circle-question"></i>';
                 $label = $trafficLabels[$type] ?? 'Неизвестно';
                 $count = $stat['count'];
                 $percentage = $total > 0 ? round(($count / $total) * 100, 1) : 0;
@@ -383,14 +383,14 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
 <?php
 // Определяем массивы для фильтров ДО их использования
 $trafficIcons = [
-    'paid_advertising' => '💸',
-    'seo' => '🔍',
-    'direct' => '🏠',
-    'social' => '👥',
-    'referral' => '🔗',
-    'email' => '✉️',
-    'telegram_bot' => '🤖',
-    'unknown' => '❓'
+    'paid_advertising' => '<i class="fas fa-bullhorn"></i>',
+    'seo' => '<i class="fas fa-magnifying-glass"></i>',
+    'direct' => '<i class="fas fa-house"></i>',
+    'social' => '<i class="fas fa-users"></i>',
+    'referral' => '<i class="fas fa-link"></i>',
+    'email' => '<i class="fas fa-envelope"></i>',
+    'telegram_bot' => '<i class="fas fa-robot"></i>',
+    'unknown' => '<i class="fas fa-circle-question"></i>'
 ];
 
 $trafficLabels = [
@@ -416,7 +416,7 @@ $trafficLabels = [
     </a>
     
     <?php foreach ($trafficLabels as $type => $label): 
-        $icon = $trafficIcons[$type] ?? '❓';
+        $icon = $trafficIcons[$type] ?? '<i class="fas fa-circle-question"></i>';
         $isActive = $trafficTypeFilter === $type;
     ?>
     <a href="?<?php 
@@ -438,14 +438,14 @@ $trafficLabels = [
                     <label for="traffic_type">Тип трафика</label>
                     <select id="traffic_type" name="traffic_type" class="form-control">
                         <option value="">Все типы</option>
-                        <option value="paid_advertising" <?php echo $trafficTypeFilter === 'paid_advertising' ? 'selected' : ''; ?>>💸 Рекламный</option>
-                        <option value="seo" <?php echo $trafficTypeFilter === 'seo' ? 'selected' : ''; ?>>🔍 SEO/Органический</option>
-                        <option value="direct" <?php echo $trafficTypeFilter === 'direct' ? 'selected' : ''; ?>>🏠 Прямые переходы</option>
-                        <option value="social" <?php echo $trafficTypeFilter === 'social' ? 'selected' : ''; ?>>👥 Социальные сети</option>
-                        <option value="referral" <?php echo $trafficTypeFilter === 'referral' ? 'selected' : ''; ?>>🔗 Реферальный</option>
-                        <option value="email" <?php echo $trafficTypeFilter === 'email' ? 'selected' : ''; ?>>✉️ Email</option>
-                        <option value="telegram_bot" <?php echo $trafficTypeFilter === 'telegram_bot' ? 'selected' : ''; ?>>🤖 Telegram Bot</option>
-                        <option value="unknown" <?php echo $trafficTypeFilter === 'unknown' ? 'selected' : ''; ?>>❓ Неизвестный</option>
+                        <option value="paid_advertising" <?php echo $trafficTypeFilter === 'paid_advertising' ? 'selected' : ''; ?>><i class="fas fa-bullhorn"></i> Рекламный</option>
+                        <option value="seo" <?php echo $trafficTypeFilter === 'seo' ? 'selected' : ''; ?>><i class="fas fa-magnifying-glass"></i> SEO/Органический</option>
+                        <option value="direct" <?php echo $trafficTypeFilter === 'direct' ? 'selected' : ''; ?>><i class="fas fa-house"></i> Прямые переходы</option>
+                        <option value="social" <?php echo $trafficTypeFilter === 'social' ? 'selected' : ''; ?>><i class="fas fa-users"></i> Социальные сети</option>
+                        <option value="referral" <?php echo $trafficTypeFilter === 'referral' ? 'selected' : ''; ?>><i class="fas fa-link"></i> Реферальный</option>
+                        <option value="email" <?php echo $trafficTypeFilter === 'email' ? 'selected' : ''; ?>><i class="fas fa-envelope"></i> Email</option>
+                        <option value="telegram_bot" <?php echo $trafficTypeFilter === 'telegram_bot' ? 'selected' : ''; ?>><i class="fas fa-robot"></i> Telegram Bot</option>
+                        <option value="unknown" <?php echo $trafficTypeFilter === 'unknown' ? 'selected' : ''; ?>><i class="fas fa-circle-question"></i> Неизвестный</option>
                     </select>
                 </div>
                 
@@ -523,14 +523,14 @@ $trafficLabels = [
                             $trafficType = $parameters['traffic_type'] ?? 'unknown';
                             
                             $trafficIcons = [
-                                'paid_advertising' => '💸',
-                                'seo' => '🔍',
-                                'direct' => '🏠',
-                                'social' => '👥',
-                                'referral' => '🔗',
-                                'email' => '✉️',
-                                'telegram_bot' => '🤖',
-                                'unknown' => '❓'
+                                'paid_advertising' => '<i class="fas fa-bullhorn"></i>',
+                                'seo' => '<i class="fas fa-magnifying-glass"></i>',
+                                'direct' => '<i class="fas fa-house"></i>',
+                                'social' => '<i class="fas fa-users"></i>',
+                                'referral' => '<i class="fas fa-link"></i>',
+                                'email' => '<i class="fas fa-envelope"></i>',
+                                'telegram_bot' => '<i class="fas fa-robot"></i>',
+                                'unknown' => '<i class="fas fa-circle-question"></i>'
                             ];
                             
                             $trafficLabels = [
@@ -544,22 +544,22 @@ $trafficLabels = [
                                 'unknown' => 'Неизв.'
                             ];
                             
-                            $icon = $trafficIcons[$trafficType] ?? '❓';
+                            $icon = $trafficIcons[$trafficType] ?? '<i class="fas fa-circle-question"></i>';
                             $label = $trafficLabels[$trafficType] ?? 'Неизвестно';
                             
                             $source = $lead['source'] ?? 'website';
                             $sourceIcons = [
-                                'yandex_direct' => '🔶',
-                                'google_ads' => '🔵',
-                                'facebook_ads' => '🔵',
-                                'yandex' => '🔶',
-                                'google' => '🔵',
-                                'vkontakte' => '🔵',
-                                'direct' => '🏠',
-                                'organic' => '🔍',
-                                'telegram_bot' => '🤖'
+                                'yandex_direct' => '<i class="fas fa-diamond"></i>',
+                                'google_ads' => '<i class="fab fa-google"></i>',
+                                'facebook_ads' => '<i class="fab fa-google"></i>',
+                                'yandex' => '<i class="fas fa-diamond"></i>',
+                                'google' => '<i class="fab fa-google"></i>',
+                                'vkontakte' => '<i class="fab fa-google"></i>',
+                                'direct' => '<i class="fas fa-house"></i>',
+                                'organic' => '<i class="fas fa-magnifying-glass"></i>',
+                                'telegram_bot' => '<i class="fas fa-robot"></i>'
                             ];
-                            $sourceIcon = $sourceIcons[$source] ?? '🌐';
+                            $sourceIcon = $sourceIcons[$source] ?? '<i class="fas fa-globe"></i>';
                         ?>
                         <tr>
                             <td>#<?php echo $lead['id']; ?></td>
@@ -614,17 +614,18 @@ $trafficLabels = [
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="/admin/lead_details.php?id=<?php echo $lead['id']; ?>" class="btn btn-sm btn-info">
+                                    <a href="/admin/lead_details.php?id=<?php echo $lead['id']; ?>" class="btn btn-sm btn-info" data-tooltip="Открыть заявку" aria-label="Открыть заявку">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="/admin/?action=change_status&id=<?php echo $lead['id']; ?>&status=processed" class="btn btn-sm btn-warning">
+                                    <a href="/admin/?action=change_status&id=<?php echo $lead['id']; ?>&status=processed" class="btn btn-sm btn-warning" data-tooltip="В работу" aria-label="В работу">
                                         <i class="fas fa-spinner"></i>
                                     </a>
-                                    <a href="/admin/?action=change_status&id=<?php echo $lead['id']; ?>&status=completed" class="btn btn-sm btn-success">
+                                    <a href="/admin/?action=change_status&id=<?php echo $lead['id']; ?>&status=completed" class="btn btn-sm btn-success" data-tooltip="Завершить" aria-label="Завершить">
                                         <i class="fas fa-check"></i>
                                     </a>
-                                    <a href="/admin/?action=delete&id=<?php echo $lead['id']; ?>" 
+                                    <a href="/admin/?action=delete&id=<?php echo $lead['id']; ?>"
                                        class="btn btn-sm btn-danger"
+                                       data-tooltip="Удалить" aria-label="Удалить"
                                        onclick="return confirm('Удалить заявку #<?php echo $lead['id']; ?>?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
