@@ -104,9 +104,16 @@ body.zlock .old-price { color: var(--z-text-3) !important; }
 body.zlock .spec-item,
 body.zlock .product-spec,
 body.zlock .badge {
-    background: var(--z-surface-2) !important;
-    border: 1px solid var(--z-hairline) !important;
-    color: var(--z-text-2) !important;
+    background: var(--z-surface) !important;
+    border: 1px solid var(--z-hairline-strong) !important;
+    color: var(--z-text) !important;
+}
+/* «Хит»/«Топ» — заливной бронзовый, чтобы читались и выделялись */
+body.zlock .badge-popular,
+body.zlock .badge-abc {
+    background: var(--z-gold) !important;
+    border-color: var(--z-gold) !important;
+    color: #231A08 !important;
 }
 body.zlock .spec-item i { color: var(--z-mint) !important; }
 
