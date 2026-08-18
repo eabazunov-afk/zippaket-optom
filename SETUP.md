@@ -14,7 +14,7 @@
 ```bash
 git clone https://github.com/eabazunov-afk/zippaket-optom.git
 cd zippaket-optom
-git checkout feature/light-design-system   # актуальная ветка работы
+git checkout fix/audit-2026-08-18   # актуальная ветка работы (поверх стека витрины и A3)
 ```
 
 ## 2. Конфигурация (config.php)
@@ -35,36 +35,75 @@ cp www/includes/config.example.php www/includes/config.php
 
 ## 3. База данных
 
-Создай базу и залей данные. **Вариант А (быстрый, с данными)** — импорт полного дампа:
+Имя базы по умолчанию — **`c103264_zippaket_optom_ru`** (оно же в `config.example.php`
+и на хостинге). Если возьмёшь другое — не забудь `DB_NAME` в `config.php`.
 
-```bash
-mysql -u root -p -e "CREATE DATABASE zippaket CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p zippaket < c103264_zippaket_optom_ru.sql
+**Вариант А (штатный) — сид из репозитория.** Схема + 49 товаров, без персональных
+данных. Работает в свежем клоне, ничего скачивать не надо.
+
+PowerShell (Windows, MySQL из Laragon не в PATH):
+
+```powershell
+$mysql = "C:\laragon\bin\mysql\mysql-8.4.3-winx64\bin\mysql.exe"
+$db    = "c103264_zippaket_optom_ru"
+& $mysql -u root -e "CREATE DATABASE IF NOT EXISTS $db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+cmd /c "`"$mysql`" -u root $db < db\seed\schema.sql"
+cmd /c "`"$mysql`" -u root $db < db\seed\products-data.sql"
 ```
 
-**Вариант Б (чистая схема)** — схема + товары:
+Bash (Linux/macOS, mysql в PATH):
 
 ```bash
-mysql -u root -p zippaket < db/seed/schema.sql
-mysql -u root -p zippaket < db/seed/products-data.sql
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS c103264_zippaket_optom_ru CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p c103264_zippaket_optom_ru < db/seed/schema.sql
+mysql -u root -p c103264_zippaket_optom_ru < db/seed/products-data.sql
+```
+
+**Вариант Б — полный дамп с боевыми данными.** Файла `c103264_zippaket_optom_ru.sql`
+**в репозитории нет** (`.gitignore` режет `*.sql` — там персональные данные лидов).
+Этот вариант доступен, только если ты сам скачал дамп с хостинга или перенёс
+с исходной машины:
+
+```bash
+mysql -u root -p c103264_zippaket_optom_ru < c103264_zippaket_optom_ru.sql
 ```
 
 ### Миграции
 
-После заливки базы накати миграции по порядку (идемпотентны — можно повторно):
+После заливки базы накати миграции по порядку имён. Все они идемпотентны —
+повторный запуск не падает и не плодит дубликаты; на свежем сиде они лишь
+досыпают стартовые строки (отзывы, цены калькулятора, роль `superadmin`).
+
+PowerShell:
+
+```powershell
+Get-ChildItem db\migrations\*.sql | Sort-Object Name | ForEach-Object {
+    Write-Host "applying $($_.Name)"
+    cmd /c "`"$mysql`" -u root $db < `"$($_.FullName)`""
+}
+```
+
+> `cmd /c`, а не `mysql -e "source ..."`: в пути к репозиторию кириллица
+> (`…\Documents\Сайт\…`), и `source` такой файл не открывает.
+
+Bash:
 
 ```bash
 for f in db/migrations/*.sql; do
   echo "applying $f"
-  mysql -u root -p zippaket < "$f"
+  mysql -u root -p c103264_zippaket_optom_ru < "$f"
 done
 ```
 
 Список на текущий момент:
-- `2026-06-18-orders-schema.sql` — таблицы заказов
-- `2026-06-19-order-access-token.sql` — токен доступа к заказу
+- `2026-06-18-orders-schema.sql` — поля упаковки у товаров + таблицы заказов
+- `2026-06-19-order-access-token.sql` — токен доступа к заказу (IDOR-фикс)
 - `2026-07-02-reviews.sql` — отзывы
 - `2026-07-03-settings.sql` — настройки калькулятора (цены материалов)
+- `2026-08-18-admin-roles.sql` — роли админов (`superadmin`/`viewer`)
+- `2026-08-18-offer-carts.sql` — «сборная корзина» расчётов
+
+Подробности (что делает каждая, откат, как пересобрать сид) — `db/README.md`.
 
 ### Админ-пользователь
 
@@ -75,15 +114,37 @@ done
 
 ## 4. Запуск дев-сервера
 
-Встроенный PHP-сервер с локальным роутером (эмулирует правила .htaccess):
+**Канонический способ — `start-dev.ps1`** (он же поднимет MySQL, если тот не запущен):
 
-```bash
-php -S 127.0.0.1:8077 -t www www/_dev_router.php
+```powershell
+.\start-dev.ps1              # http://127.0.0.1:8000/
+.\start-dev.ps1 -Port 8077   # другой порт
+.\start-dev.ps1 -SkipMysql   # если MySQL уже поднят Laragon'ом
 ```
 
-Открыть: http://127.0.0.1:8077/ · админка: http://127.0.0.1:8077/admin/
+PHP и MySQL скрипт ищет сам в `C:\laragon`, `%USERPROFILE%\laragon` и в PATH —
+версии в путях не захардкожены.
+
+Если PowerShell недоступен — то же самое руками (роутер `router.php` эмулирует
+ЧПУ-правила `www/.htaccess`):
+
+```bash
+php -S 127.0.0.1:8000 -t www router.php
+```
+
+Открыть: http://127.0.0.1:8000/ · админка: http://127.0.0.1:8000/admin/
+
+> `127.0.0.1`, а не `localhost`: на Windows `localhost` резолвится в `::1`,
+> и `php -S` садится только на IPv6.
+>
+> В `www/` лежит ещё `_dev_router.php` — более ранний вариант того же роутера.
+> Он не используется и является кандидатом на удаление.
 
 ## 5. Тесты
+
+Composer в репозитории **нет** (`www/composer` — phar, он в `.gitignore`).
+В свежем клоне поставь его: https://getcomposer.org/download/ (либо
+`winget install Composer` / пакетный менеджер системы).
 
 ```bash
 cd www
@@ -91,7 +152,9 @@ composer install          # один раз, ставит PHPUnit
 php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
 ```
 
-Ожидаемо: `OK (80 tests, ...)`.
+Ожидаемо — строка `OK (...)` без единого F/E.
+Последний замер: `OK (124 tests, 450 assertions)` — 2026-08-18, PHPUnit 9.6.34.
+Число тестов растёт с каждой фичей; ориентир — статус `OK`, а не конкретное число.
 
 ---
 
@@ -100,6 +163,9 @@ php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
 | Через git (есть на GitHub) | Только локально (настроить заново) |
 |---|---|
 | Весь код, шаблоны, CSS/JS | `config.php` (пароли/ключи) |
-| Миграции и сиды БД | Сама база данных (данные) |
+| Миграции и сиды БД (`db/`) | Сама база данных (данные) |
 | Тесты, документация | Загруженные файлы в `www/uploads/` |
-| `_dev_router.php` | Аккаунты админки |
+| `router.php`, `start-dev.ps1` | Аккаунты админки |
+| | `www/vendor/` (ставится `composer install`) |
+| | Composer (`www/composer` — phar, в `.gitignore`) |
+| | Полный дамп БД (`*.sql`, `*.tar.gz`) |

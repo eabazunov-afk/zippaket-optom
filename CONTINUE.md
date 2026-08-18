@@ -4,9 +4,16 @@
 Весь код, спеки, планы и PII-free сид БД — в GitHub. Локальные секреты и дамп с
 персональными данными в репозиторий НЕ попадают (см. раздел «Что не в GitHub»).
 
-## Текущий статус (на 2026-06-18)
+## Текущий статус (на 2026-08-18)
 
-Сделано (смержено в `master`):
+Активная ветка — **`fix/audit-2026-08-18`** (исправления по итогам аудита:
+безопасность, CSP, роли админки, telegram-вебхук, сохранение заявок, миграции БД).
+Она стоит поверх стека `feature/vitrina-faza-A → B → C → feature/light-design-system`.
+
+⚠️ **В `master` этот стек ещё НЕ слит** (`master` = `04c3624` от 2026-07-01).
+Порядок мержа расписан в `DEPLOY.md`, п. 1.
+
+### Сделано и уже в `master`
 - **План 1 — Фундамент и безопасность**: тест-харнес PHPUnit, валидация количеств,
   статусы заказа, интерфейс `PaymentGateway`, `config.example.php`, миграция БД.
 - **План 2 — Каталог и карточка товара**: `getProductById`, страница `product.php`,
@@ -30,16 +37,39 @@
   BreadcrumbList, canonical, фикс бага `SITE_URL`. Главная — отдельной итерацией.
   См. `docs/superpowers/plans/2026-06-18-редизайн-и-seo.md`.
 
-- **Редизайн главной**: премиум-слой `css/home-premium.css` по флагу `body.premium` —
-  ремап CSS-переменных `style.css` на премиум-палитру (мята/навигация/золото) + полиш
-  hero/секций/карточек/формы. Лендинг перекрашен без правки legacy-разметки.
+### Сделано после этого (в ветках, в `master` ещё не слито)
+
+- **Витрина, фаза A** (`feature/vitrina-faza-A`): главная пересобрана в B2B-витрину —
+  hero с поиском-подбором, секции «Хиты продаж» и «Новинки» из БД, опт-цены
+  (`WHOLESALE_TIERS` в config), лид-механики: «Запросить КП» (RFQ), быстрый заказ
+  в 1 клик, лид-магнит «Скачать прайс» (XLS из БД, `www/price.php`).
+- **Витрина, фаза B** (`feature/vitrina-faza-B`): отзывы в БД (`reviews`) с публичной
+  формой и модерацией в админке, блок кейсов, FAQ по опту (+FAQPage schema),
+  расширенные гарантии/документы, плавающий виджет мессенджеров.
+- **Витрина, фаза C** (`feature/vitrina-faza-C`): SEO/перф — Product JSON-LD
+  с aggregateRating, ItemList для каталога, canonical/OG на статике, LCP/CLS hero.
+- **Светлая дизайн-система A3 «Бронза»** (`feature/light-design-system`): токены
+  `--z-*` перекрашены из тёмных в светлые, типографика Fraunces, консолидация
+  `--pm-*`, тёплая серая шкала, единый набор иконок FontAwesome (Phosphor отменён,
+  коммит `e9a2d48`). Редизайн админки, страница «Расчёты», цены материалов
+  калькулятора редактируются в админке (таблица `settings`).
+- **Аудит-фиксы** (`fix/audit-2026-08-18`, текущая ветка): CSP, XSS в JSON-LD и
+  параметрах каталога, атомарный переход статуса заказа, реальное сохранение
+  заявок, секрет на telegram-вебхуке, роли админки, миграции `2026-08-18-*`.
+
+> Прежний «премиум-слой главной» `css/home-premium.css` **больше не используется**:
+> файл существует, но ни один шаблон его не подключает (`grep -rn home-premium www/`
+> даёт только комментарий внутри самого файла). Главная перекрашена напрямую через
+> токены `--z-*`. Кандидат на удаление.
 
 Дальше по дорожной карте:
+- Слить стек веток в `master` (`DEPLOY.md`, п. 1) и выкатить на прод.
 - Боевые доступы: креды ЮKassa, перевыпуск токена amoCRM, MTA для email.
-- Визуальная донастройка главной на реальных скриншотах/устройствах.
+- Решения владельца: категории Stand-Up/вакуумные (A4), финальность концепции главной.
 
-Артефакты: спека — `docs/superpowers/specs/`, планы — `docs/superpowers/plans/`,
-research — `thoughts/research/`.
+Артефакты: спеки — `docs/superpowers/specs/`, планы — `docs/superpowers/plans/`
+(у каждого плана в шапке блок «Статус»), сверка с продом —
+`docs/расхождения-прод-vs-master.md`, research — `thoughts/research/`.
 
 ## Установка на новой машине
 
@@ -54,11 +84,14 @@ cd zippaket-optom
 PHP 8.3+, MySQL/MariaDB 8.x, Composer. Запустить MySQL.
 
 ### 3. Зависимости Composer
+Composer'а в свежем клоне **нет**: `www/composer` (phar) лежит в `.gitignore`,
+файла `composer.phar` в репозитории тоже нет. Поставь Composer сам —
+https://getcomposer.org/download/ (или `winget install Composer`), затем:
+
 ```bash
 cd www
-php composer.phar install      # или: composer install (если composer в PATH)
+composer install
 ```
-(в репозитории лежит `www/composer` — phar; запуск: `php composer install`)
 
 ### 4. Конфигурация (секреты — локально)
 ```bash
@@ -67,6 +100,7 @@ cp config.example.php config.php
 ```
 Затем открыть `www/includes/config.php` и заполнить реальные значения:
 - БД: `DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASS` (для локалки обычно root@localhost, пустой пароль);
+- **все `SELLER_*`** — обязательны, иначе футер падает с Fatal (список — в `SETUP.md`, п. 2);
 - amoCRM, reCAPTCHA, ЮKassa — реальные ключи (см. исходную машину/хостинг).
 
 ### 5. База данных (из PII-free сида в репозитории)
@@ -77,22 +111,32 @@ mysql -u root -e "CREATE DATABASE IF NOT EXISTS c103264_zippaket_optom_ru CHARAC
 mysql -u root c103264_zippaket_optom_ru < db/seed/schema.sql
 # данные товаров (49 позиций, без персональных данных)
 mysql -u root c103264_zippaket_optom_ru < db/seed/products-data.sql
+# миграции — по порядку имён, все идемпотентны
+for f in db/migrations/*.sql; do mysql -u root c103264_zippaket_optom_ru < "$f"; done
 ```
-> `db/seed/schema.sql` уже включает все изменения миграций (поля упаковки `products`,
-> таблицы `orders`/`order_items`). Отдельно `db/migrations/*.sql` применять НЕ нужно —
-> они для исходной БД. Сид воспроизводит актуальную схему целиком.
+> Миграции применять **обязательно**: сид — снимок схемы, а миграции ещё и досыпают
+> стартовые данные (отзывы, цены материалов калькулятора, роль `superadmin`).
+> Варианты команд для Windows/PowerShell и разбор каждой миграции — в `db/README.md`
+> и `SETUP.md`. Процедура проверена прогоном на чистой БД 2026-08-18.
 
 ### 6. Проверка
 ```bash
 cd www
 php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
-# ожидается: OK (49 tests, ...)  # после Плана 6
+# ожидается строка OK (...) без F/E.
+# последний замер: OK (124 tests, 450 assertions) — 2026-08-18, PHPUnit 9.6.34.
+# число растёт с каждой фичей: ориентир — статус OK, а не конкретное число.
 ```
-Запустить сайт: указать `www/` корнем веб-сервера (Apache из Laragon) или
-`php -S localhost:8000 -t www` для быстрой проверки страниц.
+Запустить сайт — из корня репозитория:
+```powershell
+.\start-dev.ps1          # http://127.0.0.1:8000/ , админка /admin/
+```
+Скрипт сам находит PHP и MySQL (Laragon или PATH) и поднимает встроенный
+PHP-сервер через `router.php` (эмуляция ЧПУ из `www/.htaccess`).
+Без PowerShell — то же вручную: `php -S 127.0.0.1:8000 -t www router.php`.
 
 > На Windows без PHP в PATH используйте полный путь к php.exe
-> (напр. `C:\laragon\bin\php\php-8.3.x...\php.exe`).
+> (напр. `C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe`).
 
 ## Что НЕ в GitHub (и почему)
 
@@ -101,7 +145,8 @@ php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
 - `c103264_zippaket_optom_ru.sql` и `.tar.gz` — полный дамп с персональными данными
   лидов. Для разработки НЕ нужен — есть PII-free сид (`db/seed/`). Полные данные брать
   с хостинга при необходимости.
-- `www/vendor/`, логи, `www/tg/users/`, `.superpowers/`.
+- `www/vendor/` (ставится `composer install`), `www/composer` (phar самого Composer'а —
+  ставить с getcomposer.org), логи, `www/tg/users/`, `.superpowers/`.
 
 ## Удалённое управление сессией (с телефона/другого устройства)
 

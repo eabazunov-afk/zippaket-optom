@@ -1,5 +1,15 @@
 # Витрина — Фаза A (P0: продающая главная + лид-механики) — Implementation Plan
 
+> **Статус: реализовано (2026-07-01), ветка `feature/vitrina-faza-A`.**
+> ⚠️ В `master` ещё НЕ слито — стек PR ждёт мержа (`DEPLOY.md` §1).
+> Коммиты: `c3504a2` (home_view + тесты), `0c60bda` (`getNewProducts`),
+> `e34313f` (`WHOLESALE_TIERS`), `dadcba6` (hero + поиск-подбор), `1c9d6c6` («Хиты»),
+> `bfdcdcd` («Новинки»), `220a43a` (единые контакты), `f6c510f` (RFQ),
+> `30d97ec` (быстрый заказ), `c1d4212` (прайс XLS), `11d5065` (регрессия).
+> ⚠️ Визуальная часть плана описана в тёмной теме — она отменена светлой
+> дизайн-системой A3 (`2026-07-03-svetlaya-dizayn-sistema.md`).
+> Чекбоксы `- [ ]` ниже по ходу работы не обновлялись — ориентируйтесь на этот блок.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Пересобрать главную из имиджевого лендинга в продающую B2B-витрину: hero-оффер под опт с поиском-подбором и двумя CTA, секции «Хиты» и «Новинки» из БД, открытые опт-цены, единые контакты, и три лид-механики (запросить КП, быстрый заказ в 1 клик, скачать прайс XLS).
