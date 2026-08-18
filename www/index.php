@@ -123,6 +123,8 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF для fetch-запросов корзины (js/cart.js) -->
+    <meta name="csrf-token" content="<?= htmlspecialchars(generateCsrfToken()) ?>">
     <title>ZIP-пакеты от производителя | Производство на заказ | Завод по производству зип пакетов</title>
     <meta name="description" content="Производство ZIP-пакетов на заказ. Собственное производство, печать любого тиража, доставка по РФ. Бесплатные образцы и расчёт стоимости онлайн.">
 
