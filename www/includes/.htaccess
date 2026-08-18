@@ -1,0 +1,28 @@
+# /includes/.htaccess
+#
+# Каталог с серверными подключаемыми файлами (init.php, config.php,
+# бизнес-логика, шаблоны). Прямой HTTP-доступ к ним запрещён —
+# они подключаются только через require/include из корневых скриптов.
+# Запрет наследуется вложенными каталогами (notify/, payment/).
+#
+# ИСКЛЮЧЕНИЕ: api.php — боевой AJAX-эндпоинт, к которому обращается
+# фронтенд (js/script.js, js/rfq.js: /includes/api.php?action=...).
+# Его закрывать НЕЛЬЗЯ.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
+
+<Files "api.php">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Allow from all
+    </IfModule>
+</Files>
