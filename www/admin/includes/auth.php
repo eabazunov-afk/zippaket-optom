@@ -1,6 +1,10 @@
 <?php
 // /admin/includes/auth.php
 
+// Иерархия ролей и матрица прав живут в permissions.php — подключаем,
+// чтобы checkAdminRole() и матрица пользовались одними и теми же уровнями.
+require_once __DIR__ . '/permissions.php';
+
 /**
  * Проверка администраторской сессии
  */
@@ -23,8 +27,8 @@ function checkAdminAuth() {
     // Проверяем наличие ID администратора
     if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
         logAttempt(null, 'session_missing', false);
-        header('HTTP/1.1 403 Forbidden');
-        header('Location: /admin/login.php?error=session_expired');
+        // 302, а не 403: с кодом 403 браузер игнорирует Location и показывает пустую страницу
+        header('Location: /admin/login.php?error=session_expired', true, 302);
         exit;
     }
     
@@ -60,18 +64,11 @@ function checkAdminAuth() {
  */
 function checkAdminRole($required_role = 'admin') {
     $current_role = $_SESSION['admin_role'] ?? 'guest';
-    
-    $role_hierarchy = [
-        'superadmin' => 4,
-        'admin' => 3,
-        'manager' => 2,
-        'viewer' => 1,
-        'guest' => 0
-    ];
-    
-    $current_level = $role_hierarchy[$current_role] ?? 0;
-    $required_level = $role_hierarchy[$required_role] ?? 0;
-    
+
+    // Уровни берём из общей иерархии ($ROLE_HIERARCHY в permissions.php)
+    $current_level = roleLevel($current_role);
+    $required_level = roleLevel($required_role);
+
     if ($current_level < $required_level) {
         logAttempt($_SESSION['admin_username'] ?? 'unknown', 'insufficient_permissions', false);
         header('HTTP/1.1 403 Forbidden');
@@ -139,26 +136,41 @@ function logAttempt($username, $reason = '', $success = false) {
 }
 
 /**
- * Проверка лимита попыток входа для админки
+ * Причины из login_attempts, которые считаются неудачной попыткой подбора пароля.
+ * Всё остальное (истёкшая сессия, отказ по правам, факт блокировки) счётчик
+ * брутфорса не увеличивает — иначе блокировка сама себя продлевает.
  */
-function checkAdminBruteForce($username, $ip) {
+function bruteForceCountedReasons() {
+    return ['user_not_found', 'wrong_password'];
+}
+
+/**
+ * Проверка лимита попыток входа с одного IP.
+ * Счётчик по учётной записи ведётся отдельно (admins.failed_attempts / locked_until),
+ * чтобы чужие переборы не запирали конкретного администратора.
+ */
+function checkAdminBruteForce($ip) {
     try {
         // Получаем соединение с БД
         $db = getDbConnection();
-        
-        $time_window = 15 * 60; // 15 минут
-        $max_attempts = 5;
-        
+
+        $window_minutes = (defined('LOGIN_ATTEMPT_TIMEOUT') ? LOGIN_ATTEMPT_TIMEOUT : 900) / 60;
+        $max_attempts = defined('MAX_LOGIN_ATTEMPTS_IP') ? MAX_LOGIN_ATTEMPTS_IP : 15;
+
+        $reasons = bruteForceCountedReasons();
+        $placeholders = implode(',', array_fill(0, count($reasons), '?'));
+
         $stmt = $db->prepare("
-            SELECT COUNT(*) as attempts 
-            FROM login_attempts 
-            WHERE (username = ? OR ip_address = ?) 
+            SELECT COUNT(*) as attempts
+            FROM login_attempts
+            WHERE ip_address = ?
             AND attempt_time > DATE_SUB(NOW(), INTERVAL ? MINUTE)
             AND success = 0
+            AND reason IN ($placeholders)
         ");
-        $stmt->execute([$username, $ip, $time_window / 60]);
+        $stmt->execute(array_merge([$ip, $window_minutes], $reasons));
         $result = $stmt->fetch();
-        
+
         return ($result && $result['attempts'] >= $max_attempts);
     } catch (Exception $e) {
         error_log("Brute force check failed: " . $e->getMessage());

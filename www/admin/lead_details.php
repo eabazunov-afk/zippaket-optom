@@ -3,14 +3,11 @@ require_once '../includes/init.php';
 require_once 'includes/security_config.php';
 require_once 'includes/auth.php';
 require_once 'includes/permissions.php';
+require_once 'includes/audit.php';
 
 checkAdminAuth();
 $current_page = basename($_SERVER['PHP_SELF']);
 checkPageAccess($current_page);
-
-if (isset($_GET['action']) && $_GET['action'] == 'delete') {
-    requirePermission('delete_leads');
-}
 
 if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
     header('Location: /admin/login.php');
@@ -38,45 +35,66 @@ if (!$lead) {
 $adminName = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'Администратор';
 $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
 
-if (isset($_GET['action']) && $_GET['action'] == 'change_status' && isset($_GET['status'])) {
-    $newStatus = $_GET['status'];
-    $validStatuses = array('new', 'processed', 'completed', 'rejected');
-    
-    if (in_array($newStatus, $validStatuses)) {
-        try {
-            $updateStmt = $db->prepare("UPDATE leads SET status = ?, updated_at = NOW() WHERE id = ?");
-            $updateStmt->execute([$newStatus, $leadId]);
-            
-            logAction('lead_status_changed', array(
-                'lead_id' => $leadId,
-                'new_status' => $newStatus,
-                'admin_id' => $_SESSION['admin_id']
-            ));
-            
-            $stmt->execute([$leadId]);
-            $lead = $stmt->fetch();
-            
-            $successMessage = 'Статус заявки успешно обновлен';
-        } catch (Exception $e) {
-            $errorMessage = 'Ошибка при обновлении статуса';
+// Токен для POST-форм действий
+$csrf = generateCsrfToken();
+
+// Изменяющие действия — только POST с CSRF-токеном
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $postAction = $_POST['action'] ?? '';
+
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        $errorMessage = 'Сессия истекла, обновите страницу';
+        $postAction = '';
+    }
+
+    if ($postAction === 'change_status') {
+        requirePermission('edit_leads');
+
+        $newStatus = $_POST['status'] ?? '';
+        $validStatuses = array('new', 'processed', 'completed', 'rejected');
+
+        if (in_array($newStatus, $validStatuses)) {
+            try {
+                $updateStmt = $db->prepare("UPDATE leads SET status = ?, updated_at = NOW() WHERE id = ?");
+                $updateStmt->execute([$newStatus, $leadId]);
+
+                logAction('lead_status_changed', array(
+                    'lead_id' => $leadId,
+                    'new_status' => $newStatus,
+                    'admin_id' => $_SESSION['admin_id']
+                ));
+                logAdminAction('lead_status_changed', 'lead', $leadId, array('new_status' => $newStatus));
+
+                $stmt->execute([$leadId]);
+                $lead = $stmt->fetch();
+
+                $successMessage = 'Статус заявки успешно обновлен';
+            } catch (Exception $e) {
+                error_log('admin/lead_details.php change_status: ' . $e->getMessage());
+                $errorMessage = 'Ошибка при обновлении статуса';
+            }
         }
     }
-}
 
-if (isset($_GET['action']) && $_GET['action'] == 'delete') {
-    try {
-        $deleteStmt = $db->prepare("DELETE FROM leads WHERE id = ?");
-        $deleteStmt->execute([$leadId]);
-        
-        logAction('lead_deleted', array(
-            'lead_id' => $leadId,
-            'admin_id' => $_SESSION['admin_id']
-        ));
-        
-        header('Location: /admin/leads.php?message=Заявка успешно удалена');
-        exit;
-    } catch (Exception $e) {
-        $errorMessage = 'Ошибка при удалении заявки';
+    if ($postAction === 'delete') {
+        requirePermission('delete_leads');
+
+        try {
+            $deleteStmt = $db->prepare("DELETE FROM leads WHERE id = ?");
+            $deleteStmt->execute([$leadId]);
+
+            logAction('lead_deleted', array(
+                'lead_id' => $leadId,
+                'admin_id' => $_SESSION['admin_id']
+            ));
+            logAdminAction('lead_deleted', 'lead', $leadId);
+
+            header('Location: /admin/leads.php?message=' . urlencode('Заявка успешно удалена'));
+            exit;
+        } catch (Exception $e) {
+            error_log('admin/lead_details.php delete: ' . $e->getMessage());
+            $errorMessage = 'Ошибка при удалении заявки';
+        }
     }
 }
 
@@ -85,12 +103,6 @@ $jsonParameters = [];
 if (!empty($lead['parameters'])) {
     try {
         $jsonParameters = json_decode($lead['parameters'], true);
-// ВРЕМЕННАЯ ОТЛАДКА - удалить после исправления
-error_log("lead_details.php: ID заявки = " . $lead['id']);
-error_log("lead_details.php: jsonParameters = " . print_r($jsonParameters, true));
-$orderItems = extractOrderItems($jsonParameters);
-error_log("lead_details.php: orderItems = " . print_r($orderItems, true));
-error_log("lead_details.php: count orderItems = " . count($orderItems));
         if ($jsonParameters) {
             $utmData = $jsonParameters;
         }
@@ -119,7 +131,9 @@ function formatSource($source) {
         'website' => '<i class="fas fa-globe"></i> Сайт'
     ];
     
-    return $sourceLabels[$source] ?? $source;
+    // Метки из белого списка — доверенный HTML. Неизвестный источник приходит
+    // из публичного эндпоинта, поэтому экранируем его.
+    return $sourceLabels[$source] ?? safeOutput(is_scalar($source) ? (string)$source : '');
 }
 
 function getDeviceIcon($deviceType) {
@@ -140,7 +154,7 @@ function formatStatus($status) {
         'rejected' => 'Отклонена'
     ];
     
-    return $statusLabels[$status] ?? $status;
+    return $statusLabels[$status] ?? safeOutput(is_scalar($status) ? (string)$status : '');
 }
 
 function getStatusColor($status) {
@@ -218,13 +232,11 @@ function extractOrderItems($jsonParameters) {
     
     // Прямая проверка наличия cart_items (это наш случай!)
     if (isset($jsonParameters['cart_items']) && is_array($jsonParameters['cart_items'])) {
-        error_log("extractOrderItems: Найдены cart_items, количество: " . count($jsonParameters['cart_items']));
         return $jsonParameters['cart_items']; // ПРОСТО ВОЗВРАЩАЕМ СРАЗУ
     }
     
     // Если cart_items нет, пробуем другие варианты
     if (isset($jsonParameters['items']) && is_array($jsonParameters['items'])) {
-        error_log("extractOrderItems: Найдены items, количество: " . count($jsonParameters['items']));
         return $jsonParameters['items'];
     }
     
@@ -238,17 +250,14 @@ function extractOrderItems($jsonParameters) {
     }
     
     if (!empty($orderItems)) {
-        error_log("extractOrderItems: Найдены товары по числовым ключам, количество: " . count($orderItems));
         return $orderItems;
     }
     
     // Проверяем одиночный товар
     if (isset($jsonParameters['id']) || isset($jsonParameters['type']) || isset($jsonParameters['quantity'])) {
-        error_log("extractOrderItems: Найден одиночный товар");
         return [$jsonParameters];
     }
     
-    error_log("extractOrderItems: Товары не найдены");
     return [];
 }
 ?>
@@ -623,27 +632,37 @@ function extractOrderItems($jsonParameters) {
                     </span>
                     
                     <div class="lead-actions">
-                        <a href="?id=<?php echo $lead['id']; ?>&action=change_status&status=processed" 
-                           class="btn btn-warning" 
-                           title="В обработку">
-                            <i class="fas fa-spinner"></i>
-                        </a>
-                        <a href="?id=<?php echo $lead['id']; ?>&action=change_status&status=completed" 
-                           class="btn btn-success"
-                           title="Завершить">
-                            <i class="fas fa-check"></i>
-                        </a>
-                        <a href="?id=<?php echo $lead['id']; ?>&action=change_status&status=rejected" 
-                           class="btn btn-danger"
-                           title="Отклонить">
-                            <i class="fas fa-times"></i>
-                        </a>
-                        <a href="?id=<?php echo $lead['id']; ?>&action=delete" 
-                           class="btn btn-danger"
-                           onclick="return confirm('Вы уверены, что хотите удалить заявку #<?php echo $lead['id']; ?>?')"
-                           title="Удалить">
-                            <i class="fas fa-trash"></i>
-                        </a>
+                        <?php if (checkPermission('edit_leads')): ?>
+                            <?php
+                            // Смена статуса — POST с CSRF-токеном (иконка, подпись, статус)
+                            $statusButtons = [
+                                ['processed',  'btn-warning', 'fa-spinner', 'В обработку'],
+                                ['completed',  'btn-success', 'fa-check',   'Завершить'],
+                                ['rejected',   'btn-danger',  'fa-times',   'Отклонить'],
+                            ];
+                            foreach ($statusButtons as $btn):
+                            ?>
+                            <form method="POST" action="?id=<?php echo (int)$lead['id']; ?>" class="inline-action">
+                                <input type="hidden" name="csrf_token" value="<?php echo safeOutput($csrf); ?>">
+                                <input type="hidden" name="action" value="change_status">
+                                <input type="hidden" name="status" value="<?php echo safeOutput($btn[0]); ?>">
+                                <button type="submit" class="btn <?php echo $btn[1]; ?>" title="<?php echo safeOutput($btn[3]); ?>">
+                                    <i class="fas <?php echo $btn[2]; ?>"></i>
+                                </button>
+                            </form>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                        <?php if (checkPermission('delete_leads')): ?>
+                        <form method="POST" action="?id=<?php echo (int)$lead['id']; ?>" class="inline-action"
+                              onsubmit="return confirm('Вы уверены, что хотите удалить заявку #<?php echo (int)$lead['id']; ?>?')">
+                            <input type="hidden" name="csrf_token" value="<?php echo safeOutput($csrf); ?>">
+                            <input type="hidden" name="action" value="delete">
+                            <button type="submit" class="btn btn-danger" title="Удалить">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -695,7 +714,7 @@ function extractOrderItems($jsonParameters) {
                             <span class="detail-label">Тип заявки</span>
                             <span class="detail-value">
                                 <span style="padding: 2px 8px; background: #e9ecef; border-radius: 4px; font-size: 12px;">
-                                    <?php echo $lead['type'] ?? 'form'; ?>
+                                    <?php echo safeOutput($lead['type'] ?? 'form'); ?>
                                 </span>
                             </span>
                         </div>
@@ -720,6 +739,7 @@ function extractOrderItems($jsonParameters) {
 
                 <?php 
                 $trafficType = $utmData['traffic_type'] ?? 'unknown';
+                if (!is_string($trafficType)) { $trafficType = 'unknown'; }
                 $trafficInfo = getTrafficTypeInfo($trafficType);
                 ?>
                 <div class="detail-card" style="border-left-color: <?php echo $trafficInfo['color']; ?>;">
@@ -732,13 +752,16 @@ function extractOrderItems($jsonParameters) {
                     </div>
                     
                     <div class="detail-row">
-                        <?php if (!empty($utmData['visit_id'])): ?>
+                        <?php
+                        $visitId = $utmData['visit_id'] ?? null;
+                        $visitId = is_scalar($visitId) ? (string)$visitId : '';
+                        if ($visitId !== ''): ?>
                         <div class="detail-item">
                             <span class="detail-label">Связанный визит</span>
                             <span class="detail-value">
-                                <a href="/admin/lead_details.php?id=<?php echo $utmData['visit_id']; ?>" class="visit-link">
+                                <a href="/admin/lead_details.php?id=<?php echo rawurlencode($visitId); ?>" class="visit-link">
                                     <i class="fas fa-external-link-alt"></i>
-                                    Посещение #<?php echo $utmData['visit_id']; ?>
+                                    Посещение #<?php echo safeOutput($visitId); ?>
                                 </a>
                             </span>
                         </div>
@@ -963,7 +986,7 @@ if (!empty($orderItems)):
                                         echo $fieldLabels[$field] ?? $field;
                                         ?>:
                                     </small>
-                                    <div style="font-weight: 600;"><?php echo htmlspecialchars($jsonParameters[$field]); ?></div>
+                                    <div style="font-weight: 600;"><?php echo safeOutput(is_scalar($jsonParameters[$field]) ? (string)$jsonParameters[$field] : ''); ?></div>
                                 </div>
                             <?php endif; endforeach; ?>
                         </div>
@@ -1100,15 +1123,27 @@ if (!empty($orderItems)):
                     <h3><i class="fas fa-globe"></i> Посещение сайта</h3>
                     
                     <div class="detail-row">
-                        <?php if (!empty($lead['referrer']) || !empty($utmData['referrer'])): ?>
+                        <?php
+                        $referrer = $lead['referrer'] ?? $utmData['referrer'] ?? '';
+                        $referrer = is_scalar($referrer) ? (string)$referrer : '';
+                        // Referrer приходит с публичного эндпоинта: htmlspecialchars не спасает
+                        // от схемы javascript:/data:, поэтому кликабельным делаем только http(s).
+                        $referrerScheme = strtolower((string)parse_url($referrer, PHP_URL_SCHEME));
+                        $referrerIsSafe = in_array($referrerScheme, ['http', 'https'], true);
+                        if ($referrer !== ''): ?>
                         <div class="detail-item">
                             <span class="detail-label">Referrer (откуда пришел)</span>
                             <span class="detail-value">
-                                <a href="<?php echo safeOutput($lead['referrer'] ?? $utmData['referrer'] ?? ''); ?>" 
-                                   target="_blank" 
+                                <?php if ($referrerIsSafe): ?>
+                                <a href="<?php echo safeOutput($referrer); ?>"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
                                    style="word-break: break-all;">
-                                    <?php echo safeOutput($lead['referrer'] ?? $utmData['referrer'] ?? ''); ?>
+                                    <?php echo safeOutput($referrer); ?>
                                 </a>
+                                <?php else: ?>
+                                <span style="word-break: break-all;"><?php echo safeOutput($referrer); ?></span>
+                                <?php endif; ?>
                             </span>
                         </div>
                         <?php endif; ?>

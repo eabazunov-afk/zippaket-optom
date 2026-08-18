@@ -314,6 +314,12 @@ h1, h2, h3 { font-family: var(--z-display); font-weight: 600; }
     flex-wrap: wrap;
 }
 
+/* Изменяющие действия оформлены POST-формами (CSRF), но выглядят как кнопки в ряд */
+.inline-action {
+    display: inline-flex;
+    margin: 0;
+}
+
 /* ===== Карточки статистики ===== */
 .stats-grid {
     display: grid;

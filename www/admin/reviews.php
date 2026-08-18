@@ -7,8 +7,12 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/includes/security_config.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/permissions.php';
+require_once __DIR__ . '/includes/audit.php';
 
 checkAdminAuth();
+
+// Доступ к странице по матрице прав (view_reviews)
+checkPageAccess(basename($_SERVER['PHP_SELF']));
 
 if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
     header('Location: /admin/login.php');
@@ -19,16 +23,32 @@ require_once __DIR__ . '/../includes/reviews.php';
 
 $notice = '';
 $error = '';
+$canModerate = checkPermission('moderate_reviews');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Публикация, скрытие и удаление — изменяющие действия
+    requirePermission('moderate_reviews');
+
     if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
         $error = 'Сессия истекла, обновите страницу.';
     } else {
         $id = (int)($_POST['id'] ?? 0);
         switch ($_POST['action'] ?? '') {
-            case 'approve': review_set_approved($id, true);  $notice = 'Отзыв опубликован'; break;
-            case 'reject':  review_set_approved($id, false); $notice = 'Отзыв скрыт';       break;
-            case 'delete':  review_delete($id);              $notice = 'Отзыв удалён';      break;
+            case 'approve':
+                review_set_approved($id, true);
+                logAdminAction('review_approved', 'review', $id);
+                $notice = 'Отзыв опубликован';
+                break;
+            case 'reject':
+                review_set_approved($id, false);
+                logAdminAction('review_rejected', 'review', $id);
+                $notice = 'Отзыв скрыт';
+                break;
+            case 'delete':
+                review_delete($id);
+                logAdminAction('review_deleted', 'review', $id);
+                $notice = 'Отзыв удалён';
+                break;
         }
     }
 }
@@ -158,6 +178,9 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                     </td>
                     <td>
                         <div class="action-buttons">
+                            <?php if (!$canModerate): ?>
+                            <span class="muted">только просмотр</span>
+                            <?php else: ?>
                             <?php if (!$approved): ?>
                             <form class="inline" method="POST">
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
@@ -179,6 +202,7 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                                 <input type="hidden" name="action" value="delete">
                                 <button class="btn btn-sm btn-danger" type="submit" data-tooltip="Удалить отзыв" aria-label="Удалить отзыв" onclick="return confirm('Удалить этот отзыв?')"><i class="fas fa-trash"></i></button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </td>
                 </tr>

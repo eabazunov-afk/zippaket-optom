@@ -8,223 +8,262 @@ require_once 'includes/audit.php';
 // Проверка авторизации
 checkAdminAuth();
 
-// Проверка прав - только админы могут управлять пользователями
-checkAdminRole('admin');
+// Доступ к странице — через ту же матрицу прав, что и остальные разделы
+// (view_users). Изменяющие действия ниже требуют edit_users / delete_users.
+$current_page = basename($_SERVER['PHP_SELF']);
+checkPageAccess($current_page);
 
 $db = getDbConnection();
 $message = '';
 $error = '';
 
-// Обработка действий
-$action = isset($_GET['action']) ? $_GET['action'] : '';
-
-// Проверка CSRF для действий
-if ($action && in_array($action, ['create', 'edit', 'delete', 'toggle_status'])) {
-    if (!isset($_GET['csrf_token']) || !validateAdminCsrfToken($_GET['csrf_token'])) {
-        $error = 'Ошибка безопасности. Действие отклонено.';
-        $action = '';
-    }
-}
-
 // Получаем текущего пользователя
 $current_user_id = $_SESSION['admin_id'];
-$current_user_role = $_SESSION['admin_role'];
+$current_user_role = $_SESSION['admin_role'] ?? 'guest';
+
+// Права на управление учётными записями (для отрисовки кнопок)
+$can_edit_users = checkPermission('edit_users');
+$can_delete_users = checkPermission('delete_users');
+
+// Все изменяющие действия принимаются только POST-ом
+$action = ($_SERVER['REQUEST_METHOD'] === 'POST') ? ($_POST['action'] ?? '') : '';
+
+if ($action && !validateAdminCsrfToken($_POST['csrf_token'] ?? '')) {
+    $error = 'Ошибка безопасности. Действие отклонено.';
+    $action = '';
+}
+
+/**
+ * Сколько ещё останется активных суперадминов, кроме указанного.
+ * Суперадмин — единственная роль с правом управления пользователями,
+ * поэтому систему нельзя оставить без него.
+ */
+function countOtherActiveSuperadmins($db, $exclude_id) {
+    $stmt = $db->prepare("SELECT COUNT(*) AS c FROM admins WHERE role = 'superadmin' AND is_active = 1 AND id != ?");
+    $stmt->execute([$exclude_id]);
+    $row = $stmt->fetch();
+    return (int)($row['c'] ?? 0);
+}
+
+/**
+ * Проверка пароля действующего администратора.
+ * Требуется при любой смене пароля — своей или чужой учётной записи.
+ */
+function verifyOwnPassword($db, $admin_id, $password) {
+    if ($password === '') {
+        return false;
+    }
+    $stmt = $db->prepare("SELECT password_hash FROM admins WHERE id = ?");
+    $stmt->execute([$admin_id]);
+    $row = $stmt->fetch();
+    return $row && password_verify($password, $row['password_hash']);
+}
 
 // Обработка создания пользователя
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'create') {
-    if (!isset($_POST['csrf_token']) || !validateAdminCsrfToken($_POST['csrf_token'])) {
-        $error = 'Ошибка безопасности. Действие отклонено.';
+if ($action === 'create') {
+    requirePermission('edit_users');
+
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+    $email = trim($_POST['email'] ?? '');
+    $full_name = trim($_POST['full_name'] ?? '');
+    $role = $_POST['role'] ?? 'manager';
+    $is_active = isset($_POST['is_active']) ? 1 : 0;
+    
+    // Валидация
+    $errors = [];
+    
+    if (empty($username)) {
+        $errors[] = 'Имя пользователя обязательно';
+    } elseif (strlen($username) < 3) {
+        $errors[] = 'Имя пользователя должно быть не менее 3 символов';
+    } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+        $errors[] = 'Имя пользователя может содержать только латинские буквы, цифры и подчеркивания';
+    }
+    
+    if (empty($password)) {
+        $errors[] = 'Пароль обязателен';
+    } elseif (strlen($password) < 8) {
+        $errors[] = 'Пароль должен быть не менее 8 символов';
+    } elseif ($password !== $confirm_password) {
+        $errors[] = 'Пароли не совпадают';
+    }
+    
+    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Некорректный email';
+    }
+    
+    if (!in_array($role, $ALLOWED_ROLES, true)) {
+        $errors[] = 'Некорректная роль';
+    } elseif (!canAssignRole($current_user_role, $role)) {
+        // Нельзя выдать роль выше собственной
+        $errors[] = 'Нельзя назначить роль выше вашей собственной';
+    }
+
+    // Проверяем уникальность username
+    if (empty($errors)) {
+        try {
+            $stmt = $db->prepare("SELECT id FROM admins WHERE username = ?");
+            $stmt->execute([$username]);
+            if ($stmt->fetch()) {
+                $errors[] = 'Пользователь с таким именем уже существует';
+            }
+        } catch (Exception $e) {
+            $errors[] = 'Ошибка проверки уникальности пользователя';
+        }
+    }
+    
+    if (empty($errors)) {
+        try {
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            
+            $stmt = $db->prepare("
+                INSERT INTO admins 
+                (username, password_hash, email, full_name, role, is_active, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, NOW())
+            ");
+            
+            $stmt->execute([
+                $username,
+                $password_hash,
+                $email,
+                $full_name,
+                $role,
+                $is_active
+            ]);
+            
+            $new_user_id = $db->lastInsertId();
+            
+            // Логируем действие
+            logAdminAction('user_created', 'admin', $new_user_id, [
+                'username' => $username,
+                'email' => $email,
+                'role' => $role,
+                'is_active' => $is_active
+            ]);
+            
+            $message = 'Пользователь успешно создан';
+            header('Location: users.php?message=' . urlencode($message));
+            exit;
+        } catch (Exception $e) {
+            error_log('admin/users.php create: ' . $e->getMessage());
+            $error = 'Не удалось создать пользователя. Подробности записаны в журнал ошибок.';
+        }
     } else {
-        $username = trim($_POST['username'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $confirm_password = $_POST['confirm_password'] ?? '';
-        $email = trim($_POST['email'] ?? '');
-        $full_name = trim($_POST['full_name'] ?? '');
-        $role = $_POST['role'] ?? 'manager';
-        $is_active = isset($_POST['is_active']) ? 1 : 0;
-        
-        // Валидация
-        $errors = [];
-        
-        if (empty($username)) {
-            $errors[] = 'Имя пользователя обязательно';
-        } elseif (strlen($username) < 3) {
-            $errors[] = 'Имя пользователя должно быть не менее 3 символов';
-        } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-            $errors[] = 'Имя пользователя может содержать только латинские буквы, цифры и подчеркивания';
-        }
-        
-        if (empty($password)) {
-            $errors[] = 'Пароль обязателен';
-        } elseif (strlen($password) < 8) {
-            $errors[] = 'Пароль должен быть не менее 8 символов';
-        } elseif ($password !== $confirm_password) {
-            $errors[] = 'Пароли не совпадают';
-        }
-        
-        if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'Некорректный email';
-        }
-        
-        if (!in_array($role, ['admin', 'manager'])) {
-            $errors[] = 'Некорректная роль';
-        }
-        
-        // Проверяем уникальность username
-        if (empty($errors)) {
-            try {
-                $stmt = $db->prepare("SELECT id FROM admins WHERE username = ?");
-                $stmt->execute([$username]);
-                if ($stmt->fetch()) {
-                    $errors[] = 'Пользователь с таким именем уже существует';
-                }
-            } catch (Exception $e) {
-                $errors[] = 'Ошибка проверки уникальности пользователя';
-            }
-        }
-        
-        if (empty($errors)) {
-            try {
-                $password_hash = password_hash($password, PASSWORD_DEFAULT);
-                
-                $stmt = $db->prepare("
-                    INSERT INTO admins 
-                    (username, password_hash, email, full_name, role, is_active, created_at) 
-                    VALUES (?, ?, ?, ?, ?, ?, NOW())
-                ");
-                
-                $stmt->execute([
-                    $username,
-                    $password_hash,
-                    $email,
-                    $full_name,
-                    $role,
-                    $is_active
-                ]);
-                
-                $new_user_id = $db->lastInsertId();
-                
-                // Логируем действие
-                logAdminAction('user_created', 'admin', $new_user_id, [
-                    'username' => $username,
-                    'email' => $email,
-                    'role' => $role,
-                    'is_active' => $is_active
-                ]);
-                
-                $message = 'Пользователь успешно создан';
-                header('Location: users.php?message=' . urlencode($message));
-                exit;
-            } catch (Exception $e) {
-                $error = 'Ошибка при создании пользователя: ' . $e->getMessage();
-            }
-        } else {
-            $error = implode('<br>', $errors);
-        }
+        $error = implode('<br>', $errors);
     }
 }
 
 // Обработка редактирования пользователя
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    if (!isset($_POST['csrf_token']) || !validateAdminCsrfToken($_POST['csrf_token'])) {
-        $error = 'Ошибка безопасности. Действие отклонено.';
+if ($action === 'edit') {
+    requirePermission('edit_users');
+
+    $user_id = (int)($_POST['user_id'] ?? 0);
+    $email = trim($_POST['email'] ?? '');
+    $full_name = trim($_POST['full_name'] ?? '');
+    $role = $_POST['role'] ?? 'manager';
+    $is_active = isset($_POST['is_active']) ? 1 : 0;
+    $change_password = isset($_POST['change_password']) && $_POST['change_password'] == '1';
+    $new_password = $_POST['new_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+    $current_password = $_POST['current_password'] ?? '';
+
+    // Проверяем, что пользователь существует
+    $stmt = $db->prepare("SELECT id, username, role FROM admins WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        $error = 'Пользователь не найден';
     } else {
-        $user_id = (int)($_POST['user_id'] ?? 0);
-        $email = trim($_POST['email'] ?? '');
-        $full_name = trim($_POST['full_name'] ?? '');
-        $role = $_POST['role'] ?? 'manager';
-        $is_active = isset($_POST['is_active']) ? 1 : 0;
-        $change_password = isset($_POST['change_password']) && $_POST['change_password'] == '1';
-        $new_password = $_POST['new_password'] ?? '';
-        $confirm_password = $_POST['confirm_password'] ?? '';
-        
-        // Проверяем, что пользователь существует
-        $stmt = $db->prepare("SELECT id, username, role FROM admins WHERE id = ?");
-        $stmt->execute([$user_id]);
-        $user = $stmt->fetch();
-        
-        if (!$user) {
-            $error = 'Пользователь не найден';
+        $errors = [];
+
+        // Управлять можно только учётной записью своего уровня или ниже:
+        // сравниваем уровни иерархии, а не имена ролей
+        if (!canManageRole($current_user_role, $user['role'])) {
+            $error = 'Недостаточно прав для редактирования этой учётной записи';
         } else {
-            $errors = [];
-            
-            // Нельзя менять роль суперадмина (если только у вас не есть логика суперадмина)
-            if ($current_user_role != 'admin' && $user['role'] == 'admin') {
-                $error = 'Недостаточно прав для редактирования администратора';
+            if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'Некорректный email';
+            }
+
+            if (!in_array($role, $ALLOWED_ROLES, true)) {
+                $errors[] = 'Некорректная роль';
+            } elseif (!canAssignRole($current_user_role, $role)) {
+                // В том числе запрещает повысить самого себя
+                $errors[] = 'Нельзя назначить роль выше вашей собственной';
+            }
+
+            // Система не должна остаться без активного суперадмина:
+            // он единственный управляет учётными записями
+            $loses_superadmin = ($user['role'] === 'superadmin')
+                && ($role !== 'superadmin' || $is_active === 0);
+            if ($loses_superadmin && countOtherActiveSuperadmins($db, $user_id) === 0) {
+                $errors[] = 'Нельзя понизить или отключить последнего активного суперадминистратора';
+            }
+
+            if ($change_password) {
+                // Смена пароля подтверждается паролем действующего администратора
+                if (!verifyOwnPassword($db, $current_user_id, $current_password)) {
+                    $errors[] = 'Введите свой текущий пароль для подтверждения смены пароля';
+                }
+                if (strlen($new_password) < 8) {
+                    $errors[] = 'Новый пароль должен быть не менее 8 символов';
+                } elseif ($new_password !== $confirm_password) {
+                    $errors[] = 'Пароли не совпадают';
+                }
+            }
+
+            if (empty($errors)) {
+                try {
+                    if ($change_password) {
+                        $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
+                        $stmt = $db->prepare("
+                            UPDATE admins 
+                            SET email = ?, full_name = ?, role = ?, is_active = ?, password_hash = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([$email, $full_name, $role, $is_active, $password_hash, $user_id]);
+                    } else {
+                        $stmt = $db->prepare("
+                            UPDATE admins 
+                            SET email = ?, full_name = ?, role = ?, is_active = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([$email, $full_name, $role, $is_active, $user_id]);
+                    }
+                    
+                    // Логируем действие
+                    $changes = [
+                        'email' => $email,
+                        'full_name' => $full_name,
+                        'role' => $role,
+                        'is_active' => $is_active,
+                        'password_changed' => $change_password
+                    ];
+                    logAdminAction('user_updated', 'admin', $user_id, $changes);
+
+                    $message = 'Данные пользователя обновлены';
+                    header('Location: users.php?message=' . urlencode($message));
+                    exit;
+                } catch (Exception $e) {
+                    error_log('admin/users.php edit: ' . $e->getMessage());
+                    $error = 'Не удалось обновить пользователя. Подробности записаны в журнал ошибок.';
+                }
             } else {
-                if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $errors[] = 'Некорректный email';
-                }
-                
-                if (!in_array($role, ['admin', 'manager'])) {
-                    $errors[] = 'Некорректная роль';
-                }
-                
-                // Нельзя изменить свою роль на manager если вы последний админ
-                if ($user_id == $current_user_id && $role != 'admin') {
-                    $stmt = $db->prepare("SELECT COUNT(*) as admin_count FROM admins WHERE role = 'admin' AND id != ? AND is_active = 1");
-                    $stmt->execute([$user_id]);
-                    $result = $stmt->fetch();
-                    if ($result['admin_count'] == 0) {
-                        $errors[] = 'Нельзя изменить свою роль, вы единственный активный администратор';
-                    }
-                }
-                
-                if ($change_password) {
-                    if (strlen($new_password) < 8) {
-                        $errors[] = 'Новый пароль должен быть не менее 8 символов';
-                    } elseif ($new_password !== $confirm_password) {
-                        $errors[] = 'Пароли не совпадают';
-                    }
-                }
-                
-                if (empty($errors)) {
-                    try {
-                        if ($change_password) {
-                            $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
-                            $stmt = $db->prepare("
-                                UPDATE admins 
-                                SET email = ?, full_name = ?, role = ?, is_active = ?, password_hash = ?
-                                WHERE id = ?
-                            ");
-                            $stmt->execute([$email, $full_name, $role, $is_active, $password_hash, $user_id]);
-                        } else {
-                            $stmt = $db->prepare("
-                                UPDATE admins 
-                                SET email = ?, full_name = ?, role = ?, is_active = ?
-                                WHERE id = ?
-                            ");
-                            $stmt->execute([$email, $full_name, $role, $is_active, $user_id]);
-                        }
-                        
-                        // Логируем действие
-                        $changes = [
-                            'email' => $email,
-                            'full_name' => $full_name,
-                            'role' => $role,
-                            'is_active' => $is_active,
-                            'password_changed' => $change_password
-                        ];
-                        logAdminAction('user_updated', 'admin', $user_id, $changes);
-                        
-                        $message = 'Данные пользователя обновлены';
-                        header('Location: users.php?message=' . urlencode($message));
-                        exit;
-                    } catch (Exception $e) {
-                        $error = 'Ошибка при обновлении пользователя: ' . $e->getMessage();
-                    }
-                } else {
-                    $error = implode('<br>', $errors);
-                }
+                $error = implode('<br>', $errors);
             }
         }
     }
 }
 
 // Обработка удаления пользователя
-if ($action == 'delete' && isset($_GET['id'])) {
-    $user_id = (int)$_GET['id'];
-    
+if ($action === 'delete') {
+    requirePermission('delete_users');
+
+    $user_id = (int)($_POST['id'] ?? 0);
+
     // Нельзя удалить себя
     if ($user_id == $current_user_id) {
         $error = 'Нельзя удалить свой собственный аккаунт';
@@ -233,51 +272,37 @@ if ($action == 'delete' && isset($_GET['id'])) {
         $stmt = $db->prepare("SELECT id, username, role FROM admins WHERE id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch();
-        
+
         if (!$user) {
             $error = 'Пользователь не найден';
-        } elseif ($current_user_role != 'admin' && $user['role'] == 'admin') {
-            $error = 'Недостаточно прав для удаления администратора';
+        } elseif (!canManageRole($current_user_role, $user['role'])) {
+            $error = 'Недостаточно прав для удаления этой учётной записи';
+        } elseif ($user['role'] === 'superadmin' && countOtherActiveSuperadmins($db, $user_id) === 0) {
+            $error = 'Нельзя удалить последнего активного суперадминистратора';
         } else {
             try {
-                // Проверяем, что после удаления останется хотя бы один активный админ
-                if ($user['role'] == 'admin') {
-                    $stmt = $db->prepare("SELECT COUNT(*) as admin_count FROM admins WHERE role = 'admin' AND id != ? AND is_active = 1");
-                    $stmt->execute([$user_id]);
-                    $result = $stmt->fetch();
-                    if ($result['admin_count'] == 0) {
-                        $error = 'Нельзя удалить последнего активного администратора';
-                    } else {
-                        $stmt = $db->prepare("DELETE FROM admins WHERE id = ?");
-                        $stmt->execute([$user_id]);
-                        
-                        logAdminAction('user_deleted', 'admin', $user_id, ['username' => $user['username']]);
-                        
-                        $message = 'Пользователь удален';
-                        header('Location: users.php?message=' . urlencode($message));
-                        exit;
-                    }
-                } else {
-                    $stmt = $db->prepare("DELETE FROM admins WHERE id = ?");
-                    $stmt->execute([$user_id]);
-                    
-                    logAdminAction('user_deleted', 'admin', $user_id, ['username' => $user['username']]);
-                    
-                    $message = 'Пользователь удален';
-                    header('Location: users.php?message=' . urlencode($message));
-                    exit;
-                }
+                $stmt = $db->prepare("DELETE FROM admins WHERE id = ?");
+                $stmt->execute([$user_id]);
+
+                logAdminAction('user_deleted', 'admin', $user_id, ['username' => $user['username']]);
+
+                $message = 'Пользователь удален';
+                header('Location: users.php?message=' . urlencode($message));
+                exit;
             } catch (Exception $e) {
-                $error = 'Ошибка при удалении пользователя: ' . $e->getMessage();
+                error_log('admin/users.php delete: ' . $e->getMessage());
+                $error = 'Не удалось удалить пользователя. Подробности записаны в журнал ошибок.';
             }
         }
     }
 }
 
 // Обработка включения/выключения пользователя
-if ($action == 'toggle_status' && isset($_GET['id'])) {
-    $user_id = (int)$_GET['id'];
-    
+if ($action === 'toggle_status') {
+    requirePermission('edit_users');
+
+    $user_id = (int)($_POST['id'] ?? 0);
+
     // Нельзя отключить себя
     if ($user_id == $current_user_id) {
         $error = 'Нельзя отключить свой собственный аккаунт';
@@ -285,63 +310,62 @@ if ($action == 'toggle_status' && isset($_GET['id'])) {
         $stmt = $db->prepare("SELECT id, username, role, is_active FROM admins WHERE id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch();
-        
+
         if (!$user) {
             $error = 'Пользователь не найден';
-        } elseif ($current_user_role != 'admin' && $user['role'] == 'admin') {
-            $error = 'Недостаточно прав для изменения статуса администратора';
+        } elseif (!canManageRole($current_user_role, $user['role'])) {
+            $error = 'Недостаточно прав для изменения статуса этой учётной записи';
         } else {
             $new_status = $user['is_active'] ? 0 : 1;
-            
-            // Проверяем, что не отключаем последнего активного админа
-            if ($user['role'] == 'admin' && $new_status == 0) {
-                $stmt = $db->prepare("SELECT COUNT(*) as admin_count FROM admins WHERE role = 'admin' AND id != ? AND is_active = 1");
-                $stmt->execute([$user_id]);
-                $result = $stmt->fetch();
-                if ($result['admin_count'] == 0) {
-                    $error = 'Нельзя отключить последнего активного администратора';
-                }
+
+            // Проверяем, что не отключаем последнего активного суперадмина
+            if ($user['role'] === 'superadmin' && $new_status == 0
+                && countOtherActiveSuperadmins($db, $user_id) === 0) {
+                $error = 'Нельзя отключить последнего активного суперадминистратора';
             }
-            
+
             if (empty($error)) {
                 try {
                     $stmt = $db->prepare("UPDATE admins SET is_active = ? WHERE id = ?");
                     $stmt->execute([$new_status, $user_id]);
-                    
+
                     logAdminAction('user_status_changed', 'admin', $user_id, [
                         'old_status' => $user['is_active'],
                         'new_status' => $new_status
                     ]);
-                    
+
                     $message = $new_status ? 'Пользователь активирован' : 'Пользователь деактивирован';
                     header('Location: users.php?message=' . urlencode($message));
                     exit;
                 } catch (Exception $e) {
-                    $error = 'Ошибка при изменении статуса: ' . $e->getMessage();
+                    error_log('admin/users.php toggle_status: ' . $e->getMessage());
+                    $error = 'Не удалось изменить статус. Подробности записаны в журнал ошибок.';
                 }
             }
         }
     }
 }
 
-// Получаем список пользователей
+// Получаем список пользователей (сортировка — по уровню роли, сверху вниз)
 try {
     $stmt = $db->prepare("
-        SELECT id, username, email, full_name, role, is_active, 
+        SELECT id, username, email, full_name, role, is_active,
                last_login, created_at, failed_attempts, locked_until
-        FROM admins 
-        ORDER BY 
-            CASE role 
-                WHEN 'admin' THEN 1 
-                WHEN 'manager' THEN 2 
-                ELSE 3 
+        FROM admins
+        ORDER BY
+            CASE role
+                WHEN 'superadmin' THEN 1
+                WHEN 'admin' THEN 2
+                WHEN 'manager' THEN 3
+                ELSE 4
             END,
             created_at DESC
     ");
     $stmt->execute();
     $users = $stmt->fetchAll();
 } catch (Exception $e) {
-    $error = 'Ошибка при получении списка пользователей: ' . $e->getMessage();
+    error_log('admin/users.php list: ' . $e->getMessage());
+    $error = 'Не удалось получить список пользователей. Подробности записаны в журнал ошибок.';
     $users = [];
 }
 
@@ -494,6 +518,18 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
+        }
+
+        .role-superadmin {
+            background: #e2d9f3;
+            color: #4b2e83;
+            border: 1px solid #cdbcea;
+        }
+
+        .role-viewer {
+            background: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
         }
         
         .status-badge {
@@ -842,10 +878,12 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                     <h1>Управление пользователями</h1>
                     <p>Создание и управление учетными записями администраторов</p>
                 </div>
+                <?php if ($can_edit_users): ?>
                 <a href="#" class="create-user-btn" onclick="openCreateModal(); return false;">
                     <i class="fas fa-plus"></i>
                     Создать пользователя
                 </a>
+                <?php endif; ?>
             </div>
 
             <!-- Сообщения -->
@@ -911,14 +949,8 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <span class="role-badge role-<?php echo $user['role']; ?>">
-                                            <?php 
-                                            $roleLabels = [
-                                                'admin' => 'Администратор',
-                                                'manager' => 'Менеджер'
-                                            ];
-                                            echo isset($roleLabels[$user['role']]) ? $roleLabels[$user['role']] : $user['role'];
-                                            ?>
+                                        <span class="role-badge role-<?php echo safeOutput($user['role']); ?>">
+                                            <?php echo safeOutput($ROLE_LABELS[$user['role']] ?? $user['role']); ?>
                                         </span>
                                     </td>
                                     <td>
@@ -932,7 +964,7 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                                         } elseif ($user['locked_until'] && strtotime($user['locked_until']) > time()) {
                                             $status = 'locked';
                                             $statusText = 'Заблокирован';
-                                        } elseif ($user['failed_attempts'] >= 5) {
+                                        } elseif ($user['failed_attempts'] >= MAX_LOGIN_ATTEMPTS) {
                                             $status = 'locked';
                                             $statusText = 'Заблокирован';
                                         }
@@ -959,31 +991,51 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                                     </td>
                                     <td>
                                         <div class="user-actions">
-                                            <button class="btn btn-sm btn-info edit-user-btn" 
-                                                data-id="<?php echo $user['id']; ?>"
-                                                data-username="<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-email="<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-fullname="<?php echo htmlspecialchars($user['full_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-role="<?php echo htmlspecialchars($user['role'], ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-active="<?php echo $user['is_active']; ?>"
+                                            <?php
+                                            // Управлять можно только равными по уровню или ниже
+                                            $manageable = canManageRole($current_user_role, $user['role']);
+                                            ?>
+                                            <?php if ($can_edit_users && $manageable): ?>
+                                            <button class="btn btn-sm btn-info edit-user-btn"
+                                                data-id="<?php echo (int)$user['id']; ?>"
+                                                data-username="<?php echo safeOutput($user['username']); ?>"
+                                                data-email="<?php echo safeOutput($user['email'] ?? ''); ?>"
+                                                data-fullname="<?php echo safeOutput($user['full_name'] ?? ''); ?>"
+                                                data-role="<?php echo safeOutput($user['role']); ?>"
+                                                data-active="<?php echo (int)$user['is_active']; ?>"
                                                 data-tooltip="Редактировать" aria-label="Редактировать">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            
-                                            <?php if ($user['id'] != $current_user_id): ?>
-                                                <a href="?action=toggle_status&id=<?php echo $user['id']; ?>&csrf_token=<?php echo urlencode($_SESSION['csrf_token']); ?>" 
-                                                   class="btn btn-sm <?php echo $user['is_active'] ? 'btn-warning' : 'btn-success'; ?>"
-                                                   data-tooltip="<?php echo $user['is_active'] ? 'Деактивировать' : 'Активировать'; ?>"
-                                                   aria-label="<?php echo $user['is_active'] ? 'Деактивировать' : 'Активировать'; ?>">
-                                                    <i class="fas fa-power-off"></i>
-                                                </a>
-                                                
-                                                <a href="?action=delete&id=<?php echo $user['id']; ?>&csrf_token=<?php echo urlencode($_SESSION['csrf_token']); ?>" 
-                                                   class="btn btn-sm btn-danger"
-                                                   onclick="return confirm('Удалить пользователя <?php echo addslashes($user['username']); ?>?')"
-                                                   data-tooltip="Удалить" aria-label="Удалить">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
+                                            <?php endif; ?>
+
+                                            <?php if ($user['id'] != $current_user_id && $manageable): ?>
+                                                <?php if ($can_edit_users): ?>
+                                                <!-- POST + CSRF: изменяющее действие не должно быть GET-ссылкой -->
+                                                <form method="POST" action="users.php" class="inline-action">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo safeOutput($_SESSION['csrf_token'] ?? ''); ?>">
+                                                    <input type="hidden" name="action" value="toggle_status">
+                                                    <input type="hidden" name="id" value="<?php echo (int)$user['id']; ?>">
+                                                    <button type="submit"
+                                                            class="btn btn-sm <?php echo $user['is_active'] ? 'btn-warning' : 'btn-success'; ?>"
+                                                            data-tooltip="<?php echo $user['is_active'] ? 'Деактивировать' : 'Активировать'; ?>"
+                                                            aria-label="<?php echo $user['is_active'] ? 'Деактивировать' : 'Активировать'; ?>">
+                                                        <i class="fas fa-power-off"></i>
+                                                    </button>
+                                                </form>
+                                                <?php endif; ?>
+
+                                                <?php if ($can_delete_users): ?>
+                                                <form method="POST" action="users.php" class="inline-action"
+                                                      onsubmit="return confirm('Удалить пользователя <?php echo safeOutput(addcslashes($user['username'], "'\\")); ?>?')">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo safeOutput($_SESSION['csrf_token'] ?? ''); ?>">
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="id" value="<?php echo (int)$user['id']; ?>">
+                                                    <button type="submit" class="btn btn-sm btn-danger"
+                                                            data-tooltip="Удалить" aria-label="Удалить">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                                <?php endif; ?>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -1032,8 +1084,15 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                     <div class="form-group">
                         <label for="create_role">Роль *</label>
                         <select id="create_role" name="role" class="form-control" required>
-                            <option value="manager">Менеджер</option>
-                            <option value="admin">Администратор</option>
+                            <?php
+                            // Показываем только роли, которые текущий пользователь вправе выдать
+                            foreach ($ALLOWED_ROLES as $r):
+                                if (!canAssignRole($current_user_role, $r)) continue;
+                            ?>
+                            <option value="<?php echo safeOutput($r); ?>"<?php echo $r === 'manager' ? ' selected' : ''; ?>>
+                                <?php echo safeOutput($ROLE_LABELS[$r] ?? $r); ?>
+                            </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
@@ -1120,8 +1179,13 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                     <div class="form-group">
                         <label for="edit_role">Роль</label>
                         <select id="edit_role" name="role" class="form-control" required>
-                            <option value="manager">Менеджер</option>
-                            <option value="admin">Администратор</option>
+                            <?php foreach ($ALLOWED_ROLES as $r):
+                                if (!canAssignRole($current_user_role, $r)) continue;
+                            ?>
+                            <option value="<?php echo safeOutput($r); ?>">
+                                <?php echo safeOutput($ROLE_LABELS[$r] ?? $r); ?>
+                            </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
@@ -1132,17 +1196,26 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                 </div>
                 
                 <div id="passwordFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="edit_current_password">Ваш текущий пароль *</label>
+                        <input type="password" id="edit_current_password" name="current_password"
+                               class="form-control" autocomplete="current-password" disabled>
+                        <small style="color: #6c757d; font-size: 12px;">
+                            Смена пароля (в том числе своего) подтверждается вашим действующим паролем
+                        </small>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="edit_new_password">Новый пароль</label>
-                            <input type="password" id="edit_new_password" name="new_password" 
-                                   class="form-control" minlength="8" disabled>
+                            <input type="password" id="edit_new_password" name="new_password"
+                                   class="form-control" minlength="8" autocomplete="new-password" disabled>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="edit_confirm_password">Подтверждение пароля</label>
-                            <input type="password" id="edit_confirm_password" name="confirm_password" 
-                                   class="form-control" disabled>
+                            <input type="password" id="edit_confirm_password" name="confirm_password"
+                                   class="form-control" autocomplete="new-password" disabled>
                         </div>
                     </div>
                 </div>
@@ -1162,23 +1235,50 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
 
 <script>
 // ========== ГЕНЕРАЦИЯ ПАРОЛЯ ==========
+// Криптостойкое случайное целое [0, max) без модульного смещения
+function secureRandomInt(max) {
+    const limit = Math.floor(0x100000000 / max) * max;
+    const buf = new Uint32Array(1);
+    let value;
+    do {
+        crypto.getRandomValues(buf);
+        value = buf[0];
+    } while (value >= limit);
+    return value % max;
+}
+
+function securePick(alphabet) {
+    return alphabet.charAt(secureRandomInt(alphabet.length));
+}
+
 function generatePassword(length = 15) {
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
-    let password = "";
-    
-    // Добавляем разные типы символов
-    password += "abcdefghijklmnopqrstuvwxyz".charAt(Math.floor(Math.random() * 26));
-    password += "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 26));
-    password += "0123456789".charAt(Math.floor(Math.random() * 10));
-    password += "!@#$%^&*()_+-=[]{}|;:,.<>?".charAt(Math.floor(Math.random() * 26));
-    
+    // Math.random() предсказуем и для паролей непригоден — используем WebCrypto
+    const lower = "abcdefghijklmnopqrstuvwxyz";
+    const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const digits = "0123456789";
+    const special = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const charset = lower + upper + digits + special;
+
+    // Гарантируем присутствие всех типов символов
+    const chars = [
+        securePick(lower),
+        securePick(upper),
+        securePick(digits),
+        securePick(special)
+    ];
+
     // Добиваем длину
-    for (let i = password.length; i < length; i++) {
-        password += charset.charAt(Math.floor(Math.random() * charset.length));
+    for (let i = chars.length; i < length; i++) {
+        chars.push(securePick(charset));
     }
-    
-    // Перемешиваем
-    return password.split('').sort(() => Math.random() - 0.5).join('');
+
+    // Перемешиваем (Фишер — Йетс на криптостойком источнике)
+    for (let i = chars.length - 1; i > 0; i--) {
+        const j = secureRandomInt(i + 1);
+        [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+
+    return chars.join('');
 }
 
 function generateAndSetPassword() {
@@ -1213,22 +1313,30 @@ function showPasswordNotification(password) {
     notification.id = 'passwordNotification';
     notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 10000; max-width: 400px;';
     
+    // Разметку собираем без пароля, сам пароль кладём через textContent:
+    // в алфавите есть < > & ", подстановка в innerHTML сломала бы вёрстку
     notification.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <strong style="font-size: 16px;"><i class="fas fa-champagne-glasses"></i> Сгенерирован пароль!</strong>
-            <button onclick="document.getElementById('passwordNotification').remove()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">&times;</button>
+            <button type="button" class="pn-close" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">&times;</button>
         </div>
         <div>
             <p style="margin: 0 0 10px 0;">Скопируйте пароль:</p>
-            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-bottom: 10px; font-family: monospace; font-size: 16px; word-break: break-all;">
-                ${password}
-            </div>
-            <button onclick="copyToClipboard('${password.replace(/'/g, "\\'")}')" style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%;">
+            <div class="pn-value" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-bottom: 10px; font-family: monospace; font-size: 16px; word-break: break-all;"></div>
+            <button type="button" class="pn-copy" style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%;">
                 <i class="fas fa-copy"></i> Копировать
             </button>
         </div>
     `;
-    
+
+    notification.querySelector('.pn-value').textContent = password;
+    notification.querySelector('.pn-close').addEventListener('click', function() {
+        notification.remove();
+    });
+    notification.querySelector('.pn-copy').addEventListener('click', function() {
+        copyToClipboard(password);
+    });
+
     document.body.appendChild(notification);
     
     setTimeout(() => {
@@ -1293,10 +1401,16 @@ function openEditModal(userId, username, email, fullName, role, isActive) {
 
 function togglePasswordFields(show) {
     const passwordFields = document.getElementById('passwordFields');
+    const currentPassword = document.getElementById('edit_current_password');
     const newPassword = document.getElementById('edit_new_password');
     const confirmPassword = document.getElementById('edit_confirm_password');
-    
+
     if (passwordFields) passwordFields.style.display = show ? 'block' : 'none';
+    if (currentPassword) {
+        currentPassword.disabled = !show;
+        currentPassword.required = show;
+        if (!show) currentPassword.value = '';
+    }
     if (newPassword) {
         newPassword.disabled = !show;
         newPassword.required = show;
