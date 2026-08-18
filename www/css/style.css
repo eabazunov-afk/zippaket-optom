@@ -176,8 +176,10 @@ a {
     gap: 0.5rem;
 }
 
+/* Верхняя панель светлая (см. site-premium.css) — белый ховер делал телефон/e-mail
+   невидимыми. Ховер — акцент дизайн-системы. */
 .contacts a:hover {
-    color: var(--white);
+    color: var(--z-mint);
 }
 
 .work-hours {

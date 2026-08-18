@@ -115,6 +115,14 @@ if (isset($_GET['download'])) {
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Формируем…';
             say('');
 
+            // reCAPTCHA может быть заблокирована расширением/фильтром — не роняем форму молча.
+            if (typeof grecaptcha === 'undefined' || typeof grecaptcha.ready !== 'function') {
+                say('Проверка безопасности не загрузилась. Отключите блокировщик рекламы или позвоните нам.');
+                button.disabled = false;
+                button.innerHTML = originalText;
+                return;
+            }
+
             grecaptcha.ready(function () {
                 grecaptcha.execute(SITE_KEY, { action: 'price_download' }).then(function (token) {
                     // Payload мирроринг save_lead (см. js/script.js): type=price_download, pdn_consent, recaptcha_token.
@@ -161,7 +169,6 @@ if (isset($_GET['download'])) {
         });
     })();
     </script>
-
-    <script src="/js/script.js"></script>
+    <!-- Общие скрипты (script.js, cart.js) подключены в footer.php -->
 </body>
 </html>

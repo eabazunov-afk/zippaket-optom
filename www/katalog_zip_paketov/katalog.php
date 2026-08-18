@@ -118,7 +118,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
             border-radius: 20px;
             padding: 15px 20px;
             margin-bottom: 30px;
-            border: 1px solid #eef2f6;
+            border: 1px solid var(--z-hairline);
             box-shadow: 0 5px 20px rgba(0,0,0,0.03);
         }
         
@@ -126,14 +126,14 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #f8fafc;
+            background: var(--z-surface-2);
             padding: 8px 15px;
             border-radius: 40px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--z-hairline-strong);
         }
         
         .compact-filter-item i {
-            color: #3498db;
+            color: var(--z-mint);
             font-size: 0.9rem;
         }
         
@@ -143,7 +143,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
             background: transparent;
             padding: 5px;
             font-size: 0.95rem;
-            color: #1e293b;
+            color: var(--z-text);
             outline: none;
             min-width: 120px;
         }
@@ -175,7 +175,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
             background: white;
             border-radius: 16px;
             padding: 15px;
-            border: 1px solid #eef2f6;
+            border: 1px solid var(--z-hairline);
             transition: all 0.3s;
             position: relative;
         }
@@ -183,7 +183,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         .compact-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-color: #3498db;
+            border-color: var(--z-mint);
         }
         
         .compact-card.special {
@@ -211,7 +211,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
             align-items: center;
             justify-content: center;
             margin-bottom: 10px;
-            background: #f8fafc;
+            background: var(--z-surface-2);
             border-radius: 12px;
             padding: 10px;
         }
@@ -225,7 +225,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         .compact-name {
             font-size: 0.95rem;
             font-weight: 600;
-            color: #1e293b;
+            color: var(--z-text);
             margin-bottom: 8px;
             line-height: 1.3;
             height: 2.6em;
@@ -238,13 +238,13 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         .compact-price {
             font-size: 1.2rem;
             font-weight: 800;
-            color: #1e293b;
+            color: var(--z-text);
             margin-bottom: 5px;
         }
         
         .compact-stock {
             font-size: 0.8rem;
-            color: #64748b;
+            color: var(--z-text-2);
             margin-bottom: 10px;
         }
         
@@ -260,12 +260,12 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
             width: 100%;
             margin: 20px 0;
             padding: 15px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--z-surface-2);
+            border: 1px solid var(--z-hairline-strong);
             border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
-            color: #1e293b;
+            color: var(--z-text);
             align-items: center;
             justify-content: space-between;
         }
@@ -608,7 +608,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
 
                     <!-- Сортировка и список товаров -->
                     <h2 class="section-title" style="font-size: 1.5rem; margin: 40px 0 20px;">
-                        <i class="fas fa-boxes" style="color: #3498db;"></i> Все товары
+                        <i class="fas fa-boxes" style="color: var(--z-mint);"></i> Все товары
                     </h2>
                     
                     <div class="catalog-toolbar">
@@ -706,7 +706,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
                                         <?php endif; ?>
                                     </div>
 
-                                    <div class="pack-note" style="color:#94a3b8;font-size:0.8rem;margin:4px 0">
+                                    <div class="pack-note" style="color:var(--z-text-3);font-size:0.8rem;margin:4px 0">
                                         <?= htmlspecialchars(pv_pack_note((int)($product['min_order_qty'] ?? 1), (int)($product['qty_step'] ?? 1))) ?>
                                     </div>
 
@@ -835,31 +835,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         </div>
     </div>
 
-    <!-- Модальное окно заказа звонка -->
-    <div class="modal" id="callbackModal">
-        <div class="modal-content">
-            <button class="modal-close">
-                <i class="fas fa-times"></i>
-            </button>
-            <h3>Заказать обратный звонок</h3>
-            <form id="callbackForm">
-                <div class="form-group">
-                    <input type="text" name="name" placeholder="Ваше имя *" required>
-                </div>
-                <div class="form-group">
-                    <input type="tel" name="phone" placeholder="Телефон *" required>
-                </div>
-                <input type="hidden" id="callbackRecaptchaToken" name="recaptcha_token">
-                <div class="form-group">
-                    <textarea name="message" placeholder="Комментарий (необязательно)" rows="3"></textarea>
-                </div>
-                <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank">согласие на обработку персональных данных</a></label>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-phone"></i> Заказать звонок
-                </button>
-            </form>
-        </div>
-    </div>
+    <!-- Модалка «Заказать звонок» — общая, рендерится в footer.php -->
 
     <!-- Форма для применения фильтров -->
     <form id="filterForm" method="GET" style="display: none;">
@@ -877,10 +853,8 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         <input type="hidden" name="page" id="filterPage" value="1">
     </form>
 
-    <!-- Основные скрипты -->
-    <script src="/js/script.js"></script>
-    <script src="/js/catalog.js"></script>
-    <script src="/js/cart.js"></script>
+    <!-- Общие скрипты (script.js, cart.js) подключены в footer.php -->
+    <script src="/js/catalog.js" defer></script>
 
  <!-- Скрипт для мобильного фильтра -->
     <script>
@@ -945,47 +919,6 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         }
     });
     </script>
-
-    <!-- Скрипты для reCAPTCHA и обратного звонка -->
-    <script>
-    // Инициализация reCAPTCHA
-    grecaptcha.ready(function() {
-        console.log('reCAPTCHA готов к работе');
-    });
-
-    // Обработчик формы обратного звонка
-    window.addEventListener('load', function() {
-        const callbackForm = document.getElementById('callbackForm');
-        if (callbackForm && !callbackForm.hasAttribute('data-handler-attached')) {
-            callbackForm.setAttribute('data-handler-attached', 'true');
-            callbackForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const phone = this.querySelector('input[name="phone"]');
-                if (!phone || !phone.value.trim()) {
-                    alert('Пожалуйста, введите телефон');
-                    return;
-                }
-                
-                if (typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
-                    grecaptcha.ready(function() {
-                        grecaptcha.execute('6Lfd5FksAAAAAGQNGm2ny-aJhjuw6Mp5th7SNJRf', {action: 'callback'}).then(function(token) {
-                            const tokenInput = document.getElementById('callbackRecaptchaToken');
-                            if (tokenInput) {
-                                tokenInput.value = token;
-                            }
-                            callbackForm.submit();
-                        });
-                    });
-                } else {
-                    console.error('reCAPTCHA не загружена');
-                    callbackForm.submit();
-                }
-            });
-        }
-    });
-    </script>
-
 
     <!-- Yandex.Metrika counter -->
     <script>

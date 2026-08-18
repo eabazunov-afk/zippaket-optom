@@ -63,6 +63,22 @@ body.zlock {
 body.zlock ::selection { background: var(--z-mint); color: var(--z-bg); }
 .z-tnum { font-variant-numeric: tabular-nums; }
 
+/* ===== ДОСТУПНОСТЬ: видимый фокус с клавиатуры =====
+   В проекте ~11 сбросов `outline: none` (style.css, catalog.css, premium.css,
+   shop-dark.css, home.css) — они убирают рамку и для клавиатуры тоже.
+   :focus-visible срабатывает ТОЛЬКО при навигации с клавиатуры/AT, поэтому
+   мышиный UX не меняется; !important перебивает точечные сбросы в старых файлах. */
+:focus-visible {
+    outline: 3px solid var(--z-mint) !important;
+    outline-offset: 2px;
+}
+/* На тёмных ink-панелях (футер, CTA-бэнд) — светлая бронза для контраста. */
+.main-footer :focus-visible,
+.z-ink :focus-visible,
+.z-fab :focus-visible {
+    outline-color: var(--z-mint-deep) !important;
+}
+
 /* Чекбокс согласия на обработку ПДн (152-ФЗ) — на всех формах */
 .z-consent, .pdn-consent {
     display: flex; align-items: flex-start; gap: 8px; font-size: 13px;

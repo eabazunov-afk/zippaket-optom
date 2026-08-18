@@ -27,7 +27,9 @@ $order = $orderNumber !== '' ? order_get_by_number($orderNumber) : null;
 // Защита от IDOR: счёт доступен только с валидным токеном заказа.
 if ($order === null || !order_token_valid($order, $token) || $order['payment_method'] !== 'invoice') {
     http_response_code(404);
-    echo '<!doctype html><meta charset="utf-8"><p style="font-family:sans-serif;padding:40px">Счёт не найден или ссылка недействительна.</p>';
+    echo '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">'
+       . '<meta name="robots" content="noindex, nofollow">'
+       . '<p style="font-family:sans-serif;padding:40px">Счёт не найден или ссылка недействительна.</p>';
     exit;
 }
 
@@ -47,6 +49,9 @@ function rub_words(float $sum): string {
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php // Печатная форма с реквизитами покупателя — в поиск не отдаём. ?>
+<meta name="robots" content="noindex, nofollow">
 <title>Счёт № <?= htmlspecialchars($invoiceNo) ?> | ZLOCK</title>
 <style>
     * { box-sizing: border-box; }

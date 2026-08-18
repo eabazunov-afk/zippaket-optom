@@ -4,7 +4,7 @@
 .breadcrumbs-section {
     background: #FBFAF6;
     padding: 15px 0;
-    border-bottom: 1px solid #eef2f6;
+    border-bottom: 1px solid var(--z-hairline);
 }
 
 .breadcrumbs {
@@ -15,13 +15,13 @@
 }
 
 .breadcrumbs a {
-    color: #3498db;
+    color: var(--z-mint);
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .breadcrumbs a:hover {
-    color: #1d4ed8;
+    color: var(--z-mint-2);
     text-decoration: underline;
 }
 
@@ -82,7 +82,7 @@
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-    border: 1px solid #eef2f6;
+    border: 1px solid var(--z-hairline);
     margin-bottom: 25px;
 }
 
@@ -113,7 +113,7 @@
 }
 
 .reset-filters:hover {
-    color: #3498db;
+    color: var(--z-mint);
 }
 
 .filter-group {
@@ -157,7 +157,7 @@
 }
 
 .filter-option input[type="radio"] {
-    accent-color: #3498db;
+    accent-color: var(--z-mint);
     width: 16px;
     height: 16px;
     margin: 0;
@@ -179,7 +179,7 @@
 
 .filter-input:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--z-mint);
     box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
 }
 
@@ -219,7 +219,7 @@
 .filter-checkbox input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #3498db;
+    accent-color: var(--z-mint);
 }
 
 /* Сайдбар блоки */
@@ -228,7 +228,7 @@
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-    border: 1px solid #eef2f6;
+    border: 1px solid var(--z-hairline);
     margin-bottom: 25px;
 }
 
@@ -290,7 +290,7 @@
 .popular-price {
     font-size: 1rem;
     font-weight: 700;
-    color: #3498db;
+    color: var(--z-mint);
 }
 
 .popular-size {
@@ -381,7 +381,7 @@
 
 .sort-select:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--z-mint);
 }
 
 .view-toggle {
@@ -409,8 +409,8 @@
 }
 
 .view-btn.active {
-    background: #3498db;
-    border-color: #3498db;
+    background: var(--z-mint);
+    border-color: var(--z-mint);
     color: white;
 }
 
@@ -427,7 +427,7 @@
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-    border: 1px solid #eef2f6;
+    border: 1px solid var(--z-hairline);
     transition: all 0.3s;
     position: relative;
 }
@@ -465,7 +465,7 @@
 }
 
 .badge-abc {
-    background: #3b82f6;
+    background: var(--z-mint);
     color: white;
 }
 
@@ -501,7 +501,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #3498db;
+    color: var(--z-mint);
     font-size: 0.9rem;
 }
 
@@ -528,7 +528,7 @@
 }
 
 .product-name a:hover {
-    color: #3498db;
+    color: var(--z-mint);
 }
 
 .product-specs {
@@ -607,8 +607,8 @@
 
 .price-opt {
     font-size: 0.7rem;
-    color: #3498db;
-    background: #e8f4fd;
+    color: var(--z-mint);
+    background: rgba(154, 123, 46, .10);
     padding: 3px 8px;
     border-radius: 30px;
     white-space: nowrap;
@@ -684,8 +684,8 @@
 
 .pagination-prev:hover,
 .pagination-next:hover {
-    background: #3498db;
-    border-color: #3498db;
+    background: var(--z-mint);
+    border-color: var(--z-mint);
     color: white;
 }
 
@@ -715,8 +715,8 @@
 }
 
 .page-link.active {
-    background: #3498db;
-    border-color: #3498db;
+    background: var(--z-mint);
+    border-color: var(--z-mint);
     color: white;
 }
 
@@ -734,7 +734,7 @@
     background: white;
     padding: 50px 0;
     margin-top: 30px;
-    border-top: 1px solid #eef2f6;
+    border-top: 1px solid var(--z-hairline);
 }
 
 .seo-content {
@@ -833,7 +833,7 @@
     gap: 2rem;
     background: white;
     border-radius: 20px;
-    border: 1px solid #eef2f6;
+    border: 1px solid var(--z-hairline);
     overflow: hidden;
     transition: all 0.3s ease;
     padding: 0;
@@ -844,7 +844,7 @@
 .products-list .product-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-    border-color: #3498db;
+    border-color: var(--z-mint);
 }
 
 /* ИСПРАВЛЕНО: Бейджи для списка */
@@ -882,7 +882,7 @@
 }
 
 .products-list .badge-abc {
-    background: #3b82f6;
+    background: var(--z-mint);
     color: white;
 }
 
@@ -932,7 +932,7 @@
 }
 
 .products-list .product-name a:hover {
-    color: #3498db;
+    color: var(--z-mint);
 }
 
 .products-list .product-specs {
@@ -958,7 +958,7 @@
 
 .products-list .spec-item i {
     width: 20px;
-    color: #3498db;
+    color: var(--z-mint);
     font-size: 1rem;
 }
 
@@ -1018,8 +1018,8 @@
 
 .products-list .price-opt {
     font-size: 0.9rem;
-    color: #3498db;
-    background: #e8f4fd;
+    color: var(--z-mint);
+    background: rgba(154, 123, 46, .10);
     padding: 0.35rem 1rem;
     border-radius: 30px;
     white-space: nowrap;
@@ -1042,18 +1042,18 @@
 }
 
 .products-list .btn-primary {
-    background: #2563eb;
-    border-color: #2563eb;
+    background: var(--z-mint);
+    border-color: var(--z-mint);
 }
 
 .products-list .btn-outline {
     background: transparent;
-    border-color: #2563eb;
-    color: #2563eb;
+    border-color: var(--z-mint);
+    color: var(--z-mint);
 }
 
 .products-list .btn-outline:hover {
-    background: #2563eb;
+    background: var(--z-mint);
     color: white;
 }
 
@@ -1068,14 +1068,14 @@
     justify-content: center;
     border-radius: 50px; /* Делаем такой же радиус как у основных кнопок */
     font-size: 1.1rem;
-    border: 2px solid #2563eb;
+    border: 2px solid var(--z-mint);
     background: transparent;
-    color: #2563eb;
+    color: var(--z-mint);
     transition: all 0.3s ease;
 }
 
 .products-list .btn-sm1:hover {
-    background: #2563eb;
+    background: var(--z-mint);
     color: white;
 }
 
@@ -1094,14 +1094,14 @@
     justify-content: center;
     border-radius: 50px;
     font-size: 1.1rem;
-    border: 2px solid #2563eb;
+    border: 2px solid var(--z-mint);
     background: transparent;
-    color: #2563eb;
+    color: var(--z-mint);
     transition: all 0.3s ease;
 }
 
 .products-grid .btn-sm1:hover {
-    background: #2563eb;
+    background: var(--z-mint);
     color: white;
 }
 
