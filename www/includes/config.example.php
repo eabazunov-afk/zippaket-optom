@@ -21,6 +21,11 @@ define('INCLUDES_PATH', ROOT_PATH . '/includes');
 define('ADMIN_PATH', ROOT_PATH . '/admin');
 define('UPLOAD_PATH', ROOT_PATH . '/uploads');
 
+// Каталог логов приложения — ВНЕ веб-корня (ROOT_PATH = .../www), чтобы лог
+// нельзя было скачать по HTTP. Если каталог недоступен на запись, код
+// откатывается на системный error_log веб-сервера (см. includes/api.php).
+define('LOG_DIR', dirname(ROOT_PATH) . '/logs');
+
 define('AMOCRM_DOMAIN', 'ваш-аккаунт.amocrm.ru'); // Ваш домен AmoCRM
 define('AMOCRM_ACCESS_TOKEN', 'ВАШ_AMOCRM_ACCESS_TOKEN'); // Long-lived токен
 define('AMOCRM_CLIENT_ID', 'ВАШ_AMOCRM_CLIENT_ID'); // ID интеграции
@@ -174,7 +179,9 @@ function formatPhone($phone) {
 
 
 /**
- * Сохранить корзину в БД
+ * Сохранить «сборную корзину» заявок в БД.
+ * Таблица создаётся миграцией db/migrations/2026-08-18-offer-carts.sql.
+ * Вызывается из includes/api.php (action=submit_offer_cart).
  */
 function saveOfferCart($data) {
     $db = getDbConnection();

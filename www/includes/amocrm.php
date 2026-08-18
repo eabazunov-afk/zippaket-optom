@@ -49,7 +49,7 @@ class AmoCRM {
         $this->domain = AMOCRM_DOMAIN;
         $this->accessToken = AMOCRM_ACCESS_TOKEN;
         
-        error_log("AmoCRM: Initialized with domain: {$this->domain}");
+        error_log("AmoCRM: initialized");
     }
     
     /**
@@ -57,25 +57,12 @@ class AmoCRM {
      */
     public function sendLead($data) {
         try {
-            error_log("==========================================");
-            error_log("AmoCRM: Sending lead data. Type: " . ($data['type'] ?? 'unknown') . ", Name: " . ($data['name'] ?? 'unknown'));
-            error_log("AmoCRM: Полные данные заявки:");
-            error_log("Тип: " . ($data['type'] ?? 'не указано'));
-            error_log("Источник: " . ($data['source'] ?? 'website'));
-            error_log("Имя: " . ($data['name'] ?? 'не указано'));
-            error_log("Телефон: " . ($data['phone'] ?? 'не указано'));
-            error_log("Email: " . ($data['email'] ?? 'не указано'));
-            error_log("Сообщение: " . ($data['message'] ?? 'не указано'));
-            
-            if (isset($data['parameters'])) {
-                error_log("Параметры тип: " . gettype($data['parameters']));
-                if (is_string($data['parameters'])) {
-                    error_log("Параметры (строка): " . substr($data['parameters'], 0, 500));
-                } else {
-                    error_log("Параметры (массив): " . json_encode($data['parameters'], JSON_UNESCAPED_UNICODE));
-                }
-            }
-            
+            // 152-ФЗ: в лог только технический след — тип заявки, источник и id.
+            // Имя/телефон/email/сообщение и тела запросов не пишем.
+            error_log("AmoCRM: sending lead. Type: " . ($data['type'] ?? 'unknown')
+                . ", source: " . ($data['source'] ?? 'website')
+                . ", lead #" . ($data['lead_id'] ?? '-'));
+
             // Создаем сделку
             $leadId = $this->createLead($data);
             
@@ -104,7 +91,7 @@ class AmoCRM {
             return false;
         } catch (Exception $e) {
             error_log("AmoCRM Error: " . $e->getMessage());
-            error_log("AmoCRM Trace: " . $e->getTraceAsString());
+            // Стек-трейс не логируем: в аргументах кадров могут быть ПДн
             return false;
         }
     }
@@ -143,8 +130,6 @@ class AmoCRM {
             ];
         }
         
-        error_log("AmoCRM: Sending lead data: " . json_encode($leadData, JSON_UNESCAPED_UNICODE));
-        
         $response = $this->sendRequest('/api/v4/leads', 'POST', $leadData);
         
         if ($response && isset($response['_embedded']['leads'][0]['id'])) {
@@ -152,10 +137,12 @@ class AmoCRM {
             error_log("AmoCRM: Lead created successfully with ID: $leadId");
             return $leadId;
         } else {
+            // Пишем только коды/пути полей из ответа — сами значения содержат ПДн
             if ($response && isset($response['validation-errors'])) {
-                error_log("AmoCRM: Validation errors: " . json_encode($response['validation-errors'], JSON_UNESCAPED_UNICODE));
+                error_log("AmoCRM: validation errors on lead create: "
+                    . json_encode(array_keys((array)$response['validation-errors'])));
             }
-            error_log("AmoCRM: Failed to create lead. Response: " . json_encode($response, JSON_UNESCAPED_UNICODE));
+            error_log("AmoCRM: Failed to create lead");
         }
         
         return false;
@@ -278,7 +265,7 @@ class AmoCRM {
             error_log("AmoCRM: Contact created successfully with ID: $contactId");
             return $contactId;
         } else {
-            error_log("AmoCRM: Failed to create contact. Response: " . json_encode($response, JSON_UNESCAPED_UNICODE));
+            error_log("AmoCRM: Failed to create contact");
         }
         
         return false;
@@ -547,9 +534,8 @@ private function generateNoteText($data) {
         if ($method === 'POST') {
             curl_setopt($ch, CURLOPT_POST, true);
             if ($data) {
-                $jsonData = json_encode($data, JSON_UNESCAPED_UNICODE);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                error_log("AmoCRM: Отправка данных: " . $jsonData);
+                // Тело запроса в лог не пишем — там ПДн клиента
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data, JSON_UNESCAPED_UNICODE));
             }
         } elseif ($method === 'PATCH') {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
@@ -571,9 +557,7 @@ private function generateNoteText($data) {
         error_log("AmoCRM Response [$httpCode] for $endpoint");
         
         if ($httpCode >= 400) {
-            error_log("AmoCRM Error Response: " . $response);
-            
-            // Детализация ошибок
+            // Детализация ошибок (тело ответа может содержать отправленные ПДн)
             if ($httpCode === 401) {
                 error_log("AmoCRM: Ошибка авторизации! Проверьте токен доступа.");
             } elseif ($httpCode === 403) {
@@ -599,16 +583,13 @@ private function generateNoteText($data) {
  */
 function sendToAmoCRM($data) {
     try {
-        error_log("sendToAmoCRM: Starting...");
-        error_log("sendToAmoCRM: Данные для отправки: " . json_encode($data, JSON_UNESCAPED_UNICODE));
-        
         $amoCRM = new AmoCRM();
         $result = $amoCRM->sendLead($data);
         error_log("sendToAmoCRM: Result: " . ($result ? "Success, ID: $result" : "Failed"));
         return $result;
     } catch (Exception $e) {
         error_log("sendToAmoCRM Error: " . $e->getMessage());
-        error_log("sendToAmoCRM Trace: " . $e->getTraceAsString());
+        // Стек-трейс не логируем: в аргументах кадров могут быть ПДн
         return false;
     }
 }

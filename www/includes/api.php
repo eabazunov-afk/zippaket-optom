@@ -6,34 +6,41 @@ mb_internal_encoding('UTF-8');
 mb_http_output('UTF-8');
 header('Content-Type: application/json; charset=utf-8');
 
-// Включаем максимальное логирование
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
-ini_set('error_log', '/home/c103264/zippaket-optom.ru/www/includes/debug.log');
-
-// Логируем начало запроса
-error_log("==========================================");
-error_log("API REQUEST START: " . date('Y-m-d H:i:s'));
-error_log("REQUEST METHOD: " . $_SERVER['REQUEST_METHOD']);
-error_log("REQUEST URI: " . ($_SERVER['REQUEST_URI'] ?? 'unknown'));
-error_log("CONTENT TYPE: " . ($_SERVER['CONTENT_TYPE'] ?? 'not set'));
 
 require_once 'config.php';
 require_once 'calculator.php';
 
+// Лог пишем в каталог вне веб-корня (LOG_DIR из config.php). Если каталога нет
+// или он не пишется — молча остаёмся на системном логе веб-сервера.
+// 152-ФЗ: в лог не пишем ПДн (имена/телефоны/email/тела запросов), только
+// идентификаторы, коды ответов и технические ошибки.
+$logDir = defined('LOG_DIR') ? LOG_DIR : dirname(__DIR__, 2) . '/logs';
+if (!is_dir($logDir)) {
+    @mkdir($logDir, 0750, true);
+}
+if (is_dir($logDir) && is_writable($logDir)) {
+    ini_set('error_log', rtrim($logDir, "/\\") . DIRECTORY_SEPARATOR . 'app-error.log');
+}
+unset($logDir);
+
 // Подключаем UTM трекер если существует
 if (file_exists(__DIR__ . '/utm_tracker.php')) {
     require_once __DIR__ . '/utm_tracker.php';
-    error_log("UTM Tracker: подключен");
-} else {
-    error_log("UTM Tracker: файл не найден");
 }
 
 header('Content-Type: application/json');
 // CORS '*' убран намеренно: лид-эндпоинт принимает запросы только с нашего домена
 // (браузер блокирует cross-origin JSON-fetch без Allow-Origin) — меньше спама/CSRF.
 require_once __DIR__ . '/recaptcha.php';
+
+/**
+ * Ошибка ввода, текст которой безопасно показать пользователю
+ * (в отличие от системных исключений — те отдаются нейтральным сообщением).
+ */
+class ApiClientError extends Exception {}
 
 // Упрощенный обработчик ошибок
 function handleError($message, $code = 500) {
@@ -55,11 +62,7 @@ try {
     }
     
     error_log("API Action: $action");
-    
-    // Получаем входные данные
-    $input = file_get_contents('php://input');
-    error_log("Raw input (first 1000 chars): " . substr($input, 0, 1000));
-    
+
     // Обработка разных действий
     switch ($action) {
         case 'calculate':
@@ -89,8 +92,15 @@ try {
         default:
             handleError('Неизвестное действие: ' . $action, 400);
     }
-} catch (Exception $e) {
-    handleError('Исключение: ' . $e->getMessage() . ' в файле ' . $e->getFile() . ' на строке ' . $e->getLine());
+} catch (ApiClientError $e) {
+    // Ожидаемая ошибка ввода — её текст мы формируем сами, показывать можно.
+    handleError($e->getMessage(), 400);
+} catch (Throwable $e) {
+    // Всё остальное: путь к файлу, строка и текст исключения раскрывают структуру
+    // сервера — клиенту уходит нейтральный текст, подробности только в error_log.
+    error_log('API Exception: ' . get_class($e) . ': ' . $e->getMessage()
+        . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    handleError('Внутренняя ошибка сервера. Попробуйте позже.', 500);
 }
 
 /**
@@ -98,19 +108,17 @@ try {
  */
 function handleCalculate() {
     $input = file_get_contents('php://input');
-    error_log("Calculate input: " . substr($input, 0, 500));
-    
     $data = json_decode($input, true);
     
     if (!$data || json_last_error() !== JSON_ERROR_NONE) {
         error_log("Calculate JSON error: " . json_last_error_msg());
-        throw new Exception('Неверный формат данных JSON');
+        throw new ApiClientError('Неверный формат данных JSON');
     }
     
     $requiredFields = ['type', 'width', 'height', 'thickness', 'quantity'];
     foreach ($requiredFields as $field) {
         if (!isset($data[$field])) {
-            throw new Exception("Отсутствует обязательное поле: $field");
+            throw new ApiClientError("Отсутствует обязательное поле: $field");
         }
     }
     
@@ -137,20 +145,18 @@ function handleCalculate() {
  */
 function handleSaveCalculation() {
     $input = file_get_contents('php://input');
-    error_log("SaveCalculation input: " . substr($input, 0, 500));
-    
     $data = json_decode($input, true);
     
     if (!$data || json_last_error() !== JSON_ERROR_NONE) {
         error_log("SaveCalculation JSON error: " . json_last_error_msg());
-        throw new Exception('Неверный формат данных JSON');
+        throw new ApiClientError('Неверный формат данных JSON');
     }
     
     // Сохраняем в БД
     $calculationId = 'CALC-' . time() . '-' . bin2hex(random_bytes(3));
     $data['calculation_id'] = $calculationId;
     
-    $saveResult = saveCalculationToDB($data); // Изменено имя функции!
+    $saveResult = saveCalculationToDB($data);
     
     if ($saveResult) {
         echo json_encode([
@@ -170,31 +176,48 @@ function handleSaveCalculation() {
  */
 function handleRequestOffer() {
     $input = file_get_contents('php://input');
-    error_log("RequestOffer input: " . substr($input, 0, 500));
-    
     $data = json_decode($input, true);
-    
+
     if (!$data || json_last_error() !== JSON_ERROR_NONE) {
         error_log("RequestOffer JSON error: " . json_last_error_msg());
-        throw new Exception('Неверный формат данных JSON');
+        throw new ApiClientError('Неверный формат данных JSON');
     }
-    
+
     if (empty($data['name']) || empty($data['phone'])) {
-        throw new Exception('Заполните обязательные поля: имя и телефон');
+        throw new ApiClientError('Заполните обязательные поля: имя и телефон');
     }
-    
+
+    // Валидация — та же, что в handleSaveLead: эндпоинт пишет лид в ту же таблицу
+    if (!preg_match('/^[\d\s\-\+\(\)]{10,20}$/', $data['phone'])) {
+        throw new ApiClientError('Укажите корректный номер телефона');
+    }
+
+    if (!empty($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        throw new ApiClientError('Укажите корректный email адрес');
+    }
+
+    // Анти-бот: проверка reCAPTCHA (токен приходит из формы, см. js/script.js)
+    if (!recaptcha_verify($data['recaptcha_token'] ?? '', '')) {
+        throw new ApiClientError('Проверка безопасности не пройдена. Обновите страницу и попробуйте снова.');
+    }
+
+    // 152-ФЗ: явное согласие на обработку ПДн обязательно
+    if (empty($data['pdn_consent'])) {
+        throw new ApiClientError('Необходимо согласие на обработку персональных данных');
+    }
+
     // Сохраняем в БД как заявку
     $leadData = [
-        'name' => $data['name'],
-        'phone' => $data['phone'],
-        'email' => isset($data['email']) ? $data['email'] : '',
+        'name' => trim($data['name']),
+        'phone' => trim($data['phone']),
+        'email' => isset($data['email']) ? trim($data['email']) : '',
         'type' => 'offer_request',
         'message' => isset($data['message']) ? $data['message'] : '',
         'source' => 'calculator',
         'parameters' => isset($data['calculation']) ? json_encode($data['calculation']) : '[]'
     ];
     
-    $leadId = saveLeadToDB($leadData); // Изменено имя функции!
+    $leadId = saveLeadToDB($leadData);
     
     if ($leadId) {
         // Добавляем lead_id в данные для AmoCRM
@@ -214,13 +237,14 @@ function handleRequestOffer() {
         // Отправляем email уведомление
         if (defined('ADMIN_EMAIL') && function_exists('sendEmail')) {
             $emailSubject = 'Новая заявка на КП - ' . SITE_NAME;
+            // Поля пользователя экранируем — письмо уходит в HTML (как в handleSaveLead)
             $emailMessage = "
                 <h2>Новая заявка на коммерческое предложение</h2>
-                <p><strong>Имя:</strong> {$data['name']}</p>
-                <p><strong>Телефон:</strong> {$data['phone']}</p>
-                <p><strong>Email:</strong> " . (isset($data['email']) ? $data['email'] : 'не указан') . "</p>
-                <p><strong>Сообщение:</strong> " . (isset($data['message']) ? $data['message'] : 'нет') . "</p>
-                <p><strong>AmoCRM ID:</strong> " . ($amoCRMResult ?: 'не отправлено') . "</p>
+                <p><strong>Имя:</strong> " . htmlspecialchars($leadData['name']) . "</p>
+                <p><strong>Телефон:</strong> " . htmlspecialchars($leadData['phone']) . "</p>
+                <p><strong>Email:</strong> " . ($leadData['email'] ? htmlspecialchars($leadData['email']) : 'не указан') . "</p>
+                <p><strong>Сообщение:</strong> " . ($leadData['message'] ? htmlspecialchars($leadData['message']) : 'нет') . "</p>
+                <p><strong>AmoCRM ID:</strong> " . ($amoCRMResult ? htmlspecialchars($amoCRMResult) : 'не отправлено') . "</p>
                 <p><strong>Дата:</strong> " . date('d.m.Y H:i:s') . "</p>
             ";
             
@@ -245,34 +269,43 @@ function handleRequestOffer() {
  */
 function handleSubmitOfferCart() {
     $input = file_get_contents('php://input');
-    error_log("SubmitOfferCart input: " . substr($input, 0, 500));
-    
     $data = json_decode($input, true);
     
     if (!$data || json_last_error() !== JSON_ERROR_NONE) {
         error_log("SubmitOfferCart JSON error: " . json_last_error_msg());
-        throw new Exception('Неверный формат данных JSON');
+        throw new ApiClientError('Неверный формат данных JSON');
     }
     
     if (empty($data['items']) || !is_array($data['items'])) {
-        throw new Exception('Корзина пуста');
+        throw new ApiClientError('Корзина пуста');
     }
-    
+
+    // Ограничение размера — эндпоинт публичный, защита от «набивки» таблицы
+    if (count($data['items']) > 200) {
+        throw new ApiClientError('Слишком много позиций в корзине');
+    }
+
     // Сохраняем корзину в БД
+    $cartCode = 'CART-' . time() . '-' . bin2hex(random_bytes(3));
     $cartData = [
-        'cart_id' => 'CART-' . time() . '-' . bin2hex(random_bytes(3)),
+        'cart_id' => $cartCode,
         'items' => $data['items'],
-        'total_items' => isset($data['total_items']) ? $data['total_items'] : count($data['items'])
+        'total_items' => isset($data['total_items']) ? (int)$data['total_items'] : count($data['items'])
     ];
-    
-    $cartId = saveOfferCartToDB($cartData); // Изменено имя функции!
-    
+
+    $cartId = saveOfferCartToDB($cartData);
+
+    // Не отдаём фальшивый success: если записи нет — это ошибка сервера
+    if (!$cartId) {
+        throw new Exception('Ошибка при сохранении корзины заявок');
+    }
+
     echo json_encode([
         'success' => true,
-        'cart_id' => $cartId,
+        'cart_id' => $cartCode,
         'message' => 'Заявка отправлена успешно',
         'items_count' => count($data['items']),
-        'total_items' => isset($data['total_items']) ? $data['total_items'] : 0
+        'total_items' => $cartData['total_items']
     ]);
     exit;
 }
@@ -282,37 +315,35 @@ function handleSubmitOfferCart() {
  */
 function handleSaveLead() {
     $input = file_get_contents('php://input');
-    error_log("SaveLead input: " . substr($input, 0, 500));
-    
     $data = json_decode($input, true);
     
     if (!$data || json_last_error() !== JSON_ERROR_NONE) {
         error_log("SaveLead JSON error: " . json_last_error_msg());
-        throw new Exception('Неверный формат данных JSON');
+        throw new ApiClientError('Неверный формат данных JSON');
     }
     
     if (empty($data['name']) || empty($data['phone'])) {
-        throw new Exception('Заполните обязательные поля: имя и телефон');
+        throw new ApiClientError('Заполните обязательные поля: имя и телефон');
     }
     
     // Простая валидация телефона
     if (!preg_match('/^[\d\s\-\+\(\)]{10,20}$/', $data['phone'])) {
-        throw new Exception('Укажите корректный номер телефона');
+        throw new ApiClientError('Укажите корректный номер телефона');
     }
     
     // Валидация email если указан
     if (!empty($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-        throw new Exception('Укажите корректный email адрес');
+        throw new ApiClientError('Укажите корректный email адрес');
     }
 
     // Анти-бот: проверка reCAPTCHA (токен приходит из формы, см. js/script.js)
     if (!recaptcha_verify($data['recaptcha_token'] ?? '', '')) {
-        throw new Exception('Проверка безопасности не пройдена. Обновите страницу и попробуйте снова.');
+        throw new ApiClientError('Проверка безопасности не пройдена. Обновите страницу и попробуйте снова.');
     }
 
     // 152-ФЗ: явное согласие на обработку ПДн обязательно
     if (empty($data['pdn_consent'])) {
-        throw new Exception('Необходимо согласие на обработку персональных данных');
+        throw new ApiClientError('Необходимо согласие на обработку персональных данных');
     }
     
     // Собираем параметры
@@ -394,10 +425,11 @@ if (!empty($data['comment'])) {
         'created_at' => date('Y-m-d H:i:s')
     ];
     
-    error_log("Lead data prepared for DB: " . print_r($leadData, true));
-    
+    // 152-ФЗ: содержимое заявки (имя/телефон/email) в лог не пишем
+    error_log("Lead data prepared for DB, type=" . $leadData['type']);
+
     // Сохраняем в БД
-    $leadId = saveLeadToDB($leadData); // Изменено имя функции!
+    $leadId = saveLeadToDB($leadData);
     
     if (!$leadId) {
         error_log("Failed to save lead to database");
@@ -423,10 +455,10 @@ if (!empty($data['comment'])) {
                 'parameters' => $parameters, // Уже массив с UTM данными
                 'lead_id' => $leadId
             ];
-            
-            
-            error_log("Sending to AmoCRM: " . print_r($amoData, true));
-            
+
+            // В лог — только идентификатор заявки, без ПДн
+            error_log("Sending to AmoCRM: lead #$leadId");
+
             $amoCRMResult = sendToAmoCRM($amoData);
             
             if ($amoCRMResult) {
@@ -485,13 +517,11 @@ if (!empty($data['comment'])) {
  */
 function handleSaveCartItems() {
     $input = file_get_contents('php://input');
-    error_log("SaveCartItems input: " . substr($input, 0, 500));
-    
     $data = json_decode($input, true);
     
     if (!$data || json_last_error() !== JSON_ERROR_NONE) {
         error_log("SaveCartItems JSON error: " . json_last_error_msg());
-        throw new Exception('Неверный формат данных JSON');
+        throw new ApiClientError('Неверный формат данных JSON');
     }
     
     // Сохраняем в localStorage на клиенте, а здесь можно логировать
@@ -605,7 +635,7 @@ function saveLeadToDB($data) {
             return $leadId;
         } else {
             $errorInfo = $stmt->errorInfo();
-            error_log("❌ DB insert failed: " . print_r($errorInfo, true));
+            error_log("❌ DB insert failed, SQLSTATE " . ($errorInfo[0] ?? '?') . ", code " . ($errorInfo[1] ?? '?'));
             return false;
         }
         
@@ -645,34 +675,97 @@ function updateLeadWithAmoCRMId($leadId, $amoCRMId) {
 }
 
 /**
- * Сохранение расчета в БД
+ * Сохранение расчёта в БД (таблица calculations, см. db/seed/schema.sql).
+ * Цены считаются на сервере: клиент присылает только параметры изделия.
+ * @return string|false публичный calculation_id либо false при ошибке записи
  */
-function saveCalculationToDB($data) { // Изменено имя функции!
+function saveCalculationToDB($data) {
     try {
-        error_log("saveCalculationToDB function called");
-        // Простая симуляция сохранения
-        $calculationId = $data['calculation_id'] ?? 'CALC-' . time();
-        error_log("Calculation saved with ID: $calculationId");
+        if (!function_exists('getDbConnection')) {
+            error_log("saveCalculationToDB: getDbConnection not found");
+            return false;
+        }
+
+        $calculationId = $data['calculation_id'] ?? ('CALC-' . time());
+
+        // Пересчитываем цену на сервере — значениям из запроса не доверяем
+        $unitPrice = null;
+        $totalPrice = null;
+        try {
+            $calculator = new Calculator();
+            $result = $calculator->calculatePrice(
+                $data['type'] ?? null,
+                $data['width'] ?? 0,
+                $data['height'] ?? 0,
+                $data['thickness'] ?? 0,
+                $data['material'] ?? null,
+                $data['quantity'] ?? 1
+            );
+            $unitPrice = isset($result['unit_price']) ? (float)$result['unit_price'] : null;
+            $totalPrice = isset($result['total_price']) ? (float)$result['total_price'] : null;
+        } catch (Throwable $e) {
+            // Расчёт не удался — запись всё равно сохраняем, но без цен
+            error_log("saveCalculationToDB: расчёт цены не выполнен (" . get_class($e) . ")");
+        }
+
+        $db = getDbConnection();
+
+        $sql = "INSERT INTO calculations (
+            calculation_id, type, width, height, thickness, material,
+            quantity, unit_price, total_price, ip_address, created_at
+        ) VALUES (
+            :calculation_id, :type, :width, :height, :thickness, :material,
+            :quantity, :unit_price, :total_price, :ip_address, NOW()
+        )";
+
+        $stmt = $db->prepare($sql);
+        $ok = $stmt->execute([
+            ':calculation_id' => $calculationId,
+            ':type'           => isset($data['type']) ? (string)$data['type'] : null,
+            ':width'          => isset($data['width']) ? (int)$data['width'] : null,
+            ':height'         => isset($data['height']) ? (int)$data['height'] : null,
+            ':thickness'      => isset($data['thickness']) ? (int)$data['thickness'] : null,
+            ':material'       => isset($data['material']) ? (string)$data['material'] : null,
+            ':quantity'       => isset($data['quantity']) ? (int)$data['quantity'] : null,
+            ':unit_price'     => $unitPrice,
+            ':total_price'    => $totalPrice,
+            ':ip_address'     => function_exists('getUserIp') ? getUserIp() : ($_SERVER['REMOTE_ADDR'] ?? null)
+        ]);
+
+        if (!$ok) {
+            error_log("saveCalculationToDB: insert failed, SQLSTATE " . ($stmt->errorInfo()[0] ?? '?'));
+            return false;
+        }
+
+        error_log("Calculation saved, id=" . $db->lastInsertId());
         return $calculationId;
-    } catch (Exception $e) {
+
+    } catch (Throwable $e) {
         error_log("saveCalculationToDB error: " . $e->getMessage());
         return false;
     }
 }
 
 /**
- * Сохранение корзины в БД
+ * Сохранение «сборной корзины» в БД.
+ * Реальная запись выполняется saveOfferCart() из config.php
+ * (таблица offer_carts — миграция db/migrations/2026-08-18-offer-carts.sql).
+ * @return string|false id строки либо false при ошибке записи
  */
-function saveOfferCartToDB($data) { // Изменено имя функции!
-    try {
-        error_log("saveOfferCartToDB function called");
-        // Простая симуляция сохранения
-        $cartId = $data['cart_id'] ?? 'CART-' . time();
-        error_log("Cart saved with ID: $cartId");
-        return $cartId;
-    } catch (Exception $e) {
-        error_log("saveOfferCartToDB error: " . $e->getMessage());
+function saveOfferCartToDB($data) {
+    if (!function_exists('saveOfferCart')) {
+        error_log("saveOfferCartToDB: функция saveOfferCart не найдена");
         return false;
     }
+
+    $rowId = saveOfferCart($data);
+
+    if (!$rowId) {
+        error_log("saveOfferCartToDB: запись корзины не выполнена");
+        return false;
+    }
+
+    error_log("Offer cart saved, id=$rowId");
+    return $rowId;
 }
 ?>
