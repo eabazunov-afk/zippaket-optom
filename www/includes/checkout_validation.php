@@ -19,8 +19,12 @@ function checkout_validate(array $in): array
     if ($name === '') {
         $errors['customer_name'] = 'Укажите имя';
     }
-    if (!preg_match('/^[\d\s\-\+\(\)]{10,20}$/', $phone)) {
-        $errors['phone'] = 'Укажите корректный телефон';
+    // Телефон уходит в чек 54-ФЗ, поэтому мало «похожей на телефон» строки:
+    // '((((((((((' проходил старую маску. Требуем 10–15 РЕАЛЬНЫХ цифр.
+    $phoneDigits = preg_replace('/\D/', '', $phone);
+    if (!preg_match('/^[\d\s\-\+\(\)]{10,20}$/', $phone)
+        || strlen($phoneDigits) < 10 || strlen($phoneDigits) > 15) {
+        $errors['phone'] = 'Укажите корректный телефон (10–15 цифр)';
     }
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors['email'] = 'Некорректный email';
@@ -38,6 +42,9 @@ function checkout_validate(array $in): array
     }
     if (!in_array($delivery, ['pickup', 'courier', 'tk'], true)) {
         $errors['delivery_method'] = 'Выберите способ доставки';
+    } elseif (in_array($delivery, ['courier', 'tk'], true) && mb_strlen($address) < 5) {
+        // Курьер и ТК без адреса невыполнимы; при самовывозе адрес не нужен.
+        $errors['delivery_address'] = 'Укажите адрес доставки';
     }
     if (!in_array($payment, ['online', 'invoice'], true)) {
         $errors['payment_method'] = 'Выберите способ оплаты';

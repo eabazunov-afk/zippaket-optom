@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/catalog_functions.php';
 require_once __DIR__ . '/includes/product_view.php';
 require_once __DIR__ . '/includes/seo.php';
 require_once __DIR__ . '/includes/reviews.php';
+require_once __DIR__ . '/includes/cart_logic.php'; // оптовые ступени — те же, что в корзине
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $catalog = new Catalog();
@@ -16,8 +17,8 @@ if (!$product) {
     $pageTitle = $product['meta_title'] ?: ($product['full_name'] . ' — купить оптом | ZLOCK');
 }
 
-$minQty  = (int)($product['min_order_qty'] ?? 1);
-$qtyStep = (int)($product['qty_step'] ?? 1);
+$minQty  = $product ? (int)($product['min_order_qty'] ?? 1) : 1;
+$qtyStep = $product ? (int)($product['qty_step'] ?? 1) : 1;
 $hasPrice = $product && $product['price_rub'] !== null && (float)$product['price_rub'] > 0;
 $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
 ?>
@@ -155,6 +156,16 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                         <?php if ($hasPrice): ?>
                             <span class="current-price" style="font-size:2rem;font-weight:800"><?= pv_format_price($priceVal) ?></span>
                             <span class="price-unit">/ шт</span>
+                            <?php // Оптовые ступени — та же функция, что считает цену в корзине. ?>
+                            <div class="z-prices z-tnum" style="margin-top:12px;max-width:340px">
+                                <?php foreach (wholesale_tiers() as $t): if ((float)$t['mult'] >= 1.0) continue; ?>
+                                    <div class="row" style="display:flex;justify-content:space-between;gap:12px">
+                                        <span><?= htmlspecialchars($t['label']) ?></span>
+                                        <span><?= pv_format_price(round($priceVal * (float)$t['mult'], 2)) ?>/шт</span>
+                                    </div>
+                                <?php endforeach; ?>
+                                <div style="font-size:.8rem;color:var(--z-text-3,#94a3b8);margin-top:6px">Оптовая цена применяется в корзине автоматически.</div>
+                            </div>
                         <?php else: ?>
                             <span class="current-price" style="font-size:1.4rem;font-weight:800">Цена по запросу</span>
                         <?php endif; ?>
@@ -167,15 +178,21 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                             <?= htmlspecialchars(pv_pack_note($minQty, $qtyStep)) ?><?= !empty($product['pack_label']) ? ' (' . htmlspecialchars($product['pack_label']) . ')' : '' ?>
                         </div>
                         <div class="product-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                            <input type="number" id="qty" class="filter-input small" value="<?= pv_default_qty($minQty, $qtyStep) ?>" min="<?= $minQty ?>" step="<?= $qtyStep ?>" style="width:110px">
+                            <?php if ($hasPrice): ?>
+                            <input type="number" id="qty" class="filter-input small" value="<?= pv_default_qty($minQty, $qtyStep) ?>" min="<?= $minQty ?>" step="<?= $qtyStep ?>" max="<?= CART_MAX_QTY ?>" style="width:110px">
                             <button class="btn btn-primary js-cart-add"
                                     data-id="<?= (int)$product['id'] ?>"
                                     data-name="<?= htmlspecialchars($product['full_name']) ?>"
-                                    data-price="<?= htmlspecialchars((string)($hasPrice ? $priceVal : 0)) ?>"
+                                    data-price="<?= htmlspecialchars((string)$priceVal) ?>"
                                     data-min="<?= $minQty ?>"
                                     data-step="<?= $qtyStep ?>">
                                 <i class="fas fa-shopping-cart"></i> В корзину
                             </button>
+                            <?php else: ?>
+                            <?php // Цена не задана: положить такой товар в корзину нельзя — заказ ушёл бы на 0 ₽. ?>
+                            <a href="/index.php#leadForm" class="btn btn-primary"><i class="fas fa-file-invoice-dollar"></i> Запросить цену</a>
+                            <span style="font-size:.9rem;color:var(--z-text-2,#64748b)">Цену на эту позицию менеджер рассчитает индивидуально</span>
+                            <?php endif; ?>
                             <?php // Логотип наносим только на слайдеры; на zip-lock (грипперы) — нет. ?>
                             <?php if (mb_stripos((string)($product['category'] ?? ''), 'слайдер') !== false): ?>
                             <a href="/index.php#calculator" class="btn btn-outline">
@@ -219,7 +236,8 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                 <h2 class="z-h2" style="margin:40px 0 20px;font-size:1.6rem">Похожие товары</h2>
                 <div class="z-prod-grid">
                     <?php foreach ($related as $rp):
-                        $rprice = (float)$rp['price_rub'];
+                        $rprice = $rp['price_rub'] !== null ? (float)$rp['price_rub'] : 0.0;
+                        $rhasPrice = $rprice > 0;
                         $rimg = (mb_stripos((string)$rp['category'],'слайдер')!==false)
                             ? ((mb_stripos((string)$rp['color'],'мат')!==false)?'/images/eva.png':'/images/pvd.png') : '/images/gripper.jpg';
                     ?>
@@ -229,11 +247,15 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                             <div class="z-prod-size" style="font-size:18px"><?= htmlspecialchars($rp['short_name'] ?: $rp['full_name']) ?></div>
                         </a>
                         <div class="z-prices z-tnum" style="margin-top:12px">
-                            <div class="row"><span>Цена</span><span class="p-main"><?= number_format($rprice,2,',',' ') ?> ₽/шт</span></div>
+                            <div class="row"><span>Цена</span><span class="p-main"><?= $rhasPrice ? number_format($rprice,2,',',' ') . ' ₽/шт' : 'по запросу' ?></span></div>
                         </div>
+                        <?php if ($rhasPrice): ?>
                         <button class="z-add js-cart-add" data-id="<?= (int)$rp['id'] ?>" data-name="<?= htmlspecialchars($rp['full_name']) ?>" data-price="<?= htmlspecialchars((string)$rprice) ?>" data-min="<?= (int)($rp['min_order_qty'] ?? 1) ?>" data-step="<?= (int)($rp['qty_step'] ?? 1) ?>">
                             <i class="fas fa-shopping-cart"></i> В корзину
                         </button>
+                        <?php else: ?>
+                        <a class="z-add" href="/product/<?= (int)$rp['id'] ?>"><i class="fas fa-file-invoice-dollar"></i> Запросить цену</a>
+                        <?php endif; ?>
                     </article>
                     <?php endforeach; ?>
                 </div>

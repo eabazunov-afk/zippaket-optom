@@ -69,10 +69,13 @@ define('YOOKASSA_API_URL', 'https://api.yookassa.ru/v3');
 define('YOOKASSA_VAT_CODE', 1);
 
 // Оптовая градация цен: множитель к базовой price_rub. Порядок = порядок вывода.
+// min_qty — порог ступени в штуках. Он же используется корзиной и заказом
+// (wholesale_tier_for_qty в includes/cart_logic.php): без явного ключа порог
+// приходилось разбирать из подписи, и любая правка текста меняла цену.
 define('WHOLESALE_TIERS', [
-    ['label' => 'Опт от 300к', 'mult' => 0.82, 'class' => 'p-main'],
-    ['label' => 'Опт от 20к',  'mult' => 0.92, 'class' => 'p-sec'],
-    ['label' => 'Розница от 3к','mult' => 1.0,  'class' => 'p-sec'],
+    ['label' => 'Опт от 300к', 'min_qty' => 300000, 'mult' => 0.82, 'class' => 'p-main'],
+    ['label' => 'Опт от 20к',  'min_qty' => 20000,  'mult' => 0.92, 'class' => 'p-sec'],
+    ['label' => 'Розница от 3к','min_qty' => 3000,  'mult' => 1.0,  'class' => 'p-sec'],
 ]);
 
 // Настройки безопасности

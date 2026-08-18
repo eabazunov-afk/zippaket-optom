@@ -546,7 +546,10 @@ private function generateNoteText($data) {
         
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        // Лид отправляется до 4 запросами подряд: при 30 с без CONNECTTIMEOUT
+        // недоступная amoCRM могла держать оформление заказа до двух минут.
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 7);
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

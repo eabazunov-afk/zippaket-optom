@@ -8,11 +8,58 @@
  */
 require_once __DIR__ . '/order_message.php';
 require_once __DIR__ . '/telegram_notify.php';
-require_once __DIR__ . '/../config.php'; // sendEmail(), ADMIN_EMAIL
+// sendEmail(), ADMIN_EMAIL. Условно: если окружение уже загружено (или подменено
+// в тестах), не тянем config.php с его сессией/константами.
+if (!function_exists('sendEmail')) {
+    require_once __DIR__ . '/../config.php';
+}
 
-/** Безопасно выполнить канал: вернуть bool, залогировать исключение. */
+// Общий бюджет времени на ВСЕ каналы уведомлений. Каналы ходят по сети
+// (Telegram, amoCRM, SMTP) и в сумме способны съесть max_execution_time.
+if (!defined('NOTIFY_TIME_BUDGET')) {
+    define('NOTIFY_TIME_BUDGET', 15.0);
+}
+
+/**
+ * Дедлайн текущей серии уведомлений (unix-время с плавающей точкой).
+ * null = бюджет не задан, каналы выполняются без ограничения.
+ */
+function notify_deadline(?float $set = null, bool $reset = false): ?float
+{
+    static $deadline = null;
+    if ($reset) {
+        $deadline = null;
+    } elseif ($set !== null) {
+        $deadline = $set;
+    }
+    return $deadline;
+}
+
+/** Запустить общий бюджет времени на серию уведомлений. */
+function notify_start_budget(?float $seconds = null): void
+{
+    notify_deadline(microtime(true) + ($seconds ?? (float)NOTIFY_TIME_BUDGET));
+}
+
+/** Остаток бюджета в секундах; null — бюджет не задан. */
+function notify_time_left(): ?float
+{
+    $deadline = notify_deadline();
+    return $deadline === null ? null : $deadline - microtime(true);
+}
+
+/**
+ * Безопасно выполнить канал: вернуть bool, залогировать исключение.
+ * Если общий бюджет времени исчерпан — канал пропускается (не запускаем новый
+ * сетевой запрос, который добьёт max_execution_time уже после создания заказа).
+ */
 function notify_channel(string $name, callable $fn): bool
 {
+    $left = notify_time_left();
+    if ($left !== null && $left <= 0) {
+        error_log("notify[$name] skipped: time budget exhausted");
+        return false;
+    }
     try {
         return (bool)$fn();
     } catch (Throwable $e) {
@@ -80,6 +127,7 @@ function notify_amocrm(array $order, array $items): bool
  */
 function notify_new_order(array $order, array $items): array
 {
+    notify_start_budget();
     return [
         'telegram' => notify_telegram($order, $items, 'new'),
         'email'    => notify_email_admin($order, $items, 'new'),
@@ -93,6 +141,7 @@ function notify_new_order(array $order, array $items): array
  */
 function notify_order_paid(array $order, array $items): array
 {
+    notify_start_budget();
     return [
         'telegram'        => notify_telegram($order, $items, 'paid'),
         'email'           => notify_email_admin($order, $items, 'paid'),

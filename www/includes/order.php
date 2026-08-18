@@ -9,6 +9,13 @@ function order_create(array $checkoutData, array $lines): array
     if (empty($lines)) {
         return ['ok' => false, 'error' => 'empty_cart'];
     }
+    // Последний рубеж: заказ на 0 ₽ / с недоступной позицией не создаём вообще.
+    // Цена в $lines уже с применённой оптовой ступенью (cart_build_line) — именно
+    // она уходит в снапшот order_items.price_snapshot.
+    $issues = cart_checkout_issues($lines);
+    if ($issues) {
+        return ['ok' => false, 'error' => 'invalid_cart', 'issues' => $issues];
+    }
     $totals = cart_totals($lines);
     $db = getDbConnection();
     try {

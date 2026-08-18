@@ -6,8 +6,9 @@
 require_once __DIR__ . '/config.php';
 
 class Catalog {
-    private $db;
-    
+    /** @var PDO|null null = БД недоступна, работаем в деградированном режиме */
+    private $db = null;
+
     public function __construct() {
         // Подключение к БД через PDO (предполагается, что в config.php есть настройки)
         try {
@@ -21,15 +22,24 @@ class Catalog {
                 ]
             );
         } catch (PDOException $e) {
+            // Раньше здесь стоял бессмысленный `return []` из конструктора: $this->db
+            // оставался null, и ЛЮБОЙ метод падал Error'ом → 500 вместо страницы.
+            // Теперь методы отдают пустой результат, страница рендерится.
             error_log("Ошибка подключения к БД: " . $e->getMessage());
-            return [];
+            $this->db = null;
         }
     }
-    
+
+    /** Доступна ли БД. false → методы возвращают пустой результат вместо фатала. */
+    public function isConnected(): bool {
+        return $this->db instanceof PDO;
+    }
+
     /**
      * Получить все категории товаров
      */
     public function getCategories() {
+        if (!$this->isConnected()) { return []; }
         try {
             $stmt = $this->db->query("SELECT DISTINCT category FROM products WHERE is_active = 1 ORDER BY category");
             return $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -43,6 +53,7 @@ class Catalog {
      * Получить все доступные толщины для фильтра
      */
     public function getThicknesses() {
+        if (!$this->isConnected()) { return []; }
         try {
             $stmt = $this->db->query("SELECT DISTINCT thickness FROM products WHERE thickness IS NOT NULL AND is_active = 1 ORDER BY thickness");
             return $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -56,6 +67,7 @@ class Catalog {
      * Получить все доступные цвета
      */
     public function getColors() {
+        if (!$this->isConnected()) { return []; }
         try {
             $stmt = $this->db->query("SELECT DISTINCT color FROM products WHERE color IS NOT NULL AND color != '' AND is_active = 1 ORDER BY color");
             return $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -70,6 +82,7 @@ class Catalog {
      */
     public function getProductById(int $id): ?array
     {
+        if (!$this->isConnected()) { return null; }
         try {
             $stmt = $this->db->prepare("SELECT * FROM products WHERE id = :id AND is_active = 1");
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -79,8 +92,11 @@ class Catalog {
                 return null;
             }
 
-            $product['formatted_price'] = number_format($product['price_rub'], 2, ',', ' ') . ' ₽';
-            $product['formatted_stock'] = number_format($product['stock_quantity'], 0, ',', ' ');
+            // price_rub может быть NULL («Цена по запросу») — number_format(null) в PHP 8.1+ deprecated.
+            $product['formatted_price'] = $product['price_rub'] !== null
+                ? number_format((float)$product['price_rub'], 2, ',', ' ') . ' ₽'
+                : 'Цена по запросу';
+            $product['formatted_stock'] = number_format((int)$product['stock_quantity'], 0, ',', ' ');
             $product['size_display'] = $product['width'] . '×' . $product['height'] . ' мм';
             $product['image_url'] = !empty($product['image_url']) ? $product['image_url'] : '/images/no-image.png';
 
@@ -103,6 +119,9 @@ class Catalog {
      * Получить товары с фильтрацией и пагинацией
      */
     public function getProducts($filters = [], $page = 1, $perPage = 12) {
+        if (!$this->isConnected()) {
+            return ['products' => [], 'total' => 0, 'page' => 1, 'perPage' => $perPage, 'totalPages' => 0];
+        }
         try {
             $where = ["is_active = 1"];
             $params = [];
@@ -249,6 +268,7 @@ class Catalog {
      * Получить товары по классу ABC/XYZ для аналитики
      */
     public function getProductsByClass($abc = null, $xyz = null, $limit = 10) {
+        if (!$this->isConnected()) { return []; }
         try {
             $where = ["is_active = 1"];
             $params = [];
@@ -282,6 +302,7 @@ class Catalog {
      * Получить популярные товары
      */
     public function getPopularProducts($limit = 8) {
+        if (!$this->isConnected()) { return []; }
         try {
             $sql = "SELECT * FROM products WHERE is_active = 1 AND stock_quantity > 0 ORDER BY quantity_sold DESC, stock_quantity DESC LIMIT $limit";
             $stmt = $this->db->query($sql);
@@ -294,6 +315,7 @@ class Catalog {
 
     /** Новинки — самые свежие активные товары с ценой. */
     public function getNewProducts($limit = 4) {
+        if (!$this->isConnected()) { return []; }
         try {
             $sql = "SELECT * FROM products
                     WHERE is_active = 1 AND price_rub > 0
@@ -310,6 +332,7 @@ class Catalog {
      * Получить товары со скидкой (с нулевым запасом или специальные предложения)
      */
     public function getSpecialOffers($limit = 6) {
+        if (!$this->isConnected()) { return []; }
         try {
             // Товары с большим остатком или специальные предложения
             $sql = "SELECT * FROM products WHERE is_active = 1 AND stock_quantity > 100000 ORDER BY stock_quantity DESC LIMIT $limit";
