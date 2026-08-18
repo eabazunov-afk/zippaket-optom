@@ -183,7 +183,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     ];
     ?>
     <script type="application/ld+json">
-    <?= json_encode($orgJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
+    <?= json_encode($orgJsonLd, SEO_JSONLD_FLAGS | JSON_PRETTY_PRINT) ?>
     </script>
 </head>
 <body class="zlock">

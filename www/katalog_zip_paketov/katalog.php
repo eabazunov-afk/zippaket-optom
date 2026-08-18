@@ -5,19 +5,27 @@ require_once __DIR__ . '/../includes/product_view.php';
 require_once __DIR__ . '/../includes/seo.php';
 require_once __DIR__ . '/../includes/catalog_schema.php';
 
+// Нормализация GET-параметра к строке: ?search[]=x приходит массивом и роняет
+// htmlspecialchars()/строковые операции TypeError'ом. Не-скаляры отбрасываем.
+$getStr = static function (string $key, string $default = ''): string {
+    $v = $_GET[$key] ?? null;
+    if ($v === null || is_array($v) || is_object($v)) { return $default; }
+    return (string)$v;
+};
+
 // Получаем параметры фильтрации
 $filters = [
-    'category' => $_GET['category'] ?? '',
-    'type' => $_GET['type'] ?? '',
-    'thickness' => $_GET['thickness'] ?? '',
-    'color' => $_GET['color'] ?? '',
-    'in_stock' => $_GET['in_stock'] ?? '',
-    'min_width' => $_GET['min_width'] ?? '',
-    'max_width' => $_GET['max_width'] ?? '',
-    'min_height' => $_GET['min_height'] ?? '',
-    'max_height' => $_GET['max_height'] ?? '',
-    'search' => $_GET['search'] ?? '',
-    'sort' => $_GET['sort'] ?? 'popular'
+    'category' => $getStr('category'),
+    'type' => $getStr('type'),
+    'thickness' => $getStr('thickness'),
+    'color' => $getStr('color'),
+    'in_stock' => $getStr('in_stock'),
+    'min_width' => $getStr('min_width'),
+    'max_width' => $getStr('max_width'),
+    'min_height' => $getStr('min_height'),
+    'max_height' => $getStr('max_height'),
+    'search' => $getStr('search'),
+    'sort' => $getStr('sort', 'popular')
 ];
 
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;

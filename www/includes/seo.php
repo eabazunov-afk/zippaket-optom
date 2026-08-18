@@ -3,6 +3,16 @@
 // использования уже подключён вызывающей страницей). Сам config не тянем — чтобы
 // хелперы оставались чисто тестируемыми.
 
+/**
+ * Флаги json_encode для любых данных, попадающих внутрь <script type="application/ld+json">.
+ * HEX_TAG/HEX_AMP/HEX_APOS/HEX_QUOT не дают данным разорвать тег <script> (XSS),
+ * UNESCAPED_UNICODE сохраняет кириллицу читаемой для поисковых роботов.
+ */
+if (!defined('SEO_JSONLD_FLAGS')) {
+    define('SEO_JSONLD_FLAGS', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+        | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+}
+
 /** Канонический базовый URL без хвостового слэша. */
 function seo_base(): string
 {
@@ -38,5 +48,5 @@ function seo_breadcrumb_jsonld(array $items): string
         '@type' => 'BreadcrumbList',
         'itemListElement' => $elements,
     ];
-    return json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    return json_encode($ld, SEO_JSONLD_FLAGS | JSON_PRETTY_PRINT);
 }

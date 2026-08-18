@@ -78,7 +78,7 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
         }
     ?>
     <script type="application/ld+json">
-    <?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>
+    <?= json_encode($ld, SEO_JSONLD_FLAGS | JSON_PRETTY_PRINT) ?>
     </script>
     <?php
         $crumbs = [

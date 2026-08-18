@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/seo.php'; // SEO_JSONLD_FLAGS
+
 /** ItemList JSON-LD из списка товаров каталога. Чистая. */
 function catalog_itemlist_jsonld(array $products): string {
     $items = [];
@@ -14,5 +16,5 @@ function catalog_itemlist_jsonld(array $products): string {
         ];
     }
     $data = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'itemListElement' => $items];
-    return '<script type="application/ld+json">' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+    return '<script type="application/ld+json">' . json_encode($data, SEO_JSONLD_FLAGS) . '</script>';
 }
