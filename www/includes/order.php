@@ -191,32 +191,69 @@ function order_set_payment(int $orderId, string $paymentId): void
  */
 function order_apply_payment_status(string $paymentId, string $providerStatus, bool $paid): string
 {
-    $db = getDbConnection();
-    $order = order_get_by_payment_id($paymentId);
-    if ($order === null) {
+    return order_apply_payment_status_db(getDbConnection(), $paymentId, $providerStatus, $paid);
+}
+
+/**
+ * Та же логика с явно переданным подключением — точка расширения для тестов
+ * (фейковый PDO вместо реальной БД). Контракт возвращаемых значений см. выше.
+ */
+function order_apply_payment_status_db(PDO $db, string $paymentId, string $providerStatus, bool $paid): string
+{
+    $sel = $db->prepare("SELECT id, status FROM orders WHERE payment_id = ?");
+    $sel->execute([$paymentId]);
+    $order = $sel->fetch();
+    if (!$order) {
         return 'not_found';
     }
+    $orderId = (int)$order['id'];
+    $current = (string)$order['status'];
 
     // payment_status пишем всегда (для аудита), даже если статус заказа не меняется.
     $target = yookassa_target_order_status($providerStatus, $paid);
     if ($target === null) {
-        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
-        $upd->execute([$providerStatus, (int)$order['id']]);
+        order_write_payment_status($db, $orderId, $providerStatus);
         return 'ignored';
     }
 
-    if ($order['status'] === $target) {
-        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
-        $upd->execute([$providerStatus, (int)$order['id']]);
+    if ($current === $target) {
+        order_write_payment_status($db, $orderId, $providerStatus);
         return 'noop'; // уже в целевом статусе — идемпотентно, повторно не уведомляем
     }
-    if (!can_transition($order['status'], $target)) {
-        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
-        $upd->execute([$providerStatus, (int)$order['id']]);
+    if (!can_transition($current, $target)) {
+        order_write_payment_status($db, $orderId, $providerStatus);
         return 'forbidden';
     }
 
-    $upd = $db->prepare("UPDATE orders SET status = ?, payment_status = ? WHERE id = ?");
-    $upd->execute([$target, $providerStatus, (int)$order['id']]);
+    // Атомарный переход: условие по прочитанному статусу прямо в WHERE.
+    // ЮKassa ретраит уведомление при таймауте, и два параллельных webhook
+    // видят один и тот же pending_payment. Без условия оба сделали бы UPDATE
+    // и оба вернули applied → двойное уведомление клиенту и в Telegram.
+    // Строку меняет только первый; второй получает rowCount()=0 → noop.
+    $upd = $db->prepare("UPDATE orders SET status = ?, payment_status = ? WHERE id = ? AND status = ?");
+    $upd->execute([$target, $providerStatus, $orderId, $current]);
+    if ($upd->rowCount() === 0) {
+        // Статус успел измениться между SELECT и UPDATE — гонку выиграл другой webhook.
+        order_write_payment_status($db, $orderId, $providerStatus);
+        return 'noop';
+    }
     return 'applied';
+}
+
+/** Записать payment_status заказа без смены orders.status (аудит webhook'ов). */
+function order_write_payment_status(PDO $db, int $orderId, string $providerStatus): void
+{
+    $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
+    $upd->execute([$providerStatus, $orderId]);
+}
+
+/**
+ * Совпадают ли денежные суммы с точностью до копейки.
+ * amount.value от ЮKassa приходит строкой «1234.00», orders.total — строкой
+ * DECIMAL («1234.0000» и т.п.), поэтому сравниваем нормализованные копейки,
+ * а не строки и не float напрямую.
+ */
+function order_amount_equals($a, $b): bool
+{
+    return (int)round((float)$a * 100) === (int)round((float)$b * 100);
 }
