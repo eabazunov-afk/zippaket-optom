@@ -1,15 +1,69 @@
+# =====================================================================
+#  zippaket-optom.ru — корневой .htaccess
+# =====================================================================
+
 # Включаем модуль перенаправления
 RewriteEngine On
-
-# Кастомная страница 404
-ErrorDocument 404 /404.php
 
 # Базовый URL
 RewriteBase /
 
-# Ваша существующая CSP политика
+# Кастомная страница 404
+ErrorDocument 404 /404.php
+
+
+# ---------------------------------------------------------------------
+# 1. КАНОНИЗАЦИЯ СХЕМЫ И ХОСТА
+#    ВАЖНО: этот блок обязан идти ПЕРВЫМ. Если он стоит после внутренних
+#    правил ЧПУ, mod_rewrite на втором проходе видит уже переписанный URI
+#    и отдаёт 301 на «сырой» адрес (/product.php?id=123) вместо ЧПУ
+#    (/product/123).
+# ---------------------------------------------------------------------
+
+# Принудительный HTTPS.
+# Вторая RewriteCond — страховка от петли редиректов на хостингах,
+# где SSL терминируется на прокси/балансировщике (там %{HTTPS} = off
+# даже при запросе по https). Если заголовка нет — условие истинно,
+# поведение прежнее.
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Редирект с www на без www
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+
+# ---------------------------------------------------------------------
+# 2. ЗАГОЛОВКИ БЕЗОПАСНОСТИ
+# ---------------------------------------------------------------------
 <IfModule mod_headers.c>
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-56n51Te25XL0G2sWAhTNzQFSoGTQjPEfyN6b9PCjP94=' https://www.google.com https://www.gstatic.com;"
+    # Content-Security-Policy.
+    # Источники перечислены по факту использования в коде:
+    #   cdnjs.cloudflare.com  — FontAwesome 6.4 (css + шрифты), ~22 подключения
+    #   fonts.googleapis.com  — Google Fonts (css), fonts.gstatic.com — сами шрифты
+    #   cdn.jsdelivr.net      — Chart.js (admin/statistics.php)
+    #   www.google.com / www.gstatic.com — reCAPTCHA v3 (скрипт, XHR, iframe-бейдж)
+    #   mc.yandex.ru          — Яндекс.Метрика (скрипт, пиксель, beacon, Вебвизор)
+    #
+    # 'unsafe-inline' в style-src обязателен: 371 инлайн-атрибут style
+    #   и 16 блоков <style> — хэши тут нереалистичны.
+    # 'unsafe-inline' в script-src — вынужденная мера: 19 инлайн-<script>,
+    #   9 блоков ld+json (CSP проверяет и их) и 19 инлайн-обработчиков on*=.
+    #   См. TODO ниже.
+    # 'unsafe-eval' — требование Яндекс.Метрики с включённым Вебвизором.
+    #
+    # form-action: все формы сайта отправляются на свой домен, но POST
+    #   /checkout.php завершается редиректом на платёжную страницу
+    #   yoomoney.ru. По CSP3 редиректы против form-action не проверяются,
+    #   однако старые браузеры это делали — поэтому домен добавлен явно.
+    #
+    # TODO(security): вынести инлайн-скрипты в файлы /js/*.js, убрать on*=
+    #   и заменить 'unsafe-inline'/'unsafe-eval' на nonce.
+    # ВНИМАНИЕ: строка ДОЛЖНА оставаться однострочной — перенос по «\»
+    #   не поддерживается Apache 2.2.
+    Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self' https://yoomoney.ru; frame-ancestors 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://mc.yandex.ru; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://mc.yandex.ru; connect-src 'self' https://www.google.com https://mc.yandex.ru; frame-src https://www.google.com https://mc.yandex.ru; worker-src 'self' blob:"
+
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
@@ -17,7 +71,12 @@ RewriteBase /
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 </IfModule>
 
-# Запрет прямого доступа к логам/дампам/бэкапам по всему сайту (api.php .php — не затрагивается)
+
+# ---------------------------------------------------------------------
+# 3. ЗАПРЕТ ПРЯМОГО HTTP-ДОСТУПА К СЛУЖЕБНЫМ ФАЙЛАМ
+# ---------------------------------------------------------------------
+
+# Логи/дампы/бэкапы по всему сайту (api.php и прочие .php — не затрагиваются)
 <FilesMatch "\.(log|sql|gz|tgz|bak|sql\.gz)$">
     <IfModule mod_authz_core.c>
         Require all denied
@@ -28,11 +87,54 @@ RewriteBase /
     </IfModule>
 </FilesMatch>
 
+# Файлы сборки/разработки, которые не должны быть доступны на проде
+# (composer.json/lock — раскрывают версии зависимостей; _dev_router.php —
+#  локальный dev-роутер).
+<FilesMatch "^(composer\.(json|lock)|_dev_router\.php|\.env.*)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Защита файлов .htaccess и .htpasswd
+<FilesMatch "^\.ht">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Каталоги, которых на проде быть не должно (см. DEPLOY.md, п. 2.2), но если
+# они всё же залиты — отдаём 403. Дублирует www/vendor/.htaccess и
+# www/tests/.htaccess: www/vendor/ в .gitignore, поэтому лежащий там
+# .htaccess не версионируется и исчезнет после `composer install`.
+# Стиль RedirectMatch 403 уже используется в www/admin/.htaccess.
+RedirectMatch 403 ^/vendor/.*$
+RedirectMatch 403 ^/tests/.*$
+
+# Защита от просмотра директорий
+Options -Indexes
+
+
+# ---------------------------------------------------------------------
+# 4. ЧПУ И 301-КАНОНИЗАЦИЯ АДРЕСОВ
+#    Порядок правил внутри блока сохранён без изменений — от него
+#    зависит, какие адреса отдаются 301-редиректом, а какие переписываются
+#    внутренне (см. router.php, который эмулирует те же маршруты для dev).
+# ---------------------------------------------------------------------
+
 # Перенаправление с zip_paket_s_logotipom на файл zip_lock_logo.php
 RewriteRule ^zip_paket_s_logotipom/?$ zip_lock_logo.php [L,QSA]
 
 # Убираем index.php из URL
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,9]\ /index\.php\ HTTP/
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.php\ HTTP/
 RewriteRule ^index\.php$ https://%{HTTP_HOST}/ [R=301,L]
 
 # Убираем katalog.php из URL для папки katalog_zip_paketov
@@ -57,6 +159,11 @@ RewriteRule ^product/([0-9]+)/?$ product.php?id=$1 [L,QSA]
 
 # Динамический sitemap (отдаётся по чистому /sitemap.xml)
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+
+# ---------------------------------------------------------------------
+# 5. СЖАТИЕ И КЭШИРОВАНИЕ
+# ---------------------------------------------------------------------
 
 # Сжатие текстовых файлов
 <IfModule mod_deflate.c>
@@ -83,20 +190,3 @@ RewriteRule ^sitemap\.xml$ sitemap.php [L]
     ExpiresByType text/html "access plus 1 hour"
     ExpiresByType application/xhtml+xml "access plus 1 hour"
 </IfModule>
-
-# Защита от просмотра директорий
-Options -Indexes
-
-# Защита файлов .htaccess и .htpasswd
-<FilesMatch "^\.ht">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# Принудительный HTTPS
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
-
-# Редирект с www на без www
-RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-RewriteRule ^(.*)$ https://%1/$1 [R=301,L]

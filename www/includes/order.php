@@ -6,17 +6,41 @@ require_once __DIR__ . '/payment/payment_status_map.php';
 
 function order_create(array $checkoutData, array $lines): array
 {
+    return order_create_db(getDbConnection(), $checkoutData, $lines);
+}
+
+/**
+ * Та же логика с явно переданным подключением — точка расширения для тестов
+ * (фейковый PDO вместо реальной БД). Контракт возвращаемых значений см. выше.
+ *
+ * @return array{ok:bool, error?:string, issues?:array, order_id?:int,
+ *               order_number?:string, access_token?:string, total?:float}
+ */
+function order_create_db(PDO $db, array $checkoutData, array $lines): array
+{
     if (empty($lines)) {
         return ['ok' => false, 'error' => 'empty_cart'];
     }
+    // Последний рубеж: заказ на 0 ₽ / с недоступной позицией не создаём вообще.
+    // Цена в $lines уже с применённой оптовой ступенью (cart_build_line) — именно
+    // она уходит в снапшот order_items.price_snapshot.
+    $issues = cart_checkout_issues($lines);
+    if ($issues) {
+        return ['ok' => false, 'error' => 'invalid_cart', 'issues' => $issues];
+    }
+    // Суммы считаются здесь, из строк корзины: с клиента приходят только id и qty,
+    // ни items_total, ни total из $checkoutData не берутся.
     $totals = cart_totals($lines);
-    $db = getDbConnection();
     try {
         $db->beginTransaction();
 
-        $countStmt = $db->query("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()");
+        // Полуинтервал вместо DATE(created_at) = CURDATE(): функция от колонки
+        // отключила бы idx_created, а так COUNT идёт по диапазону индекса.
+        $countStmt = $db->query(
+            "SELECT COUNT(*) FROM orders
+             WHERE created_at >= CURDATE() AND created_at < CURDATE() + INTERVAL 1 DAY"
+        );
         $seq = (int)$countStmt->fetchColumn() + 1;
-        $orderNo = order_number($seq);
         // Непредсказуемый токен доступа к заказу/счёту (защита от IDOR по номеру).
         $accessToken = bin2hex(random_bytes(16));
 
@@ -30,8 +54,8 @@ function order_create(array $checkoutData, array $lines): array
              :company_name, :inn, :kpp, :legal_address, :needs_invoice,
              :delivery_method, :delivery_address, :comment, :payment_method,
              :items_total, :total)");
-        $stmt->execute([
-            ':order_number' => $orderNo,
+        $params = [
+            ':order_number' => '', // проставляется в цикле ниже
             ':access_token' => $accessToken,
             ':customer_type' => $checkoutData['customer_type'],
             ':customer_name' => $checkoutData['customer_name'],
@@ -48,7 +72,27 @@ function order_create(array $checkoutData, array $lines): array
             ':payment_method' => $checkoutData['payment_method'],
             ':items_total' => $totals['items_total'],
             ':total' => $totals['items_total'],
-        ]);
+        ];
+
+        // Гонка номеров: при параллельных заказах COUNT+1 у двух запросов совпадает
+        // → второй INSERT падает дубликатом uq_order_number. В InnoDB duplicate-key
+        // откатывает лишь оператор (не транзакцию), поэтому берём следующий seq и
+        // повторяем. order_number — единственный UNIQUE на orders, значит 1062 здесь
+        // всегда именно о номере.
+        $orderNo = '';
+        for ($attempt = 0; ; $attempt++) {
+            $orderNo = order_number($seq + $attempt);
+            $params[':order_number'] = $orderNo;
+            try {
+                $stmt->execute($params);
+                break;
+            } catch (PDOException $e) {
+                if ($attempt < 25 && (int)($e->errorInfo[1] ?? 0) === 1062) {
+                    continue; // номер занят параллельным заказом — пробуем следующий
+                }
+                throw $e;
+            }
+        }
         $orderId = (int)$db->lastInsertId();
 
         $itemStmt = $db->prepare("INSERT INTO order_items
@@ -172,32 +216,69 @@ function order_set_payment(int $orderId, string $paymentId): void
  */
 function order_apply_payment_status(string $paymentId, string $providerStatus, bool $paid): string
 {
-    $db = getDbConnection();
-    $order = order_get_by_payment_id($paymentId);
-    if ($order === null) {
+    return order_apply_payment_status_db(getDbConnection(), $paymentId, $providerStatus, $paid);
+}
+
+/**
+ * Та же логика с явно переданным подключением — точка расширения для тестов
+ * (фейковый PDO вместо реальной БД). Контракт возвращаемых значений см. выше.
+ */
+function order_apply_payment_status_db(PDO $db, string $paymentId, string $providerStatus, bool $paid): string
+{
+    $sel = $db->prepare("SELECT id, status FROM orders WHERE payment_id = ?");
+    $sel->execute([$paymentId]);
+    $order = $sel->fetch();
+    if (!$order) {
         return 'not_found';
     }
+    $orderId = (int)$order['id'];
+    $current = (string)$order['status'];
 
     // payment_status пишем всегда (для аудита), даже если статус заказа не меняется.
     $target = yookassa_target_order_status($providerStatus, $paid);
     if ($target === null) {
-        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
-        $upd->execute([$providerStatus, (int)$order['id']]);
+        order_write_payment_status($db, $orderId, $providerStatus);
         return 'ignored';
     }
 
-    if ($order['status'] === $target) {
-        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
-        $upd->execute([$providerStatus, (int)$order['id']]);
+    if ($current === $target) {
+        order_write_payment_status($db, $orderId, $providerStatus);
         return 'noop'; // уже в целевом статусе — идемпотентно, повторно не уведомляем
     }
-    if (!can_transition($order['status'], $target)) {
-        $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
-        $upd->execute([$providerStatus, (int)$order['id']]);
+    if (!can_transition($current, $target)) {
+        order_write_payment_status($db, $orderId, $providerStatus);
         return 'forbidden';
     }
 
-    $upd = $db->prepare("UPDATE orders SET status = ?, payment_status = ? WHERE id = ?");
-    $upd->execute([$target, $providerStatus, (int)$order['id']]);
+    // Атомарный переход: условие по прочитанному статусу прямо в WHERE.
+    // ЮKassa ретраит уведомление при таймауте, и два параллельных webhook
+    // видят один и тот же pending_payment. Без условия оба сделали бы UPDATE
+    // и оба вернули applied → двойное уведомление клиенту и в Telegram.
+    // Строку меняет только первый; второй получает rowCount()=0 → noop.
+    $upd = $db->prepare("UPDATE orders SET status = ?, payment_status = ? WHERE id = ? AND status = ?");
+    $upd->execute([$target, $providerStatus, $orderId, $current]);
+    if ($upd->rowCount() === 0) {
+        // Статус успел измениться между SELECT и UPDATE — гонку выиграл другой webhook.
+        order_write_payment_status($db, $orderId, $providerStatus);
+        return 'noop';
+    }
     return 'applied';
+}
+
+/** Записать payment_status заказа без смены orders.status (аудит webhook'ов). */
+function order_write_payment_status(PDO $db, int $orderId, string $providerStatus): void
+{
+    $upd = $db->prepare("UPDATE orders SET payment_status = ? WHERE id = ?");
+    $upd->execute([$providerStatus, $orderId]);
+}
+
+/**
+ * Совпадают ли денежные суммы с точностью до копейки.
+ * amount.value от ЮKassa приходит строкой «1234.00», orders.total — строкой
+ * DECIMAL («1234.0000» и т.п.), поэтому сравниваем нормализованные копейки,
+ * а не строки и не float напрямую.
+ */
+function order_amount_equals($a, $b): bool
+{
+    return (int)round((float)$a * 100) === (int)round((float)$b * 100);
 }

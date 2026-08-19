@@ -1,3 +1,19 @@
+-- Схема БД zippaket-optom (PII-free сид).
+-- Структура ВСЕХ таблиц рабочей базы на дату генерации, без данных.
+--
+-- Сгенерировано:
+--   mysqldump --no-data --routines=false --triggers=false --skip-comments <база>
+-- + постобработка: убраны DROP TABLE, добавлено IF NOT EXISTS,
+--   убраны счётчики AUTO_INCREMENT=N локальной базы.
+--
+-- Порядок установки (см. SETUP.md):
+--   1) CREATE DATABASE ... CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+--   2) db/seed/schema.sql        <- этот файл (структура)
+--   3) db/seed/products-data.sql <- 49 товаров, без персональных данных
+--   4) db/migrations/*.sql       <- по порядку имён; все идемпотентны и на свежем
+--      сиде лишь досыпают стартовые строки (отзывы, цены калькулятора, роли админов)
+--
+-- Файл идемпотентен: повторный запуск существующие таблицы не трогает.
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -9,10 +25,9 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-DROP TABLE IF EXISTS `admin_audit_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `admin_audit_log` (
+CREATE TABLE IF NOT EXISTS `admin_audit_log` (
   `id` int NOT NULL AUTO_INCREMENT,
   `admin_id` int NOT NULL,
   `action` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -25,18 +40,17 @@ CREATE TABLE `admin_audit_log` (
   PRIMARY KEY (`id`),
   KEY `idx_admin_time` (`admin_id`,`created_at`),
   KEY `idx_action_time` (`action`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `admins`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `admins` (
+CREATE TABLE IF NOT EXISTS `admins` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `full_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `role` enum('admin','manager') COLLATE utf8mb4_unicode_ci DEFAULT 'manager',
+  `role` enum('superadmin','admin','manager','viewer') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'manager',
   `last_login` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `is_active` tinyint(1) DEFAULT '1',
@@ -48,12 +62,11 @@ CREATE TABLE `admins` (
   `remember_expiry` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `calculations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `calculations` (
+CREATE TABLE IF NOT EXISTS `calculations` (
   `id` int NOT NULL AUTO_INCREMENT,
   `calculation_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -68,12 +81,11 @@ CREATE TABLE `calculations` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_calculation_id` (`calculation_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `leads`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `leads` (
+CREATE TABLE IF NOT EXISTS `leads` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -118,12 +130,11 @@ CREATE TABLE `leads` (
   KEY `idx_first_visit` (`first_visit`),
   KEY `idx_external_id` (`external_id`),
   KEY `idx_amocrm_synced` (`amocrm_synced_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=1737 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `login_attempts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `login_attempts` (
+CREATE TABLE IF NOT EXISTS `login_attempts` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -135,12 +146,25 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`id`),
   KEY `idx_username_time` (`username`,`attempt_time`),
   KEY `idx_ip_time` (`ip_address`,`attempt_time`)
-) ENGINE=InnoDB AUTO_INCREMENT=168 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `order_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `order_items` (
+CREATE TABLE IF NOT EXISTS `offer_carts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `cart_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `items` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `total_items` int NOT NULL DEFAULT '0',
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_cart_id` (`cart_id`),
+  KEY `idx_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `order_items` (
   `id` int NOT NULL AUTO_INCREMENT,
   `order_id` int NOT NULL,
   `product_id` int DEFAULT NULL,
@@ -151,15 +175,13 @@ CREATE TABLE `order_items` (
   PRIMARY KEY (`id`),
   KEY `idx_order` (`order_id`),
   CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `orders`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `orders` (
+CREATE TABLE IF NOT EXISTS `orders` (
   `id` int NOT NULL AUTO_INCREMENT,
   `order_number` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `access_token` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new',
   `customer_type` enum('individual','company') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'individual',
   `customer_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -182,16 +204,14 @@ CREATE TABLE `orders` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_order_number` (`order_number`),
-  KEY `idx_access_token` (`access_token`),
   KEY `idx_status` (`status`),
   KEY `idx_payment_id` (`payment_id`),
   KEY `idx_created` (`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `products`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `products` (
+CREATE TABLE IF NOT EXISTS `products` (
   `id` int NOT NULL AUTO_INCREMENT,
   `category` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `abc_class` char(1) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -222,13 +242,43 @@ CREATE TABLE `products` (
   KEY `idx_category` (`category`),
   KEY `idx_abc_xyz` (`abc_class`,`xyz_class`),
   KEY `idx_size` (`width`,`height`),
-  KEY `idx_stock` (`stock_quantity`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `idx_stock` (`stock_quantity`),
+  KEY `idx_active` (`is_active`),
+  KEY `idx_active_created` (`is_active`,`created_at`),
+  KEY `idx_active_sold` (`is_active`,`quantity_sold`,`stock_quantity`),
+  KEY `idx_active_price` (`is_active`,`price_rub`),
+  KEY `idx_active_stock` (`is_active`,`stock_quantity`),
+  KEY `idx_active_category` (`is_active`,`category`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `telegram_admins`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `telegram_admins` (
+CREATE TABLE IF NOT EXISTS `reviews` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `author_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `author_role` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rating` tinyint NOT NULL DEFAULT '5',
+  `body` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` int DEFAULT NULL,
+  `is_approved` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_approved` (`is_approved`,`created_at`),
+  KEY `idx_product` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `settings` (
+  `setting_key` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `setting_value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `telegram_admins` (
   `id` int NOT NULL AUTO_INCREMENT,
   `telegram_id` bigint NOT NULL,
   `username` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -238,10 +288,9 @@ CREATE TABLE `telegram_admins` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `telegram_logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `telegram_logs` (
+CREATE TABLE IF NOT EXISTS `telegram_logs` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint DEFAULT NULL,
   `action` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -250,10 +299,9 @@ CREATE TABLE `telegram_logs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `telegram_sessions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `telegram_sessions` (
+CREATE TABLE IF NOT EXISTS `telegram_sessions` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint NOT NULL,
   `chat_id` bigint NOT NULL,
@@ -265,10 +313,9 @@ CREATE TABLE `telegram_sessions` (
   UNIQUE KEY `user_id_unique` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `visits`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `visits` (
+CREATE TABLE IF NOT EXISTS `visits` (
   `id` int NOT NULL AUTO_INCREMENT,
   `visit_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -294,7 +341,7 @@ CREATE TABLE `visits` (
   KEY `idx_visit_date` (`visit_date`),
   KEY `idx_lead_id` (`lead_id`),
   KEY `idx_traffic_source` (`traffic_source`)
-) ENGINE=InnoDB AUTO_INCREMENT=1385 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

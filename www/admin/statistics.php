@@ -13,7 +13,11 @@ $db = getDbConnection();
 $dateFrom = isset($_GET['date_from']) ? $_GET['date_from'] : date('Y-m-d', strtotime('-30 days'));
 $dateTo = isset($_GET['date_to']) ? $_GET['date_to'] : date('Y-m-d');
 
-// Устанавливаем время на конец дня для dateTo
+// Период фильтруется полуинтервалом [dateFrom 00:00:00, dateTo+1 день 00:00:00):
+// DATE(col) BETWEEN ? AND ? — функция от колонки, она отключает индексы
+// idx_visit_date / idx_created_at и заставляет сканировать таблицу целиком.
+// Верхняя граница считается в SQL (`? + INTERVAL 1 DAY`), поэтому последний
+// день диапазона по-прежнему входит в выборку полностью, до 23:59:59.999.
 $dateToEnd = $dateTo . ' 23:59:59';
 
 // ============================================
@@ -26,8 +30,8 @@ $visitsQuery = "
         COUNT(*) as total_visits,
         COUNT(DISTINCT session_id) as unique_visitors,
         COUNT(DISTINCT ip_address) as unique_ips
-    FROM visits 
-    WHERE DATE(visit_date) BETWEEN ? AND ?
+    FROM visits
+    WHERE visit_date >= ? AND visit_date < ? + INTERVAL 1 DAY
 ";
 
 $stmt = $db->prepare($visitsQuery);
@@ -41,8 +45,8 @@ $leadsQuery = "
         COUNT(DISTINCT CASE WHEN status = 'new' THEN id END) as new_leads,
         COUNT(DISTINCT CASE WHEN status = 'processed' THEN id END) as processed_leads,
         COUNT(DISTINCT CASE WHEN status = 'completed' THEN id END) as completed_leads
-    FROM leads 
-    WHERE DATE(created_at) BETWEEN ? AND ?
+    FROM leads
+    WHERE created_at >= ? AND created_at < ? + INTERVAL 1 DAY
     AND (type != 'visit' OR type IS NULL)
     AND (name != 'Посетитель' OR name IS NULL)
 ";
@@ -68,8 +72,8 @@ $trafficQuery = "
         COUNT(DISTINCT 
             CASE WHEN lead_id IS NOT NULL THEN session_id END
         ) as converted_visits
-    FROM visits 
-    WHERE DATE(visit_date) BETWEEN ? AND ?
+    FROM visits
+    WHERE visit_date >= ? AND visit_date < ? + INTERVAL 1 DAY
     GROUP BY traffic_source
     ORDER BY visits DESC
 ";
@@ -83,8 +87,8 @@ $leadsBySourceQuery = "
     SELECT 
         JSON_UNQUOTE(JSON_EXTRACT(parameters, '$.traffic_source')) as traffic_source,
         COUNT(*) as leads_count
-    FROM leads 
-    WHERE DATE(created_at) BETWEEN ? AND ?
+    FROM leads
+    WHERE created_at >= ? AND created_at < ? + INTERVAL 1 DAY
     AND (type != 'visit' OR type IS NULL)
     AND (name != 'Посетитель' OR name IS NULL)
     GROUP BY JSON_UNQUOTE(JSON_EXTRACT(parameters, '$.traffic_source'))
@@ -131,10 +135,13 @@ $dailyQuery = "
         COUNT(DISTINCT v.session_id) as unique_visits,
         COUNT(DISTINCT l.id) as leads
     FROM visits v
-    LEFT JOIN leads l ON DATE(l.created_at) = DATE(v.visit_date) 
+    -- Полуинтервал и в ON: DATE(l.created_at) = ... не давал использовать
+    -- leads.idx_created_at, а диапазон по l.created_at — даёт.
+    LEFT JOIN leads l ON l.created_at >= DATE(v.visit_date)
+        AND l.created_at < DATE(v.visit_date) + INTERVAL 1 DAY
         AND (l.type != 'visit' OR l.type IS NULL)
         AND (l.name != 'Посетитель' OR l.name IS NULL)
-    WHERE DATE(v.visit_date) BETWEEN ? AND ?
+    WHERE v.visit_date >= ? AND v.visit_date < ? + INTERVAL 1 DAY
     GROUP BY DATE(v.visit_date)
     ORDER BY date
 ";
@@ -154,8 +161,8 @@ $utmSourcesQuery = "
         utm_campaign,
         COUNT(*) as visits,
         COUNT(DISTINCT CASE WHEN lead_id IS NOT NULL THEN id END) as leads
-    FROM visits 
-    WHERE DATE(visit_date) BETWEEN ? AND ?
+    FROM visits
+    WHERE visit_date >= ? AND visit_date < ? + INTERVAL 1 DAY
         AND (utm_source IS NOT NULL OR utm_medium IS NOT NULL)
     GROUP BY utm_source, utm_medium, utm_campaign
     ORDER BY visits DESC

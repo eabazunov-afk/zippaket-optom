@@ -2,7 +2,8 @@
 require_once '../includes/init.php';
 require_once 'includes/security_config.php';
 require_once 'includes/auth.php';
-require_once 'includes/permissions.php'; // Добавьте эту строку
+require_once 'includes/permissions.php';
+require_once 'includes/audit.php';
 
 // Проверка авторизации
 checkAdminAuth();
@@ -10,11 +11,6 @@ checkAdminAuth();
 // Проверка доступа к этой странице
 $current_page = basename($_SERVER['PHP_SELF']);
 checkPageAccess($current_page);
-
-// Для конкретных действий в файле:
-if (isset($_GET['action']) && $_GET['action'] == 'delete') {
-    requirePermission('delete_leads');
-}
 
 // Простая проверка авторизации без вызова функции
 if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
@@ -25,51 +21,68 @@ if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
 // Получаем соединение с БД
 $db = getDbConnection();
 
-// Обработка действий
-$action = isset($_GET['action']) ? $_GET['action'] : '';
 $message = '';
+$csrf = generateCsrfToken();
 
-// Изменение статуса заявки
-if ($action === 'change_status' && isset($_GET['id']) && isset($_GET['status'])) {
-    $id = (int)$_GET['id'];
-    $status = $_GET['status'];
-    
-    $validStatuses = array('new', 'processed', 'completed', 'rejected');
-    
-    if (in_array($status, $validStatuses)) {
-        try {
-            $stmt = $db->prepare("UPDATE leads SET status = ?, updated_at = NOW() WHERE id = ?");
-            $stmt->execute(array($status, $id));
-            
-            logAction('lead_status_changed', array(
-                'lead_id' => $id,
-                'new_status' => $status,
-                'admin_id' => $_SESSION['admin_id']
-            ));
-            
-            $message = '<div class="alert alert-success">Статус заявки обновлен</div>';
-        } catch (Exception $e) {
-            $message = '<div class="alert alert-danger">Ошибка при обновлении статуса</div>';
+// Изменяющие действия принимаются только POST-ом и только с CSRF-токеном
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = '<div class="alert alert-danger">Сессия истекла, обновите страницу</div>';
+        $action = '';
+    }
+
+    // Изменение статуса заявки
+    if ($action === 'change_status') {
+        requirePermission('edit_leads');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $status = $_POST['status'] ?? '';
+
+        $validStatuses = array('new', 'processed', 'completed', 'rejected');
+
+        if (in_array($status, $validStatuses)) {
+            try {
+                $stmt = $db->prepare("UPDATE leads SET status = ?, updated_at = NOW() WHERE id = ?");
+                $stmt->execute(array($status, $id));
+
+                logAction('lead_status_changed', array(
+                    'lead_id' => $id,
+                    'new_status' => $status,
+                    'admin_id' => $_SESSION['admin_id']
+                ));
+                logAdminAction('lead_status_changed', 'lead', $id, array('new_status' => $status));
+
+                $message = '<div class="alert alert-success">Статус заявки обновлен</div>';
+            } catch (Exception $e) {
+                error_log('admin/index.php change_status: ' . $e->getMessage());
+                $message = '<div class="alert alert-danger">Ошибка при обновлении статуса</div>';
+            }
         }
     }
-}
 
-// Удаление заявки
-if ($action === 'delete' && isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-    
-    try {
-        $stmt = $db->prepare("DELETE FROM leads WHERE id = ?");
-        $stmt->execute(array($id));
-        
-        logAction('lead_deleted', array(
-            'lead_id' => $id,
-            'admin_id' => $_SESSION['admin_id']
-        ));
-        
-        $message = '<div class="alert alert-success">Заявка удалена</div>';
-    } catch (Exception $e) {
-        $message = '<div class="alert alert-danger">Ошибка при удалении заявки</div>';
+    // Удаление заявки
+    if ($action === 'delete') {
+        requirePermission('delete_leads');
+
+        $id = (int)($_POST['id'] ?? 0);
+
+        try {
+            $stmt = $db->prepare("DELETE FROM leads WHERE id = ?");
+            $stmt->execute(array($id));
+
+            logAction('lead_deleted', array(
+                'lead_id' => $id,
+                'admin_id' => $_SESSION['admin_id']
+            ));
+            logAdminAction('lead_deleted', 'lead', $id);
+
+            $message = '<div class="alert alert-success">Заявка удалена</div>';
+        } catch (Exception $e) {
+            error_log('admin/index.php delete: ' . $e->getMessage());
+            $message = '<div class="alert alert-danger">Ошибка при удалении заявки</div>';
+        }
     }
 }
 
@@ -310,7 +323,8 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
         <div class="filters">
             <h3>Фильтры заявок</h3>
             <form method="GET" class="filter-form">
- <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                <!-- CSRF-токен в GET-форме не нужен (фильтры ничего не меняют), а в
+                     query-string он утекал бы в историю браузера, Referer и логи -->
                 <div class="form-group">
                     <label for="status">Статус</label>
                     <select id="status" name="status" class="form-control">
@@ -324,12 +338,12 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
                 
                 <div class="form-group">
                     <label for="date_from">Дата с</label>
-                    <input type="date" id="date_from" name="date_from" class="form-control" value="<?php echo $filterDateFrom; ?>">
+                    <input type="date" id="date_from" name="date_from" class="form-control" value="<?php echo safeOutput($filterDateFrom); ?>">
                 </div>
                 
                 <div class="form-group">
                     <label for="date_to">Дата по</label>
-                    <input type="date" id="date_to" name="date_to" class="form-control" value="<?php echo $filterDateTo; ?>">
+                    <input type="date" id="date_to" name="date_to" class="form-control" value="<?php echo safeOutput($filterDateTo); ?>">
                 </div>
                 
                 <div class="form-group">
@@ -396,7 +410,7 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <span class="status-badge status-<?php echo $lead['status']; ?>">
+                                    <span class="status-badge status-<?php echo safeOutput($lead['status']); ?>">
                                         <?php 
                                         $statusLabels = array(
                                             'new' => 'Новая',
@@ -404,7 +418,7 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
                                             'completed' => 'Завершена',
                                             'rejected' => 'Отклонена'
                                         );
-                                        echo isset($statusLabels[$lead['status']]) ? $statusLabels[$lead['status']] : $lead['status'];
+                                        echo isset($statusLabels[$lead['status']]) ? $statusLabels[$lead['status']] : safeOutput($lead['status']);
                                         ?>
                                     </span>
                                 </td>
@@ -416,18 +430,37 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
                                         <a href="/admin/lead_details.php?id=<?php echo $lead['id']; ?>" class="btn btn-sm btn-info" data-tooltip="Открыть заявку" aria-label="Открыть заявку">
     <i class="fas fa-eye"></i>
 </a>
-                                        <a href="?action=change_status&id=<?php echo $lead['id']; ?>&status=processed" class="btn btn-sm btn-warning" data-tooltip="В работу" aria-label="В работу">
-                                            <i class="fas fa-spinner"></i>
-                                        </a>
-                                        <a href="?action=change_status&id=<?php echo $lead['id']; ?>&status=completed" class="btn btn-sm btn-success" data-tooltip="Завершить" aria-label="Завершить">
-                                            <i class="fas fa-check"></i>
-                                        </a>
-                                        <a href="?action=delete&id=<?php echo $lead['id']; ?>"
-                                           class="btn btn-sm btn-danger"
-                                           data-tooltip="Удалить" aria-label="Удалить"
-                                           onclick="return confirm('Удалить заявку #<?php echo $lead['id']; ?>?')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
+                                        <?php if (checkPermission('edit_leads')): ?>
+                                        <form method="POST" action="/admin/" class="inline-action">
+                                            <input type="hidden" name="csrf_token" value="<?php echo safeOutput($csrf); ?>">
+                                            <input type="hidden" name="action" value="change_status">
+                                            <input type="hidden" name="id" value="<?php echo (int)$lead['id']; ?>">
+                                            <input type="hidden" name="status" value="processed">
+                                            <button type="submit" class="btn btn-sm btn-warning" data-tooltip="В работу" aria-label="В работу">
+                                                <i class="fas fa-spinner"></i>
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="/admin/" class="inline-action">
+                                            <input type="hidden" name="csrf_token" value="<?php echo safeOutput($csrf); ?>">
+                                            <input type="hidden" name="action" value="change_status">
+                                            <input type="hidden" name="id" value="<?php echo (int)$lead['id']; ?>">
+                                            <input type="hidden" name="status" value="completed">
+                                            <button type="submit" class="btn btn-sm btn-success" data-tooltip="Завершить" aria-label="Завершить">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <?php endif; ?>
+                                        <?php if (checkPermission('delete_leads')): ?>
+                                        <form method="POST" action="/admin/" class="inline-action"
+                                              onsubmit="return confirm('Удалить заявку #<?php echo (int)$lead['id']; ?>?')">
+                                            <input type="hidden" name="csrf_token" value="<?php echo safeOutput($csrf); ?>">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="id" value="<?php echo (int)$lead['id']; ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger" data-tooltip="Удалить" aria-label="Удалить">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

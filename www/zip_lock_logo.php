@@ -1,11 +1,18 @@
 <?php
 // Подключаем конфигурацию
 require_once 'includes/config.php';
+require_once __DIR__ . '/includes/seo.php';
 
 // UTM трекер инициализируется ТОЛЬКО в header.php
 if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     require_once __DIR__ . '/includes/utm_tracker.php';
 }
+
+// У страницы свой cookie-баннер ниже — общий из footer.php не дублируем.
+define('COOKIE_BANNER_RENDERED', true);
+
+// Реальный маршрут страницы (см. .htaccess RewriteRule ^zip_paket_s_logotipom/?$ и sitemap.php).
+$zlCanonical = seo_url('/zip_paket_s_logotipom/');
 ?>
 
 <!DOCTYPE html>
@@ -20,14 +27,17 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     <meta property="og:title" content="Зип-лок пакеты с логотипом → печать на слайдерах | ZLOCK">
     <meta property="og:description" content="На zip-lock (грипперы) печать не наносится — брендируем пакеты-слайдеры с бегунком: флексопечать, любой тираж, доставка по РФ.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zippaket-optom.ru/zip-lock-pakety-s-logotipom">
-    <meta property="og:image" content="https://zippaket-optom.ru/images/og-image.jpg">
+    <meta property="og:url" content="<?= htmlspecialchars($zlCanonical) ?>">
+    <meta property="og:image" content="<?= htmlspecialchars(seo_url('/images/og-image.jpg')) ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <link rel="canonical" href="<?= htmlspecialchars($zlCanonical) ?>">
     <meta name="yandex-verification" content="300261c5f186d190">
     
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="images/zlock.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="images/zlock.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="images/zlock.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/zlock.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/zlock.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/zlock.ico">
     <link rel="icon" href="https://zippaket-optom.ru/images/favicon.ico" type="image/x-icon">
     
     <!-- reCAPTCHA v3 -->
@@ -46,27 +56,32 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     <link rel="stylesheet" href="/css/shop-dark.css">
 
     <!-- JSON-LD -->
+    <?php
+    // Данные проходят через json_encode с SEO_JSONLD_FLAGS (includes/seo.php):
+    // HEX_TAG/HEX_AMP/HEX_APOS/HEX_QUOT не дают содержимому разорвать тег <script>.
+    // logo: images/logo.png в проекте нет — реальный векторный логотип (SVG поддерживается).
+    $zlOrgJsonLd = [
+        '@context'    => 'https://schema.org',
+        '@type'       => 'Organization',
+        'name'        => 'ZLOCK — печать логотипа на пакетах-слайдерах',
+        'url'         => $zlCanonical,
+        'logo'        => seo_url('/images/logo_zip_optom.svg'),
+        'description' => 'Печать логотипа на пакетах-слайдерах с бегунком (альтернатива zip-lock с логотипом)',
+        'address'     => [
+            '@type'           => 'PostalAddress',
+            'addressLocality' => 'Москва',
+            'addressCountry'  => 'RU',
+        ],
+        'contactPoint' => [
+            '@type'             => 'ContactPoint',
+            'telephone'         => defined('SUPPORT_PHONE') ? SUPPORT_PHONE : '',
+            'contactType'       => 'customer service',
+            'availableLanguage' => 'Russian',
+        ],
+    ];
+    ?>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "ZLOCK — печать логотипа на пакетах-слайдерах",
-      "url": "https://zippaket-optom.ru/zip-lock-pakety-s-logotipom",
-      "logo": "https://zippaket-optom.ru/images/logo.png",
-      "description": "Печать логотипа на пакетах-слайдерах с бегунком (альтернатива zip-lock с логотипом)",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "",
-        "addressLocality": "Москва",
-        "addressCountry": "RU"
-      },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+7 (920) 346-50-67",
-        "contactType": "customer service",
-        "availableLanguage": "Russian"
-      }
-    }
+    <?= json_encode($zlOrgJsonLd, SEO_JSONLD_FLAGS | JSON_PRETTY_PRINT) ?>
     </script>
 </head>
 <body class="zlock">
@@ -78,8 +93,10 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
             <!-- ===== БЛОК 1: ГЕРОЙ ДЛЯ ZIP-LOCK С ЛОГОТИПОМ ===== -->
             <section class="hero-section">
                 <div class="hero-video-bg">
-                    <video autoplay muted loop playsinline preload="metadata" class="hero-video">
-                        <source src="images/main_zip.mp4" type="video/mp4">
+                    <?php // Абсолютные пути: страница отдаётся по /zip_paket_s_logotipom/ — относительные ломаются. ?>
+                    <video autoplay muted loop playsinline preload="metadata" class="hero-video"
+                           poster="/images/main_zip_poster.jpg">
+                        <source src="/images/main_zip.mp4" type="video/mp4">
                         <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='800'%20height='600'%20viewBox='0%200%20800%20600'%3E%3Crect%20width='800'%20height='600'%20fill='%232563eb'/%3E%3Ctext%20x='400'%20y='300'%20font-family='Arial'%20font-size='60'%20fill='white'%20text-anchor='middle'%20dominant-baseline='middle'%3EZLOCK%3C/text%3E%3C/svg%3E"
      alt="Пакеты-слайдеры с логотипом (альтернатива зип-лок с логотипом)"
      class="video-fallback">
@@ -225,7 +242,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                     <!-- 30*35 см -->
                     <div class="product-offer-card">
                         <div class="product-image-mini">
-                            <img src="images/begun.png" alt="Слайдер пакет 30×35 см с логотипом" loading="lazy">
+                            <img src="/images/begun.png" alt="Слайдер пакет 30×35 см с логотипом" loading="lazy">
                             <div class="image-overlay-logo">
                                 <i class="fas fa-crown" style="position: absolute; top: 10px; right: 10px; background: gold; color: #333; border-radius: 50%; padding: 8px; font-size: 1rem;"></i>
                             </div>
@@ -260,7 +277,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                     <!-- 35*45 см -->
                     <div class="product-offer-card">
                         <div class="product-image-mini">
-                            <img src="images/begun.png" alt="Слайдер пакет 35×45 см с логотипом" loading="lazy">
+                            <img src="/images/begun.png" alt="Слайдер пакет 35×45 см с логотипом" loading="lazy">
                             <div class="image-overlay-logo">
                                 <i class="fas fa-crown" style="position: absolute; top: 10px; right: 10px; background: gold; color: #333; border-radius: 50%; padding: 8px; font-size: 1rem;"></i>
                             </div>
@@ -295,7 +312,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                     <!-- 40*50 см -->
                     <div class="product-offer-card">
                         <div class="product-image-mini">
-                            <img src="images/begun.png" alt="Слайдер пакет 40×50 см с логотипом" loading="lazy">
+                            <img src="/images/begun.png" alt="Слайдер пакет 40×50 см с логотипом" loading="lazy">
                             <div class="image-overlay-logo">
                                 <i class="fas fa-crown" style="position: absolute; top: 10px; right: 10px; background: gold; color: #333; border-radius: 50%; padding: 8px; font-size: 1rem;"></i>
                             </div>
@@ -350,7 +367,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                             <div class="material-header">
                                 <div class="material-preview">
                                     <div class="product-image-container">
-                                        <img src="images/eva.png" 
+                                        <img src="/images/eva.png" 
                                              alt="ZIP-пакет из матового материала EVA" 
                                              class="product-preview-image"
                                              loading="lazy">
@@ -520,7 +537,6 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     </div>
 </section>
             
-            <script src="/js/script.js"></script>
 
             <!-- ===== БЛОК 5: ПРОИЗВОДСТВО С ПЕЧАТЬЮ ===== -->
             <section class="production-section" id="production">
@@ -816,8 +832,8 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                         <i class="fas fa-cookie-bite"></i>
                         <p>Мы используем файлы cookie для улучшения работы сайта и предоставления вам наилучшего сервиса. 
                            Продолжая использовать сайт, вы соглашаетесь с 
-                           <a href="polconf.html" target="_blank">Политикой конфиденциальности</a> и 
-                           <a href="/cookie-policy.html" target="_blank">Политикой использования cookie</a>.
+                           <a href="/polconf.html" target="_blank">Политикой конфиденциальности</a> и 
+                           <a href="/cookie-policy.php" target="_blank">Политикой использования cookie</a>.
                         </p>
                     </div>
                     <div class="cookie-actions">
@@ -877,37 +893,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
             </div>
         </div>
 
-        <!-- Модальное окно заказа звонка -->
-        <div class="modal" id="callbackModal">
-            <div class="modal-content">
-                <button class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h3>Заказать обратный звонок</h3>
-                <form id="callbackForm">
-                    <div class="form-group">
-                        <input type="text" name="name" placeholder="Ваше имя *" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="tel" name="phone" placeholder="Телефон *" required>
-                    </div>
-                    <input type="hidden" id="callbackRecaptchaToken" name="recaptcha_token">
-                    <div class="form-group">
-                        <textarea name="message" placeholder="Комментарий (необязательно)" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-phone"></i> Заказать звонок
-                    </button>
-                </form>
-            </div>
-        </div>
-
         <script>
-        // Инициализация reCAPTCHA
-        grecaptcha.ready(function() {
-            console.log('reCAPTCHA готов к работе');
-        });
-
         // Управление cookie-баннером
         document.addEventListener('DOMContentLoaded', function() {
             const cookieConsent = document.getElementById('cookieConsent');
@@ -1031,74 +1017,11 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
             }
         });
 
-        // Обработчики для reCAPTCHA
-        window.addEventListener('load', function() {
-            const leadForm = document.getElementById('leadForm');
-            if (leadForm && !leadForm.hasAttribute('data-handler-attached')) {
-                leadForm.setAttribute('data-handler-attached', 'true');
-                leadForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const phone = this.querySelector('input[name="phone"]');
-                    const name = this.querySelector('input[name="name"]');
-                    
-                    if (!phone || !phone.value.trim()) {
-                        alert('Пожалуйста, введите телефон');
-                        return;
-                    }
-                    
-                    if (!name || !name.value.trim()) {
-                        alert('Пожалуйста, введите имя');
-                        return;
-                    }
-                    
-                    if (typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
-                        grecaptcha.ready(function() {
-                            grecaptcha.execute('6Lfd5FksAAAAAGQNGm2ny-aJhjuw6Mp5th7SNJRf', {action: 'submit'}).then(function(token) {
-                                const tokenInput = document.getElementById('recaptchaToken');
-                                if (tokenInput) {
-                                    tokenInput.value = token;
-                                }
-                                leadForm.submit();
-                            });
-                        });
-                    } else {
-                        console.error('reCAPTCHA не загружена');
-                        leadForm.submit();
-                    }
-                });
-            }
-            
-            const callbackForm = document.getElementById('callbackForm');
-            if (callbackForm && !callbackForm.hasAttribute('data-handler-attached')) {
-                callbackForm.setAttribute('data-handler-attached', 'true');
-                callbackForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const phone = this.querySelector('input[name="phone"]');
-                    if (!phone || !phone.value.trim()) {
-                        alert('Пожалуйста, введите телефон');
-                        return;
-                    }
-                    
-                    if (typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
-                        grecaptcha.ready(function() {
-                            grecaptcha.execute('6Lfd5FksAAAAAGQNGm2ny-aJhjuw6Mp5th7SNJRf', {action: 'callback'}).then(function(token) {
-                                const tokenInput = document.getElementById('callbackRecaptchaToken');
-                                if (tokenInput) {
-                                    tokenInput.value = token;
-                                }
-                                callbackForm.submit();
-                            });
-                        });
-                    } else {
-                        console.error('reCAPTCHA не загружена');
-                        callbackForm.submit();
-                    }
-                });
-            }
-        });
         </script>
+
+        <!-- Footer: общий футер + модалка «Заказать звонок» + общие скрипты (script.js, cart.js) -->
+        <?php include __DIR__ . '/footer.php'; ?>
+    </div><!-- /.site-wrapper -->
 
     <!-- Yandex.Metrika counter -->
     <script>

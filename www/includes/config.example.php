@@ -21,6 +21,11 @@ define('INCLUDES_PATH', ROOT_PATH . '/includes');
 define('ADMIN_PATH', ROOT_PATH . '/admin');
 define('UPLOAD_PATH', ROOT_PATH . '/uploads');
 
+// Каталог логов приложения — ВНЕ веб-корня (ROOT_PATH = .../www), чтобы лог
+// нельзя было скачать по HTTP. Если каталог недоступен на запись, код
+// откатывается на системный error_log веб-сервера (см. includes/api.php).
+define('LOG_DIR', dirname(ROOT_PATH) . '/logs');
+
 define('AMOCRM_DOMAIN', 'ваш-аккаунт.amocrm.ru'); // Ваш домен AmoCRM
 define('AMOCRM_ACCESS_TOKEN', 'ВАШ_AMOCRM_ACCESS_TOKEN'); // Long-lived токен
 define('AMOCRM_CLIENT_ID', 'ВАШ_AMOCRM_CLIENT_ID'); // ID интеграции
@@ -64,10 +69,13 @@ define('YOOKASSA_API_URL', 'https://api.yookassa.ru/v3');
 define('YOOKASSA_VAT_CODE', 1);
 
 // Оптовая градация цен: множитель к базовой price_rub. Порядок = порядок вывода.
+// min_qty — порог ступени в штуках. Он же используется корзиной и заказом
+// (wholesale_tier_for_qty в includes/cart_logic.php): без явного ключа порог
+// приходилось разбирать из подписи, и любая правка текста меняла цену.
 define('WHOLESALE_TIERS', [
-    ['label' => 'Опт от 300к', 'mult' => 0.82, 'class' => 'p-main'],
-    ['label' => 'Опт от 20к',  'mult' => 0.92, 'class' => 'p-sec'],
-    ['label' => 'Розница от 3к','mult' => 1.0,  'class' => 'p-sec'],
+    ['label' => 'Опт от 300к', 'min_qty' => 300000, 'mult' => 0.82, 'class' => 'p-main'],
+    ['label' => 'Опт от 20к',  'min_qty' => 20000,  'mult' => 0.92, 'class' => 'p-sec'],
+    ['label' => 'Розница от 3к','min_qty' => 3000,  'mult' => 1.0,  'class' => 'p-sec'],
 ]);
 
 // Настройки безопасности
@@ -174,7 +182,9 @@ function formatPhone($phone) {
 
 
 /**
- * Сохранить корзину в БД
+ * Сохранить «сборную корзину» заявок в БД.
+ * Таблица создаётся миграцией db/migrations/2026-08-18-offer-carts.sql.
+ * Вызывается из includes/api.php (action=submit_offer_cart).
  */
 function saveOfferCart($data) {
     $db = getDbConnection();
@@ -214,6 +224,49 @@ session_set_cookie_params([
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+/**
+ * Незаполненные секреты: константы, оставшиеся плейсхолдерами «ВАШ_…».
+ * Возвращает список имён — пусто, если всё заполнено.
+ */
+function config_placeholder_keys(): array
+{
+    $keys = [
+        'RECAPTCHA_SITE_KEY', 'RECAPTCHA_SECRET_KEY',
+        'AMOCRM_ACCESS_TOKEN', 'AMOCRM_CLIENT_ID', 'AMOCRM_CLIENT_SECRET',
+        'YOOKASSA_SHOP_ID', 'YOOKASSA_SECRET_KEY',
+        'FNS_API_KEY',
+    ];
+    $missing = [];
+    foreach ($keys as $k) {
+        if (!defined($k)) { $missing[] = $k; continue; }
+        $v = (string)constant($k);
+        if ($v === '' || mb_stripos($v, 'ВАШ_') === 0) { $missing[] = $k; }
+    }
+    return $missing;
+}
+
+/**
+ * Предупредить в лог о незаполненных секретах. Молчаливая заглушка опаснее
+ * ошибки: reCAPTCHA без ключа пропускает всех, ЮKassa без кредов не создаёт
+ * платёж, неверный YOOKASSA_VAT_CODE уходит в чек 54-ФЗ.
+ * Чтобы не забивать лог, пишем не чаще раза в час (маркер в LOG_DIR).
+ */
+function config_warn_placeholders(): void
+{
+    $missing = config_placeholder_keys();
+    if (!$missing) { return; }
+
+    $dir = defined('LOG_DIR') ? LOG_DIR : sys_get_temp_dir();
+    $stamp = rtrim($dir, "/\\") . DIRECTORY_SEPARATOR . 'config-warn.stamp';
+    if (is_file($stamp) && (time() - (int)filemtime($stamp)) < 3600) { return; }
+    if (is_dir($dir) && is_writable($dir)) { @touch($stamp); }
+
+    error_log('config: не заполнены секреты (' . implode(', ', $missing)
+        . ') — соответствующие интеграции работают в режиме заглушки');
+}
+
+config_warn_placeholders();
 
 // Автоматическое обновление времени жизни сессии
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > SESSION_LIFETIME)) {

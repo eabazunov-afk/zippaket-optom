@@ -123,6 +123,8 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF для fetch-запросов корзины (js/cart.js) -->
+    <meta name="csrf-token" content="<?= htmlspecialchars(generateCsrfToken()) ?>">
     <title>ZIP-пакеты от производителя | Производство на заказ | Завод по производству зип пакетов</title>
     <meta name="description" content="Производство ZIP-пакетов на заказ. Собственное производство, печать любого тиража, доставка по РФ. Бесплатные образцы и расчёт стоимости онлайн.">
 
@@ -132,6 +134,8 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zippaket-optom.ru/">
     <meta property="og:image" content="https://zippaket-optom.ru/images/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <link rel="canonical" href="https://zippaket-optom.ru/">
     <meta name="yandex-verification" content="300261c5f186d190">
 
@@ -164,7 +168,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
         '@type'        => 'Organization',
         'name'         => 'ZLOCK - Производство zip пакетов оптом',
         'url'          => 'https://zippaket-optom.ru/',
-        'logo'         => 'https://zippaket-optom.ru/images/logo.png',
+        // images/logo.png в проекте нет — используем реальный векторный логотип (Google
+        // Images поддерживает SVG). Второй растровый файл не плодим.
+        'logo'         => 'https://zippaket-optom.ru/images/logo_zip_optom.svg',
         'description'  => 'Производство ZIP-пакетов на заказ',
         'address'      => [
             '@type'          => 'PostalAddress',
@@ -181,7 +187,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     ];
     ?>
     <script type="application/ld+json">
-    <?= json_encode($orgJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
+    <?= json_encode($orgJsonLd, SEO_JSONLD_FLAGS | JSON_PRETTY_PRINT) ?>
     </script>
 </head>
 <body class="zlock">
@@ -312,17 +318,19 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     </div>
                     <div class="z-adv-grid">
                         <?php
+                        // Иконки — FontAwesome (единый набор проекта). Шрифт Phosphor на сайте
+                        // не подключён, старые ph-* давали пустые места.
                         $adv = [
-                            ['ph-factory', 'Собственное производство', 'Полный контроль качества на всех этапах — от сырья до отгрузки.'],
-                            ['ph-gauge', 'Высокая скорость', 'Изготовление от 1 дня. Срочные заказы — в приоритете.'],
-                            ['ph-paint-roller', 'Любой дизайн', 'Печать в 4 цвета, тиснение, индивидуальная разработка макета.'],
-                            ['ph-truck', 'Доставка по РФ', 'Работаем с проверенными транспортными компаниями по всей стране.'],
-                            ['ph-headset', 'Персональный менеджер', 'Сопровождение заказа от расчёта до доставки на склад.'],
-                            ['ph-shield-check', 'Гарантия качества', 'Используем только сертифицированные материалы EVA и ПВД.'],
+                            ['fa-industry', 'Собственное производство', 'Полный контроль качества на всех этапах — от сырья до отгрузки.'],
+                            ['fa-gauge-high', 'Высокая скорость', 'Изготовление от 1 дня. Срочные заказы — в приоритете.'],
+                            ['fa-fill-drip', 'Любой дизайн', 'Печать в 4 цвета, тиснение, индивидуальная разработка макета.'],
+                            ['fa-truck', 'Доставка по РФ', 'Работаем с проверенными транспортными компаниями по всей стране.'],
+                            ['fa-headset', 'Персональный менеджер', 'Сопровождение заказа от расчёта до доставки на склад.'],
+                            ['fa-shield-halved', 'Гарантия качества', 'Используем только сертифицированные материалы EVA и ПВД.'],
                         ];
                         foreach ($adv as $a): ?>
                         <div class="z-card z-lift" data-reveal>
-                            <span class="z-ico"><i class="ph <?= $a[0] ?>"></i></span>
+                            <span class="z-ico"><i class="fas <?= $a[0] ?>"></i></span>
                             <h3 class="z-h3"><?= htmlspecialchars($a[1]) ?></h3>
                             <p><?= htmlspecialchars($a[2]) ?></p>
                         </div>
@@ -478,8 +486,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <div class="z-eyebrow">Быстрый заказ</div>
                         <h3 class="z-h3 js-quick-title" style="margin:6px 0 8px">Заказ в 1 клик</h3>
                         <p style="margin:0 0 16px;color:var(--z-text-3)">Оставьте телефон — перезвоним и оформим заказ за минуту.</p>
+                        <?php // Светлая тема: текст поля — ink на светлой поверхности (был #fff на белом .z-glass). ?>
                         <input type="tel" class="js-quick-phone" placeholder="Ваш телефон" autocomplete="tel"
-                               style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-size:16px;margin-bottom:14px">
+                               style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--z-hairline-strong);background:var(--z-surface-2);color:var(--z-text);font-size:16px;margin-bottom:14px">
                         <button type="button" class="z-btn z-btn-gold z-shine js-quick-submit" style="width:100%"><i class="fas fa-paper-plane"></i>Заказать</button>
                         <p style="margin:10px 0 0;font-size:12px;color:var(--z-text-3)">Нажимая «Заказать», вы соглашаетесь с <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">обработкой персональных данных</a></p>
                     </div>
@@ -700,48 +709,17 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
             </div>
         </div>
 
-        <!-- Модальное окно заказа звонка -->
-        <div class="modal" id="callbackModal">
-            <div class="modal-content">
-                <button class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h3>Заказать обратный звонок</h3>
-                <form id="callbackForm">
-                    <div class="form-group">
-                        <input type="text" name="name" placeholder="Ваше имя *" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="tel" name="phone" placeholder="Телефон *" required>
-                    </div>
-                    <input type="hidden" id="callbackRecaptchaToken" name="recaptcha_token">
-                    <div class="form-group">
-                        <textarea name="message" placeholder="Комментарий (необязательно)" rows="3"></textarea>
-                    </div>
-                    <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank">согласие на обработку персональных данных</a></label>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-phone"></i> Заказать звонок
-                    </button>
-                </form>
-            </div>
-        </div>
+        <!-- Модалка «Заказать звонок» — общая, рендерится в footer.php -->
 
-        <!-- Footer -->
+        <!-- Footer (там же общие скрипты script.js + cart.js) -->
         <?php include 'footer.php'; ?>
         </div><!-- /.z-content -->
     </div><!-- /.site-wrapper -->
 
-    <script src="/js/script.js" defer></script>
-    <script src="/js/cart.js" defer></script>
     <script src="/js/home.js" defer></script>
     <script src="/js/rfq.js" defer></script>
 
     <script>
-    // Инициализация reCAPTCHA
-    grecaptcha.ready(function() {
-        console.log('reCAPTCHA готов к работе');
-    });
-
     // Управление cookie-баннером
     document.addEventListener('DOMContentLoaded', function() {
         const cookieConsent = document.getElementById('cookieConsent');
@@ -826,54 +804,6 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
         }
     });
 
-    // Обработчики reCAPTCHA для форм
-    window.addEventListener('load', function() {
-        const leadForm = document.getElementById('leadForm');
-        if (leadForm && !leadForm.hasAttribute('data-handler-attached')) {
-            leadForm.setAttribute('data-handler-attached', 'true');
-            leadForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const phone = this.querySelector('input[name="phone"]');
-                const name = this.querySelector('input[name="name"]');
-                if (!phone || !phone.value.trim()) { alert('Пожалуйста, введите телефон'); return; }
-                if (!name || !name.value.trim()) { alert('Пожалуйста, введите имя'); return; }
-                if (typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
-                    grecaptcha.ready(function() {
-                        grecaptcha.execute('6Lfd5FksAAAAAGQNGm2ny-aJhjuw6Mp5th7SNJRf', {action: 'submit'}).then(function(token) {
-                            const tokenInput = document.getElementById('recaptchaToken');
-                            if (tokenInput) { tokenInput.value = token; }
-                            leadForm.submit();
-                        });
-                    });
-                } else {
-                    console.error('reCAPTCHA не загружена');
-                    leadForm.submit();
-                }
-            });
-        }
-
-        const callbackForm = document.getElementById('callbackForm');
-        if (callbackForm && !callbackForm.hasAttribute('data-handler-attached')) {
-            callbackForm.setAttribute('data-handler-attached', 'true');
-            callbackForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const phone = this.querySelector('input[name="phone"]');
-                if (!phone || !phone.value.trim()) { alert('Пожалуйста, введите телефон'); return; }
-                if (typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
-                    grecaptcha.ready(function() {
-                        grecaptcha.execute('6Lfd5FksAAAAAGQNGm2ny-aJhjuw6Mp5th7SNJRf', {action: 'callback'}).then(function(token) {
-                            const tokenInput = document.getElementById('callbackRecaptchaToken');
-                            if (tokenInput) { tokenInput.value = token; }
-                            callbackForm.submit();
-                        });
-                    });
-                } else {
-                    console.error('reCAPTCHA не загружена');
-                    callbackForm.submit();
-                }
-            });
-        }
-    });
 
     // Автозаполнение калькулятора по ссылкам ассортимента (если ведут на якорь)
     document.addEventListener('DOMContentLoaded', function() {

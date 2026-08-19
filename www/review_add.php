@@ -132,7 +132,6 @@ function ra_old(array $old, string $k): string { return htmlspecialchars((string
         });
     })();
     </script>
-
-    <script src="/js/script.js"></script>
+    <!-- Общие скрипты (script.js, cart.js) подключены в footer.php -->
 </body>
 </html>

@@ -125,3 +125,49 @@
 </footer>
 <?php include __DIR__ . '/includes/contact_fab.php'; ?>
 <?php include __DIR__ . '/includes/cookie_banner.php'; ?>
+
+<?php
+// Модалка «Заказать звонок» — рендерится ОДИН раз для всех страниц с общим футером.
+// Кнопки-триггеры (#headerCallback / #mobileCallback) живут в header.php, поэтому и
+// модалка должна быть там же, где шапка, иначе кнопка молча ничего не делает.
+if (!defined('CALLBACK_MODAL_RENDERED')):
+    define('CALLBACK_MODAL_RENDERED', true);
+?>
+<div class="modal" id="callbackModal">
+    <div class="modal-content">
+        <button class="modal-close" type="button" aria-label="Закрыть">
+            <i class="fas fa-times"></i>
+        </button>
+        <h3>Заказать обратный звонок</h3>
+        <form id="callbackForm">
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Ваше имя *" required>
+            </div>
+            <div class="form-group">
+                <input type="tel" name="phone" placeholder="Телефон *" required>
+            </div>
+            <input type="hidden" id="callbackRecaptchaToken" name="recaptcha_token">
+            <div class="form-group">
+                <textarea name="message" placeholder="Комментарий (необязательно)" rows="3"></textarea>
+            </div>
+            <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank">согласие на обработку персональных данных</a></label>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-phone"></i> Заказать звонок
+            </button>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php
+// Общие скрипты сайта — ЕДИНСТВЕННОЕ место подключения.
+// Всё, что включает footer.php (index, каталог, карточка, корзина, checkout,
+// order_success, price, review_add, страницы через includes/page_foot.php),
+// получает мобильное меню/модалку (script.js) и счётчик корзины (cart.js).
+// Оба файла самозащищены от повторного подключения (см. флаги в самих файлах).
+if (!defined('COMMON_SCRIPTS_RENDERED')):
+    define('COMMON_SCRIPTS_RENDERED', true);
+?>
+<script src="/js/script.js" defer></script>
+<script src="/js/cart.js" defer></script>
+<?php endif; ?>

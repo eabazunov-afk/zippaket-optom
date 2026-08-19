@@ -52,6 +52,46 @@ class CheckoutValidationTest extends TestCase
         $this->assertArrayHasKey('payment_method', $r['errors']);
     }
 
+    public function testPhoneWithoutDigitsRejected(): void
+    {
+        // Старая маска пропускала «((((((((((» — телефон уходит в чек 54-ФЗ.
+        foreach (['((((((((((', '+-+-+-+-+-+-', '   ---   ()', '12345'] as $phone) {
+            $r = checkout_validate($this->base(['phone' => $phone]));
+            $this->assertFalse($r['ok'], "принят некорректный телефон: $phone");
+            $this->assertArrayHasKey('phone', $r['errors']);
+        }
+    }
+
+    public function testValidPhoneFormats(): void
+    {
+        foreach (['+7 920 346-50-67', '89203465067', '8 (920) 346 50 67'] as $phone) {
+            $r = checkout_validate($this->base(['phone' => $phone]));
+            $this->assertTrue($r['ok'], "отклонён корректный телефон: $phone");
+        }
+    }
+
+    public function testDeliveryAddressRequiredForCourierAndTk(): void
+    {
+        foreach (['courier', 'tk'] as $method) {
+            $r = checkout_validate($this->base(['delivery_method' => $method]));
+            $this->assertFalse($r['ok']);
+            $this->assertArrayHasKey('delivery_address', $r['errors']);
+
+            $ok = checkout_validate($this->base([
+                'delivery_method' => $method, 'delivery_address' => 'Москва, ул. Ленина, 1',
+            ]));
+            $this->assertTrue($ok['ok']);
+            $this->assertSame('Москва, ул. Ленина, 1', $ok['data']['delivery_address']);
+        }
+    }
+
+    public function testPickupDoesNotRequireAddress(): void
+    {
+        $r = checkout_validate($this->base(['delivery_method' => 'pickup']));
+        $this->assertTrue($r['ok']);
+        $this->assertNull($r['data']['delivery_address']);
+    }
+
     public function testBadDeliveryAndType(): void
     {
         $r = checkout_validate($this->base(['delivery_method' => 'plane', 'customer_type' => 'x']));

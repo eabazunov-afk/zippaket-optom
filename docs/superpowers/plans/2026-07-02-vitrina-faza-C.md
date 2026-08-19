@@ -1,5 +1,13 @@
 # Витрина — Фаза C (SEO / производительность) — Implementation Plan
 
+> **Статус: реализовано (2026-07-02), ветка `feature/vitrina-faza-C`.**
+> ⚠️ В `master` ещё НЕ слито — стек PR ждёт мержа (`DEPLOY.md` §1).
+> Коммиты: `7b6f817` (агрегат рейтинга), `2b0db02` (Product JSON-LD + aggregateRating),
+> `9710ea6` (canonical на главной), `171491c` (meta/OG статических страниц),
+> `ced6d89` (ItemList JSON-LD), `6237421` (Organization + robots.txt),
+> `ac6f54c` (LCP/CLS hero), `e95f822` (регрессия).
+> Чекбоксы `- [ ]` ниже по ходу работы не обновлялись — ориентируйтесь на этот блок.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Закрыть SEO/перф-пробелы витрины по стандартам 2026: canonical везде, уникальные meta description + Open Graph на статических страницах, обогащённый Product JSON-LD с `aggregateRating` из отзывов Фазы B (rich-сниппеты со звёздами), микроразметка листинга, LocalBusiness, починка robots.txt и базовая перф-гигиена (LCP/CLS hero).

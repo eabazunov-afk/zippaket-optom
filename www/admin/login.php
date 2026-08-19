@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/init.php';
+require_once 'includes/security_config.php';
 require_once 'includes/auth.php';
 
 // Если уже авторизован - редирект
@@ -30,26 +31,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($username) || empty($password)) {
             $error = 'Заполните все поля';
         } else {
-            // Упрощенная проверка брутфорса
             $ip = $_SERVER['REMOTE_ADDR'];
-            
+
             try {
                 $db = getDbConnection();
-                
-                // Проверяем количество неудачных попыток
-                $stmt = $db->prepare("
-                    SELECT COUNT(*) as attempts 
-                    FROM login_attempts 
-                    WHERE (username = ? OR ip_address = ?) 
-                    AND attempt_time > DATE_SUB(NOW(), INTERVAL 15 MINUTE)
-                    AND success = 0
-                ");
-                $stmt->execute([$username, $ip]);
-                $result = $stmt->fetch();
-                
-                if ($result && $result['attempts'] >= 5) {
-                    $error = 'Слишком много неудачных попыток. Попробуйте через 15 минут.';
-                    logAttempt($username, 'brute_force_blocked', false);
+
+                // Троттлинг по IP. Считаем только реальные ошибки учётных данных
+                // (см. bruteForceCountedReasons()), иначе истёкшие сессии и сам
+                // факт блокировки продлевали бы блокировку до бесконечности.
+                // Блокировка конкретной учётной записи ведётся отдельно —
+                // через admins.failed_attempts / locked_until.
+                $ip_blocked = checkAdminBruteForce($ip);
+
+                if ($ip_blocked) {
+                    $error = 'Слишком много неудачных попыток с вашего адреса. Попробуйте позже.';
+                    // Служебная запись: в счётчик брутфорса она не попадает
+                    logAttempt($username, 'ip_throttled', false);
                 } else {
                     // Проверяем администратора
                     $stmt = $db->prepare("
@@ -72,9 +69,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     elseif ($admin['locked_until'] && strtotime($admin['locked_until']) > time()) {
                         $error = 'Аккаунт временно заблокирован';
+                        // Служебная причина: счётчик подбора не увеличиваем
                         logAttempt($username, 'account_locked', false);
                     }
                     elseif (!password_verify($password, $admin['password_hash'])) {
+                        // Срок блокировки истёк — начинаем счёт заново
+                        if ($admin['locked_until'] && strtotime($admin['locked_until']) <= time()) {
+                            $db->prepare("UPDATE admins SET failed_attempts = 0, locked_until = NULL WHERE id = ?")
+                               ->execute([$admin['id']]);
+                            $admin['failed_attempts'] = 0;
+                        }
+
                         $error = 'Неверное имя пользователя или пароль';
                         
                         // Увеличиваем счетчик неудачных попыток
@@ -86,9 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ");
                         $stmt->execute([$admin['id']]);
                         
-                        // Блокируем после 5 неудачных попыток
-                        if ($admin['failed_attempts'] + 1 >= 5) {
-                            $lock_time = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+                        // Блокируем учётную запись после MAX_LOGIN_ATTEMPTS неудач
+                        if ($admin['failed_attempts'] + 1 >= MAX_LOGIN_ATTEMPTS) {
+                            $lock_time = date('Y-m-d H:i:s', time() + LOGIN_ATTEMPT_TIMEOUT);
                             $stmt = $db->prepare("
                                 UPDATE admins 
                                 SET locked_until = ?
@@ -112,7 +117,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             WHERE id = ?
                         ");
                         $stmt->execute([$ip, $admin['id']]);
-                        
+
+                        // Защита от фиксации сессии: меняем идентификатор ДО записи
+                        // данных администратора. Содержимое $_SESSION при этом
+                        // сохраняется (в том числе csrf_token, который ниже
+                        // всё равно перевыпускается), старый файл сессии удаляется.
+                        session_regenerate_id(true);
+
                         // Устанавливаем сессию
                         $_SESSION['admin_id'] = $admin['id'];
                         $_SESSION['admin_username'] = $admin['username'];

@@ -22,6 +22,9 @@ $statusText = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Заказ оформлен | ZLOCK</title>
+    <?php // Транзакционная страница: в индекс не отдаём (персональные данные заказа в URL). ?>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="Страница подтверждения заказа ZLOCK.">
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

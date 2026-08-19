@@ -52,6 +52,27 @@ try {
 
 $status = (string)($payment['status'] ?? '');
 $paid = (bool)($payment['paid'] ?? false);
+$amountValue = (string)($payment['amount']['value'] ?? '');
+
+$order = order_get_by_payment_id($event['payment_id']);
+if ($order === null) {
+    error_log('payment_callback: заказ для payment ' . $event['payment_id'] . ' не найден');
+    callback_done(404, 'order_not_found');
+}
+
+// Сверка суммы: оплачено может быть меньше/больше суммы заказа (подмена платежа,
+// правка цены после createPayment). Такой платёж заказ в «оплачен» не переводит.
+// Отсутствующий amount.value тоже не совпадёт — считаем это ошибкой, а не оплатой.
+if ($status === 'succeeded' && $paid && !order_amount_equals($amountValue, $order['total'])) {
+    error_log(sprintf(
+        'payment_callback: сумма платежа %s (%s) не совпадает с суммой заказа %s (%s)',
+        $event['payment_id'],
+        $amountValue !== '' ? $amountValue : '—',
+        (string)$order['order_number'],
+        (string)$order['total']
+    ));
+    callback_done(409, 'amount_mismatch'); // 4xx → постоянная ошибка, повтор бесполезен
+}
 
 $result = order_apply_payment_status($event['payment_id'], $status, $paid);
 if ($result === 'not_found') {

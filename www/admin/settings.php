@@ -4,6 +4,7 @@ require_once '../includes/app_settings.php';
 require_once 'includes/security_config.php';
 require_once 'includes/auth.php';
 require_once 'includes/permissions.php';
+require_once 'includes/audit.php';
 
 // Авторизация + доступ к странице (view_settings: superadmin, admin)
 checkAdminAuth();
@@ -49,6 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ok = set_setting('calc_price_eva', (string)(float)$ne)
                && set_setting('calc_price_pvd', (string)(float)$np);
             if ($ok) {
+                logAdminAction('settings_updated', 'settings', null, [
+                    'calc_price_eva' => (string)(float)$ne,
+                    'calc_price_pvd' => (string)(float)$np
+                ]);
                 $message = 'Настройки сохранены';
                 $eva = (float)$ne;
                 $pvd = (float)$np;

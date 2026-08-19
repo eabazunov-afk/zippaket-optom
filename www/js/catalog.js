@@ -193,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Сохраняем в localStorage
                 localStorage.setItem('catalogView', view);
                 
-                console.log('Вид изменен на:', view); // Для отладки
             });
         });
         

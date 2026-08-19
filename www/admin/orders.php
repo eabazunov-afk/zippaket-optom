@@ -8,8 +8,12 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/includes/security_config.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/permissions.php';
+require_once __DIR__ . '/includes/audit.php';
 
 checkAdminAuth();
+
+// Доступ к странице по матрице прав (view_orders)
+checkPageAccess(basename($_SERVER['PHP_SELF']));
 
 if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
     header('Location: /admin/login.php');
@@ -20,16 +24,22 @@ require_once __DIR__ . '/../includes/order.php';
 
 $notice = '';
 $error = '';
+$canEditOrders = checkPermission('edit_orders');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Смена статуса и подтверждение оплаты — изменяющие действия
+    requirePermission('edit_orders');
+
     if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
         $error = 'Сессия истекла, обновите страницу.';
     } else {
         $orderId = (int)($_POST['order_id'] ?? 0);
         $action = $_POST['action'] ?? '';
         if ($action === 'set_status') {
-            $res = order_admin_set_status($orderId, (string)($_POST['status'] ?? ''));
+            $newStatus = (string)($_POST['status'] ?? '');
+            $res = order_admin_set_status($orderId, $newStatus);
             if ($res['ok']) {
+                logAdminAction('order_status_changed', 'order', $orderId, ['new_status' => $newStatus]);
                 $notice = 'Статус заказа обновлён.';
             } else {
                 $error = $res['error'] === 'forbidden_transition' ? 'Такой переход статуса запрещён.' : 'Не удалось сменить статус.';
@@ -39,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($res['ok']) {
                 $db = getDbConnection();
                 $db->prepare("UPDATE orders SET payment_status = 'manual_invoice' WHERE id = ?")->execute([$orderId]);
+                logAdminAction('order_invoice_confirmed', 'order', $orderId, ['payment_status' => 'manual_invoice']);
                 $notice = 'Оплата по счёту подтверждена, заказ переведён в «Оплачен».';
             } else {
                 $error = 'Не удалось подтвердить оплату (статус заказа не позволяет переход).';
@@ -195,6 +206,9 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                     <td style="white-space:nowrap"><?= number_format((float)$o['total'], 2, ',', ' ') ?> ₽</td>
                     <td><?php [$bbg, $bfg] = status_badge_colors($st); ?><span class="status-badge" style="background:<?= $bbg ?>; color:<?= $bfg ?>"><?= htmlspecialchars($statusLabels[$st] ?? $st) ?></span></td>
                     <td>
+                        <?php if (!$canEditOrders): ?>
+                        <span class="muted">только просмотр</span>
+                        <?php else: ?>
                         <form class="inline" method="POST">
                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
                             <input type="hidden" name="order_id" value="<?= (int)$o['id'] ?>">
@@ -213,6 +227,7 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                             <input type="hidden" name="action" value="confirm_invoice">
                             <button class="btn btn-sm btn-gold" type="submit"><i class="fas fa-check"></i> Оплата по счёту</button>
                         </form>
+                        <?php endif; ?>
                         <?php endif; ?>
                     </td>
                 </tr>

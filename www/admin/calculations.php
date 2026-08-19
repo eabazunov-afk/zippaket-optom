@@ -29,7 +29,9 @@ try {
     )->fetch(PDO::FETCH_ASSOC);
     $stats = ['count' => (int)$row['c'], 'sum' => (float)$row['s'], 'avg_unit' => (float)$row['a']];
 } catch (Throwable $e) {
-    $loadError = 'Не удалось загрузить расчёты: ' . $e->getMessage();
+    // Текст исключения пользователю не показываем — он раскрывает структуру БД
+    error_log('admin/calculations.php: ' . $e->getMessage());
+    $loadError = 'Не удалось загрузить расчёты. Подробности записаны в журнал ошибок.';
 }
 
 $typeMeta = [

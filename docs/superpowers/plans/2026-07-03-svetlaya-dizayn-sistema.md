@@ -1,5 +1,15 @@
 # Светлая дизайн-система A3 «Бронза» — Implementation Plan
 
+> **Статус: реализовано (2026-07-02 … 2026-07-03), ветка `feature/light-design-system`.**
+> ⚠️ В `master` ещё НЕ слито — стек PR ждёт мержа (`DEPLOY.md` §1).
+> Коммиты: `3dcb39e` (ремап токенов `--z-*` тёмная→светлая A3), `8fb7e58` (Fraunces),
+> `fc3611c`, `4e8eea5`, `5011974`, `d9ec5f0`, `da19346` (консолидация `--pm-*`),
+> `0a0a3e6`, `9055be3`, `c9704fc`, `ac575e0` (регрессия), `763380a` (тёплая серая шкала).
+> ⚠️ **Task 8 частично отменён:** переход на иконки Phosphor не состоялся —
+> коммит `e9a2d48` унифицировал весь сайт на FontAwesome. Читать Task 8 и
+> упоминания Phosphor в Architecture/Tech Stack как устаревшие.
+> Чекбоксы `- [ ]` ниже по ходу работы не обновлялись — ориентируйтесь на этот блок.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Перевести публичную витрину zippaket-optom.ru с тёмной темы на светлую A3 «Бронза / тихая роскошь» и свести три конкурирующие системы токенов в одну — преимущественно ремапом значений `--z-*`, на которых уже построены Фазы A/B/C.

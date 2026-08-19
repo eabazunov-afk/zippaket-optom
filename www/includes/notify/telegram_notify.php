@@ -60,7 +60,10 @@ function telegram_curl_post(string $url, array $post): array
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => http_build_query($post),
-        CURLOPT_TIMEOUT => 10,
+        // Жёсткие таймауты: без CONNECTTIMEOUT «мёртвый» api.telegram.org держит
+        // скрипт до общего TIMEOUT, а раньше это было ещё и на пути пользователя.
+        CURLOPT_CONNECTTIMEOUT => 3,
+        CURLOPT_TIMEOUT => 5,
     ]);
     $body = curl_exec($ch);
     if ($body === false) {

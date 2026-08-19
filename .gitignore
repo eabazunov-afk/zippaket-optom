@@ -13,6 +13,8 @@ www/tg/config.php
 
 # Логи
 www/logs/
+# LOG_DIR — логи приложения вне веб-корня
+/logs/
 www/**/*.log
 www/**/debug*.txt
 www/**/notify_log.txt

@@ -1,11 +1,31 @@
-# Запрет прямого доступа к логам/отладке Telegram-бота (.txt/.log/.json),
-# .php (bot.php/webhook) остаются доступными.
-<FilesMatch "\.(txt|log|json|users)$">
+# /tg/.htaccess
+#
+# Каталог Telegram-бота. По умолчанию прямой HTTP-доступ запрещён — запрет
+# наследуется вложенными каталогами, в том числе users/ (там лежат файлы
+# состояний с именами и телефонами — ПДн, 152-ФЗ), а также покрывает
+# config.php, config.example.php, bot_lib.php и любые случайные .log/.txt/.json.
+#
+# ИСКЛЮЧЕНИЯ (открываются явно):
+#   bot.php        — вебхук Telegram (сам проверяет секретный токен);
+#   setwebhook.php — служебная регистрация вебхука (требует TG_WEBHOOK_SECRET);
+#   index.html     — заглушка для /tg/.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
+
+<FilesMatch "^(bot\.php|setwebhook\.php|index\.html)$">
     <IfModule mod_authz_core.c>
-        Require all denied
+        Require all granted
     </IfModule>
     <IfModule !mod_authz_core.c>
         Order allow,deny
-        Deny from all
+        Allow from all
     </IfModule>
 </FilesMatch>
+
+Options -Indexes

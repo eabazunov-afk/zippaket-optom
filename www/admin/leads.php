@@ -9,16 +9,15 @@ checkAdminAuth();
 $current_page = basename($_SERVER['PHP_SELF']);
 checkPageAccess($current_page);
 
-if (isset($_GET['action']) && $_GET['action'] == 'delete') {
-    requirePermission('delete_leads');
-}
-
 if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
     header('Location: /admin/login.php');
     exit;
 }
 
 $db = getDbConnection();
+
+// Токен для POST-форм действий над заявками (обрабатываются в /admin/index.php)
+$csrf = generateCsrfToken();
 
 $trafficIcons = [
     'paid_advertising' => '<i class="fas fa-bullhorn"></i>',
@@ -431,9 +430,10 @@ $trafficLabels = [
         
         <div class="filters">
             <h3>Фильтры заявок</h3>
+            <!-- GET-форма фильтров: CSRF-токен здесь не нужен и вреден
+                 (утекает в логи веб-сервера и заголовок Referer) -->
             <form method="GET" class="filter-form">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
-                
+
                 <div class="form-group">
                     <label for="traffic_type">Тип трафика</label>
                     <select id="traffic_type" name="traffic_type" class="form-control">
@@ -462,12 +462,12 @@ $trafficLabels = [
                 
                 <div class="form-group">
                     <label for="date_from">Дата с</label>
-                    <input type="date" id="date_from" name="date_from" value="<?php echo $dateFrom; ?>" class="form-control">
+                    <input type="date" id="date_from" name="date_from" value="<?php echo safeOutput($dateFrom); ?>" class="form-control">
                 </div>
                 
                 <div class="form-group">
                     <label for="date_to">Дата по</label>
-                    <input type="date" id="date_to" name="date_to" value="<?php echo $dateTo; ?>" class="form-control">
+                    <input type="date" id="date_to" name="date_to" value="<?php echo safeOutput($dateTo); ?>" class="form-control">
                 </div>
                 
                 <div class="form-group">
@@ -488,9 +488,9 @@ $trafficLabels = [
             </form>
         </div>
         
-        <?php if (isset($_GET['message'])): ?>
+        <?php if (isset($_GET['message']) && is_scalar($_GET['message'])): ?>
             <div class="alert alert-success">
-                <?php echo safeOutput($_GET['message']); ?>
+                <?php echo safeOutput((string)$_GET['message']); ?>
             </div>
         <?php endif; ?>
         
@@ -521,7 +521,8 @@ $trafficLabels = [
                         <?php foreach ($leads as $lead): 
                             $parameters = !empty($lead['parameters']) ? json_decode($lead['parameters'], true) : [];
                             $trafficType = $parameters['traffic_type'] ?? 'unknown';
-                            
+                            if (!is_string($trafficType)) { $trafficType = 'unknown'; }
+
                             $trafficIcons = [
                                 'paid_advertising' => '<i class="fas fa-bullhorn"></i>',
                                 'seo' => '<i class="fas fa-magnifying-glass"></i>',
@@ -548,6 +549,7 @@ $trafficLabels = [
                             $label = $trafficLabels[$trafficType] ?? 'Неизвестно';
                             
                             $source = $lead['source'] ?? 'website';
+                            if (!is_string($source)) { $source = 'website'; }
                             $sourceIcons = [
                                 'yandex_direct' => '<i class="fas fa-diamond"></i>',
                                 'google_ads' => '<i class="fab fa-google"></i>',
@@ -585,19 +587,19 @@ $trafficLabels = [
                             </td>
                             <td>
                                 <span style="font-size: 11px; padding: 2px 6px; background: #e9ecef; border-radius: 4px;">
-                                    <?php echo $lead['type'] ?? 'form'; ?>
+                                    <?php echo safeOutput($lead['type'] ?? 'form'); ?>
                                 </span>
                             </td>
                             <td>
                                 <?php echo $sourceIcon . ' ' . safeOutput($source); ?>
                             </td>
                             <td>
-                                <span title="<?php echo $trafficType; ?>" style="cursor: help;">
+                                <span title="<?php echo safeOutput($trafficType); ?>" style="cursor: help;">
                                     <?php echo $icon . ' ' . $label; ?>
                                 </span>
                             </td>
                             <td>
-                                <span class="status-badge status-<?php echo $lead['status']; ?>">
+                                <span class="status-badge status-<?php echo safeOutput($lead['status']); ?>">
                                     <?php 
                                     $statusLabels = array(
                                         'new' => 'Новая',
@@ -605,7 +607,7 @@ $trafficLabels = [
                                         'completed' => 'Завершена',
                                         'rejected' => 'Отклонена'
                                     );
-                                    echo isset($statusLabels[$lead['status']]) ? $statusLabels[$lead['status']] : $lead['status'];
+                                    echo isset($statusLabels[$lead['status']]) ? $statusLabels[$lead['status']] : safeOutput($lead['status']);
                                     ?>
                                 </span>
                             </td>
@@ -617,18 +619,37 @@ $trafficLabels = [
                                     <a href="/admin/lead_details.php?id=<?php echo $lead['id']; ?>" class="btn btn-sm btn-info" data-tooltip="Открыть заявку" aria-label="Открыть заявку">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="/admin/?action=change_status&id=<?php echo $lead['id']; ?>&status=processed" class="btn btn-sm btn-warning" data-tooltip="В работу" aria-label="В работу">
-                                        <i class="fas fa-spinner"></i>
-                                    </a>
-                                    <a href="/admin/?action=change_status&id=<?php echo $lead['id']; ?>&status=completed" class="btn btn-sm btn-success" data-tooltip="Завершить" aria-label="Завершить">
-                                        <i class="fas fa-check"></i>
-                                    </a>
-                                    <a href="/admin/?action=delete&id=<?php echo $lead['id']; ?>"
-                                       class="btn btn-sm btn-danger"
-                                       data-tooltip="Удалить" aria-label="Удалить"
-                                       onclick="return confirm('Удалить заявку #<?php echo $lead['id']; ?>?')">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <?php if (checkPermission('edit_leads')): ?>
+                                    <form method="POST" action="/admin/" class="inline-action">
+                                        <input type="hidden" name="csrf_token" value="<?php echo safeOutput($csrf); ?>">
+                                        <input type="hidden" name="action" value="change_status">
+                                        <input type="hidden" name="id" value="<?php echo (int)$lead['id']; ?>">
+                                        <input type="hidden" name="status" value="processed">
+                                        <button type="submit" class="btn btn-sm btn-warning" data-tooltip="В работу" aria-label="В работу">
+                                            <i class="fas fa-spinner"></i>
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="/admin/" class="inline-action">
+                                        <input type="hidden" name="csrf_token" value="<?php echo safeOutput($csrf); ?>">
+                                        <input type="hidden" name="action" value="change_status">
+                                        <input type="hidden" name="id" value="<?php echo (int)$lead['id']; ?>">
+                                        <input type="hidden" name="status" value="completed">
+                                        <button type="submit" class="btn btn-sm btn-success" data-tooltip="Завершить" aria-label="Завершить">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <?php endif; ?>
+                                    <?php if (checkPermission('delete_leads')): ?>
+                                    <form method="POST" action="/admin/" class="inline-action"
+                                          onsubmit="return confirm('Удалить заявку #<?php echo (int)$lead['id']; ?>?')">
+                                        <input type="hidden" name="csrf_token" value="<?php echo safeOutput($csrf); ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo (int)$lead['id']; ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger" data-tooltip="Удалить" aria-label="Удалить">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

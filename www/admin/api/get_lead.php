@@ -2,6 +2,9 @@
 require_once '../../includes/init.php';
 require_once '../includes/security_config.php';
 require_once '../includes/auth.php';
+require_once '../includes/permissions.php';
+
+header('Content-Type: application/json; charset=utf-8');
 
 // Разрешить доступ только из админки
 $allowed_referer = '/admin/';
@@ -18,6 +21,9 @@ if (!isset($_SESSION['admin_id']) || empty($_SESSION['admin_id'])) {
     echo json_encode(['success' => false, 'error' => 'Не авторизован']);
     exit;
 }
+
+// Тот же барьер, что и у страниц заявок (view_leads)
+checkPageAccess(basename(__FILE__));
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     echo json_encode(['success' => false, 'error' => 'ID не указан']);
