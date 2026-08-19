@@ -502,8 +502,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Отправка через AJAX
                     const formData = new FormData(leadForm);
                     const data = Object.fromEntries(formData.entries());
-                    data.type = 'contact_form';
-                    data.source = 'main_form';
+                    // Уважаем скрытое поле type (rfq.js ставит 'rfq' для «Запросить КП»),
+                    // по умолчанию — 'contact_form'.
+                    if (!data.type) data.type = 'contact_form';
+                    data.source = data.type === 'rfq' ? 'rfq_button' : 'main_form';
                     data.recaptcha_token = token;
                     
                     // Добавляем comment из message если есть

@@ -18,13 +18,13 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     <div class="container">
         <div class="top-bar-content">
             <div class="contacts">
-                <a href="tel:+79203465067">
+                <a href="tel:<?= preg_replace('/[^0-9+]/', '', SUPPORT_PHONE) ?>">
                     <i class="fas fa-phone"></i>
-                    +7 (920) 346-50-67
+                    <?= htmlspecialchars(SUPPORT_PHONE) ?>
                 </a>
-                <a href="mailto:ZTR37@Bk.ru">
+                <a href="mailto:<?= htmlspecialchars(ADMIN_EMAIL) ?>">
                     <i class="fas fa-envelope"></i>
-                    ZTR37@Bk.ru
+                    <?= htmlspecialchars(ADMIN_EMAIL) ?>
                 </a>
             </div>
             <div class="work-hours">
@@ -115,13 +115,13 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
         <div class="mobile-contact-item">
             <i class="fas fa-phone"></i>
             <div>
-                <strong><a href="tel:+79203465067">+7 (920) 346-50-67</a></strong>
+                <strong><a href="tel:<?= preg_replace('/[^0-9+]/', '', SUPPORT_PHONE) ?>"><?= htmlspecialchars(SUPPORT_PHONE) ?></a></strong>
             </div>
         </div>
         <div class="mobile-contact-item">
             <i class="fas fa-envelope"></i>
             <div>
-                <strong><a href="mailto:ZTR37@Bk.ru">ZTR37@Bk.ru</a></strong>
+                <strong><a href="mailto:<?= htmlspecialchars(ADMIN_EMAIL) ?>"><?= htmlspecialchars(ADMIN_EMAIL) ?></a></strong>
             </div>
         </div>
         <div class="mobile-contact-item">

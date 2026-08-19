@@ -13,12 +13,12 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Зип лок пакеты с логотипом | Производство ZIP-LOCK пакетов с печатью</title>
-    <meta name="description" content="Производство ZIP-LOCK пакетов с логотипом на заказ. Собственное производство, печать любого тиража, доставка по РФ. Бесплатные образцы и расчёт стоимости онлайн.">
+    <title>Зип-лок пакеты с логотипом → печать на пакетах-слайдерах | ZLOCK</title>
+    <meta name="description" content="Ищете зип-лок пакеты с логотипом? На грипперы (zip-lock) логотип по технологии флексопечати не наносится — брендируем пакеты-слайдеры с бегунком: печать до 4 цветов, тираж от 1000 шт, доставка по РФ.">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="Зип лок пакеты с логотипом | Завод по производству ZIP-LOCK пакетов">
-    <meta property="og:description" content="Производство ZIP-LOCK пакетов с логотипом на заказ. Собственное производство, быстрые сроки, гарантия качества.">
+    <meta property="og:title" content="Зип-лок пакеты с логотипом → печать на слайдерах | ZLOCK">
+    <meta property="og:description" content="На zip-lock (грипперы) печать не наносится — брендируем пакеты-слайдеры с бегунком: флексопечать, любой тираж, доставка по РФ.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zippaket-optom.ru/zip-lock-pakety-s-logotipom">
     <meta property="og:image" content="https://zippaket-optom.ru/images/og-image.jpg">
@@ -50,10 +50,10 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "ZLOCK - Производство ZIP-LOCK пакетов с логотипом",
+      "name": "ZLOCK — печать логотипа на пакетах-слайдерах",
       "url": "https://zippaket-optom.ru/zip-lock-pakety-s-logotipom",
       "logo": "https://zippaket-optom.ru/images/logo.png",
-      "description": "Производство ZIP-LOCK пакетов с логотипом на заказ",
+      "description": "Печать логотипа на пакетах-слайдерах с бегунком (альтернатива zip-lock с логотипом)",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "",
@@ -81,7 +81,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                     <video autoplay muted loop playsinline preload="metadata" class="hero-video">
                         <source src="images/main_zip.mp4" type="video/mp4">
                         <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='800'%20height='600'%20viewBox='0%200%20800%20600'%3E%3Crect%20width='800'%20height='600'%20fill='%232563eb'/%3E%3Ctext%20x='400'%20y='300'%20font-family='Arial'%20font-size='60'%20fill='white'%20text-anchor='middle'%20dominant-baseline='middle'%3EZLOCK%3C/text%3E%3C/svg%3E"
-     alt="ZIP-LOCK пакеты с логотипом" 
+     alt="Пакеты-слайдеры с логотипом (альтернатива зип-лок с логотипом)"
      class="video-fallback">
                     </video>
                     <div class="video-overlay"></div>
@@ -96,19 +96,19 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                             </div>-->
                             
                             <h1 class="hero-title">
-                                Зип лок пакеты <span class="text-gradient">с логотипом</span><br>
-                                на заказ от 4 дней
+                                Зип-лок пакеты <span class="text-gradient">с логотипом</span>?<br>
+                                Печатаем на пакетах-слайдерах
                             </h1>
-                            
+
                             <p class="hero-description">
-                                Нанесём ваш логотип на ZIP-LOCK пакеты любых размеров. <br><br>
-                                Собственное производство, флексопечать, любой тираж от 1000 штук.
+                                На ZIP-LOCK (грипперы) логотип по технологии флексопечати не наносится. <br><br>
+                                Для брендирования делаем <b>пакеты-слайдеры с бегунком</b> с вашим логотипом — любые размеры, тираж от 1000 штук.
                             </p>
                             
                             <div class="hero-actions">
                                 <a href="#contact" class="btn btn-primary btn-lg">
                                     <i class="fas fa-paint-brush"></i>
-                                    Заказать с логотипом
+                                    Заказать слайдеры с логотипом
                                 </a>
                                 <a href="#prices" class="btn btn-outline btn-lg">
                                     <i class="fas fa-tags"></i>
@@ -143,8 +143,8 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
             <section class="advantages-section" id="advantages">
                 <div class="container">
                     <div class="section-header">
-                        <h2 class="section-title">Печать логотипа на ZIP-LOCK пакетах</h2>
-                        <p class="section-subtitle">Профессиональное нанесение изображений на упаковку</p>
+                        <h2 class="section-title">Печать логотипа на пакетах-слайдерах</h2>
+                        <p class="section-subtitle">Брендируем пакеты с бегунком — альтернатива zip-lock с логотипом</p>
                     </div>
                     
                     <div class="advantages-grid">
@@ -205,7 +205,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
         <div class="special-offer-header">
             <div class="offer-badge">
                 <i class="fas fa-tag"></i>
-                <span>ZIP-LOCK с логотипом</span>
+                <span>Слайдеры с логотипом</span>
             </div>
             <h2 class="section-title">Пакеты с бегунком (слайдеры) с печатью логотипа</h2>
             <p class="section-subtitle">Цены указаны за пакет с нанесением логотипа (1 цвет)</p>
@@ -527,7 +527,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                 <div class="container">
                     <div class="section-header">
                         <h2 class="section-title">Как мы наносим логотип</h2>
-                        <p class="section-subtitle">Процесс производства ZIP-LOCK пакетов с печатью</p>
+                        <p class="section-subtitle">Процесс производства пакетов-слайдеров с печатью</p>
                     </div>
                     
                     <div class="production-steps">
@@ -630,7 +630,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
             <section class="cta-section">
                 <div class="container">
                     <div class="cta-content">
-                        <h2>Готовы заказать ZIP-LOCK пакеты с логотипом?</h2>
+                        <h2>Готовы заказать пакеты-слайдеры с логотипом?</h2>
                         <p>Свяжитесь с нами сегодня и получите индивидуальное предложение</p>
                         <div class="cta-actions">
                             <a href="tel:+79203465067" class="btn btn-primary btn-lg">
@@ -651,7 +651,7 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                 <div class="container">
                     <div class="contact-grid">
                         <div class="contact-form">
-                            <h2>Заказать ZIP-LOCK с логотипом</h2>
+                            <h2>Заказать слайдеры с логотипом</h2>
                             <p>Отправьте заявку и получите коммерческое предложение с образцами в течение часа</p>
                             
                             <form id="leadForm" class="lead-form">
@@ -736,33 +736,33 @@ if (file_exists(__DIR__ . '/includes/utm_tracker.php')) {
                     <div style="text-align: center; margin-bottom: 3rem;">
                         <h2 style="color: var(--dark); font-size: 2rem; margin-bottom: 1rem;">
                             <i class="fas fa-print" style="color: var(--primary); margin-right: 10px;"></i>
-                            ZIP-LOCK пакеты с логотипом от производителя
+                            Логотип на пакеты с замком — печатаем на слайдерах
                         </h2>
                         <p style="color: var(--gray-600); font-size: 1.125rem; max-width: 800px; margin: 0 auto;">
-                            Производство и печать на ZIP-LOCK пакетах оптом и в розницу
+                            Zip-lock (грипперы) под печать не идут — брендируем пакеты-слайдеры, опт и розница
                         </p>
                     </div>
                     
                     <div style="margin-top: 4rem; padding: 3rem; background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow); text-align: left;">
                         <h3 style="color: var(--dark); font-size: 1.75rem; margin-bottom: 1.5rem;">
                             <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 10px;"></i>
-                            Всё о ZIP-LOCK пакетах с логотипом
+                            Почему логотип печатаем на слайдерах, а не на zip-lock
                         </h3>
                         
                         <div style="margin-top: 2.5rem; padding-top: 2rem; border-top: 2px solid #f1f5f9;">
                             <p style="color: var(--gray-700); font-size: 1.125rem; max-width: 900px; margin: 0px 45px; line-height: 1.7; text-align:left;">
-                                Компания ZLOCK специализируется на производстве ZIP-LOCK пакетов с нанесением логотипа. 
-                                Мы используем метод флексопечати, который обеспечивает высокое качество и стойкость изображения. 
-                                В нашем ассортименте представлены пакеты различных размеров: от 4×6 см до 50×70 см, 
-                                с толщиной от 35 до 100 мкм. Возможно нанесение логотипа в 1-4 цвета. 
-                                Минимальный тираж — от 1000 штук. Работаем с розничными и оптовыми клиентами, 
-                                предоставляя индивидуальные условия сотрудничества. Бесплатно разработаем макет 
+                                На пакеты zip-lock (грипперы) логотип по технологии флексопечати не наносится.
+                                Для брендирования мы производим <b>пакеты-слайдеры с бегунком</b> с нанесением логотипа —
+                                метод флексопечати обеспечивает высокое качество и стойкость изображения.
+                                Размеры от 4×6 см до 50×70 см, толщина от 35 до 100 мкм, печать в 1-4 цвета.
+                                Минимальный тираж — от 1000 штук. Работаем с розничными и оптовыми клиентами,
+                                предоставляя индивидуальные условия сотрудничества. Бесплатно разработаем макет
                                 и предоставим образцы продукции.
                             </p>
                         </div>
                         
                         <div style="margin-top: 3rem;">
-                            <h4 style="font-size: 1.3rem; margin-bottom: 1.5rem;">Преимущества печати на ZIP-LOCK пакетах:</h4>
+                            <h4 style="font-size: 1.3rem; margin-bottom: 1.5rem;">Преимущества пакетов-слайдеров с логотипом:</h4>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                                 <div style="display: flex; align-items: start; gap: 1rem;">
                                     <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.5rem;"></i>

@@ -291,7 +291,21 @@ class Catalog {
             return [];
         }
     }
-    
+
+    /** Новинки — самые свежие активные товары с ценой. */
+    public function getNewProducts($limit = 4) {
+        try {
+            $sql = "SELECT * FROM products
+                    WHERE is_active = 1 AND price_rub > 0
+                    ORDER BY created_at DESC, id DESC
+                    LIMIT " . (int)$limit;
+            return $this->db->query($sql)->fetchAll();
+        } catch (PDOException $e) {
+            error_log("Ошибка получения новинок: " . $e->getMessage());
+            return [];
+        }
+    }
+
     /**
      * Получить товары со скидкой (с нулевым запасом или специальные предложения)
      */

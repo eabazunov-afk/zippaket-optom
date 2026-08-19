@@ -2,6 +2,7 @@
 // Подключаем конфигурацию
 require_once 'includes/config.php';
 require_once 'includes/catalog_functions.php';
+require_once __DIR__ . '/includes/home_view.php';
 // У главной свой cookie-баннер ниже — не дублируем общим из footer.php
 define('COOKIE_BANNER_RENDERED', true);
 
@@ -44,16 +45,16 @@ $zGripperMax = $zGrippersTop ? (int)$zGrippersTop[0]['stock_quantity'] : 1;
 // Порог «мало» — по абсолютному остатку (а не относительному), чтобы бестселлеры не помечались ложно.
 define('Z_LOW_STOCK', 100000);
 
-/** Ценовые уровни из price_rub: розница, опт 20к (−8%), опт 300к (−18%). */
-function z_price(float $base, float $mult): string {
-    return number_format($base * $mult, 2, ',', ' ');
-}
-/** Размер из мм в «25 × 30 см». */
-function z_size(?int $w, ?int $h): string {
-    $f = function ($mm) { $cm = $mm / 10; return rtrim(rtrim(number_format($cm, 1, '.', ''), '0'), '.'); };
-    if (!$w || !$h) return '';
-    return $f($w) . ' × ' . $f($h) . ' см';
-}
+// Толщины для селекта поиска-подбора в hero (из БД).
+$zCatalog = $zCatalog ?? new Catalog();
+$zThicknesses = $zCatalog->getThicknesses();
+
+// Хиты продаж — витрина под hero (hero использует $zHits[0]['min_order_qty']).
+$zHits = home_pick_hits($zCatalog->getPopularProducts(12), 8);
+
+// Новинки — секция после «Хитов».
+$zNew = home_pick_new($zCatalog->getNewProducts(8), 4);
+
 /** Фото слайдера по цвету: матовый → eva, прозрачный → pvd. */
 function z_slider_img(array $r): string {
     return (mb_stripos((string)$r['color'], 'мат') !== false) ? '/images/eva.png' : '/images/pvd.png';
@@ -65,7 +66,7 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
     $stock = (int)$r['stock_quantity'];
     $fill = max(10, min(100, (int)round($stock / max(1, $maxStock) * 100)));
     $low = $stock < Z_LOW_STOCK;
-    $size = z_size($r['width'] !== null ? (int)$r['width'] : null, $r['height'] !== null ? (int)$r['height'] : null);
+    $size = home_size($r['width'] !== null ? (int)$r['width'] : null, $r['height'] !== null ? (int)$r['height'] : null);
     $mk = $r['thickness'] ? ((int)$r['thickness'] . ' мкм') : 'стандарт';
     $name = htmlspecialchars($r['short_name'] ?: $r['full_name']);
 
@@ -89,9 +90,9 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
             <span class="z-prod-ico"><i class="ph ph-package"></i></span>
         </div>
         <div class="z-prices z-tnum">
-            <div class="row"><span>Опт от 300к</span><span class="p-main"><?= z_price($base, 0.82) ?> ₽/шт</span></div>
-            <div class="row"><span>Опт от 20к</span><span class="p-sec"><?= z_price($base, 0.92) ?> ₽/шт</span></div>
-            <div class="row"><span>Розница от 3к</span><span class="p-sec"><?= z_price($base, 1.0) ?> ₽/шт</span></div>
+            <?php foreach (home_tiers() as $t): ?>
+                <div class="row"><span><?= htmlspecialchars($t['label']) ?></span><span class="<?= htmlspecialchars($t['class']) ?>"><?= home_price($base, $t['mult']) ?> ₽/шт</span></div>
+            <?php endforeach; ?>
         </div>
         <div class="z-stock<?= $low ? ' low' : '' ?>">
             <div class="lbl"><span><i class="ph ph-warehouse"></i>В наличии: <span class="z-tnum"><?= $stockLabel ?></span> шт</span><?= $low ? '<span class="low-tag">мало</span>' : '' ?></div>
@@ -105,6 +106,8 @@ function z_card(array $r, bool $withPhoto, int $maxStock): string {
                 data-step="<?= (int)($r['qty_step'] ?? 1) ?>">
             <i class="ph ph-shopping-cart-simple"></i>В корзину
         </button>
+        <button type="button" class="z-btn z-btn-ghost js-rfq" data-rfq="card" data-id="<?= (int)$r['id'] ?>" data-name="<?= htmlspecialchars($r['full_name']) ?>">Запросить КП</button>
+        <button type="button" class="z-btn z-btn-accent js-quick" data-id="<?= (int)$r['id'] ?>" data-name="<?= htmlspecialchars($r['full_name']) ?>" data-min="<?= (int)($r['min_order_qty'] ?? 1) ?>">Быстрый заказ</button>
     </article>
     <?php
     return ob_get_clean();
@@ -177,15 +180,31 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     <div>
                         <div class="z-badge" data-reveal><i class="ph ph-seal-check"></i><span>Производитель №1 в России</span></div>
                         <h1 class="z-h1" data-reveal>Производство <span class="z-grad">ZIP-пакетов</span><br>на заказ от 1 дня</h1>
-                        <p class="z-hero-sub" data-reveal>Расчёт стоимости за 10 минут — напрямую от производителя со скидкой до 30%. Собственное производство, любой тираж, гарантия качества.</p>
-                        <div class="z-cta-row" data-reveal>
-                            <a href="#calculator" class="z-btn z-btn-gold z-shine"><i class="ph ph-calculator"></i>Рассчитать стоимость</a>
-                            <a href="/katalog_zip_paketov/" class="z-btn z-btn-glass"><i class="ph ph-package"></i>Весь каталог</a>
+                        <p class="z-hero-sub" data-reveal>ZIP-пакеты оптом от производителя со склада в РФ. Минимальная партия, наличие, отгрузка от 1 дня, работа с НДС.</p>
+                        <div class="z-hero-trust" data-reveal>
+                            <span>✔ Мин. партия от <?= (int)($zHits[0]['min_order_qty'] ?? 1000) ?> шт</span>
+                            <span>✔ В наличии на складе</span>
+                            <span>✔ Документы, НДС</span>
+                            <span>✔ Отгрузка от 1 дня</span>
                         </div>
-                        <div class="z-checks" data-reveal>
-                            <div class="z-check"><i class="ph ph-check-circle"></i>Бесплатные образцы</div>
-                            <div class="z-check"><i class="ph ph-check-circle"></i>Доставка по РФ</div>
-                            <div class="z-check"><i class="ph ph-check-circle"></i>Гарантия качества</div>
+                        <form class="z-hero-search" action="/katalog_zip_paketov/" method="get" role="search" data-reveal>
+                            <input type="text" name="search" class="z-hs-input" placeholder="Размер (25x30), «zip-lock» или артикул" aria-label="Поиск пакетов">
+                            <select name="type" class="z-hs-select" aria-label="Тип замка">
+                                <option value="">Любой тип</option>
+                                <option value="slider">Слайдер</option>
+                                <option value="ziplock">ZIP-LOCK (гриппер)</option>
+                            </select>
+                            <select name="thickness" class="z-hs-select" aria-label="Толщина">
+                                <option value="">Толщина</option>
+                                <?php foreach ($zThicknesses as $t): ?>
+                                    <option value="<?= (int)$t ?>"><?= (int)$t ?> мкм</option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button type="submit" class="z-btn z-btn-accent z-hs-submit">Найти</button>
+                        </form>
+                        <div class="z-hero-cta" data-reveal>
+                            <a href="/price.php" class="z-btn z-btn-gold">Скачать прайс</a>
+                            <a href="#leadForm" class="z-btn z-btn-glass js-rfq" data-rfq="hero">Запросить КП</a>
                         </div>
                     </div>
                     <div class="z-hero-visual" data-reveal>
@@ -204,6 +223,50 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     </div>
                 </div>
             </section>
+
+            <!-- ===== ПОЛОСА ОПТ-УСЛОВИЙ ===== -->
+            <section class="z-section" style="padding-top:0">
+                <div class="z-wrap">
+                    <div class="z-opt-terms" data-reveal>
+                        <span>✔ Мин. заказ от <?= (int)($zHits[0]['min_order_qty'] ?? 1000) ?> шт</span>
+                        <span>✔ Скидки от объёма: −8% от 20 000 · −18% от 300 000</span>
+                        <span>✔ Доставка по РФ · документы, НДС</span>
+                        <span>✔ Отгрузка от 1 дня</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== ХИТЫ ПРОДАЖ ===== -->
+            <?php if ($zHits): ?>
+            <section class="z-section z-hits" id="hits" data-reveal>
+                <div class="z-wrap">
+                    <div class="z-sec-head z-center">
+                        <h2>Хиты продаж</h2>
+                        <p class="z-sec-sub">Самые ходовые размеры — в наличии, с оптовыми ценами</p>
+                    </div>
+                    <div class="z-prod-grid">
+                        <?php foreach ($zHits as $r): ?>
+                            <?= z_card($r, mb_stripos((string)$r['category'], 'слайдер') !== false, $zGripperMax ?: 1) ?>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="z-center"><a href="/katalog_zip_paketov/" class="z-btn z-btn-ghost">Весь каталог →</a></div>
+                </div>
+            </section>
+            <?php endif; ?>
+
+            <!-- ===== НОВИНКИ ===== -->
+            <?php if ($zNew): ?>
+            <section class="z-section z-new" id="new" data-reveal>
+                <div class="z-wrap">
+                    <div class="z-sec-head z-center"><h2>Новинки</h2></div>
+                    <div class="z-prod-grid">
+                        <?php foreach ($zNew as $r): ?>
+                            <?= z_card($r, mb_stripos((string)$r['category'], 'слайдер') !== false, $zGripperMax ?: 1) ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </section>
+            <?php endif; ?>
 
             <!-- ===== ЦИФРЫ ДОВЕРИЯ ===== -->
             <section class="z-section" style="padding-top:0">
@@ -383,6 +446,23 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                 </div>
             </div>
 
+            <!-- ===== БЫСТРЫЙ ЗАКАЗ В 1 КЛИК (мини-модалка, тёмная тема) ===== -->
+            <div class="z-modal" id="quickModal" aria-hidden="true" data-id="" data-name="" data-min="1">
+                <div class="z-modal-overlay" data-quick-close></div>
+                <div class="z-modal-box z-quick-box" role="dialog" aria-modal="true" aria-label="Быстрый заказ">
+                    <button class="z-modal-close" type="button" data-quick-close aria-label="Закрыть"><i class="fas fa-times"></i></button>
+                    <div class="z-glass" style="padding:clamp(20px,3vw,32px)">
+                        <div class="z-eyebrow">Быстрый заказ</div>
+                        <h3 class="z-h3 js-quick-title" style="margin:6px 0 8px">Заказ в 1 клик</h3>
+                        <p style="margin:0 0 16px;color:var(--z-text-3)">Оставьте телефон — перезвоним и оформим заказ за минуту.</p>
+                        <input type="tel" class="js-quick-phone" placeholder="Ваш телефон" autocomplete="tel"
+                               style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-size:16px;margin-bottom:14px">
+                        <button type="button" class="z-btn z-btn-gold z-shine js-quick-submit" style="width:100%"><i class="ph ph-paper-plane-tilt"></i>Заказать</button>
+                        <p style="margin:10px 0 0;font-size:12px;color:var(--z-text-3)">Нажимая «Заказать», вы соглашаетесь с <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">обработкой персональных данных</a></p>
+                    </div>
+                </div>
+            </div>
+
             <!-- ===== ОТЗЫВЫ / ДОВЕРИЕ (⚠️ ЗАГЛУШКИ — заменить на реальные) ===== -->
             <section class="z-section">
                 <div class="z-wrap">
@@ -429,15 +509,16 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                         <div>
                             <h2 class="z-h2" style="font-size:clamp(26px,3.6vw,38px);margin-bottom:16px">Получите расчёт и образец бесплатно</h2>
                             <p style="font-size:16px;line-height:1.6;color:var(--z-text-2);margin-bottom:30px">Оставьте контакты — менеджер свяжется в течение 10 минут в рабочее время.</p>
-                            <a href="tel:+79203465067" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-phone"></i></span><span><small>Телефон</small><b>+7 (920) 346-50-67</b></span></a>
+                            <a href="tel:<?= preg_replace('/[^0-9+]/', '', SUPPORT_PHONE) ?>" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-phone"></i></span><span><small>Телефон</small><b><?= htmlspecialchars(SUPPORT_PHONE) ?></b></span></a>
                             <a href="https://t.me/zlock_sales_bot" target="_blank" rel="noopener noreferrer" class="z-contact-link"><span class="ic" style="background:rgba(34,158,217,.16);color:#5FB9E8"><i class="ph ph-telegram-logo"></i></span><span><small>Telegram</small><b>@zlock_sales_bot</b></span></a>
-                            <a href="mailto:ZTR37@Bk.ru" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-envelope-simple"></i></span><span><small>Email</small><b>ZTR37@Bk.ru</b></span></a>
+                            <a href="mailto:<?= htmlspecialchars(ADMIN_EMAIL) ?>" class="z-contact-link"><span class="ic" style="background:rgba(95,227,208,.14);color:#5FE3D0"><i class="ph ph-envelope-simple"></i></span><span><small>Email</small><b><?= htmlspecialchars(ADMIN_EMAIL) ?></b></span></a>
                         </div>
                         <form id="leadForm" class="z-form">
                             <input type="text" name="name" placeholder="Ваше имя *" required>
                             <input type="tel" name="phone" placeholder="Телефон *" required>
                             <input type="email" name="email" placeholder="Email">
                             <textarea name="message" placeholder="Размер, материал, тираж" rows="3"></textarea>
+                            <input type="hidden" name="type" value="contact_form">
                             <input type="hidden" id="recaptchaToken" name="recaptcha_token">
                             <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">согласие на обработку персональных данных</a></label>
                             <button type="submit" class="z-btn z-btn-gold z-shine"><i class="ph ph-paper-plane-tilt"></i>Получить расчёт</button>
@@ -591,6 +672,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <script src="/js/script.js"></script>
     <script src="/js/cart.js"></script>
     <script src="/js/home.js"></script>
+    <script src="/js/rfq.js" defer></script>
 
     <script>
     // Инициализация reCAPTCHA

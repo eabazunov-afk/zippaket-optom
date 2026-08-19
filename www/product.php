@@ -166,9 +166,12 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
                                     data-step="<?= $qtyStep ?>">
                                 <i class="fas fa-shopping-cart"></i> В корзину
                             </button>
+                            <?php // Логотип наносим только на слайдеры; на zip-lock (грипперы) — нет. ?>
+                            <?php if (mb_stripos((string)($product['category'] ?? ''), 'слайдер') !== false): ?>
                             <a href="/index.php#calculator" class="btn btn-outline">
                                 <i class="fas fa-calculator"></i> С логотипом? Рассчитать
                             </a>
+                            <?php endif; ?>
                         </div>
                         <!-- Блок доверия -->
                         <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid var(--z-hairline,#e6ecf3)">
