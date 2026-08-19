@@ -1,4 +1,9 @@
-<?php $pageTitle = 'Контакты'; require __DIR__ . '/includes/page_head.php'; ?>
+<?php
+$pageTitle = 'Контакты';
+$pageDescription = 'Контакты оптового поставщика ZIP-пакетов ZLOCK: телефон, e-mail, Telegram, реквизиты и режим работы. Заявка на оптовую поставку по всей России.';
+$pageCanonical = 'https://zippaket-optom.ru/kontakty.php';
+require __DIR__ . '/includes/page_head.php';
+?>
 
 <div class="legal-stub"><i class="fas fa-circle-info"></i> Реквизиты подставляются из настроек продавца (<code>SELLER_*</code>) — укажите реальные ИНН/ОГРН/адрес.</div>
 

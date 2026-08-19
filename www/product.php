@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/catalog_functions.php';
 require_once __DIR__ . '/includes/product_view.php';
 require_once __DIR__ . '/includes/seo.php';
+require_once __DIR__ . '/includes/reviews.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $catalog = new Catalog();
@@ -52,10 +53,12 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
     <link rel="stylesheet" href="/css/shop-dark.css">
     <?php if ($product):
         $stock = pv_stock_status((int)$product['stock_quantity']);
+        $agg = reviews_rating_aggregate((int)$product['id']);
         $ld = [
             '@context' => 'https://schema.org',
             '@type' => 'Product',
             'name' => $product['full_name'],
+            'url' => 'https://zippaket-optom.ru/product/' . (int)$product['id'],
             'image' => (strpos($product['image_url'], 'no-image') === false) ? 'https://zippaket-optom.ru' . $product['image_url'] : null,
             'description' => $product['meta_description'] ?: $product['full_name'],
             'offers' => array_filter([
@@ -66,6 +69,13 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
             ], static fn($v) => $v !== null),
         ];
         $ld = array_filter($ld, static fn($v) => $v !== null);
+        if ($agg['count'] > 0) {
+            $ld['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => rating_round($agg['avg']),
+                'reviewCount' => $agg['count'],
+            ];
+        }
     ?>
     <script type="application/ld+json">
     <?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?>

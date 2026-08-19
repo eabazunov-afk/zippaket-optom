@@ -34,4 +34,11 @@ class ReviewsTest extends TestCase
         $this->assertArrayHasKey('author_name', $r['errors']);
         $this->assertArrayHasKey('body', $r['errors']);
     }
+
+    public function testRatingRound(): void
+    {
+        $this->assertSame('4.7', rating_round(4.6667));
+        $this->assertSame('5.0', rating_round(5.0));
+        $this->assertSame('', rating_round(0.0));
+    }
 }

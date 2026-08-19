@@ -132,6 +132,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zippaket-optom.ru/">
     <meta property="og:image" content="https://zippaket-optom.ru/images/og-image.jpg">
+    <link rel="canonical" href="https://zippaket-optom.ru/">
     <meta name="yandex-verification" content="300261c5f186d190">
 
     <!-- Favicon -->
@@ -149,18 +150,38 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/home.css">
 
+    <!-- Preload LCP hero image (above-the-fold) -->
+    <link rel="preload" as="image" href="/images/pvd.png" fetchpriority="high">
+
     <!-- JSON-LD -->
+    <?php
+    // Телефон — из константы SUPPORT_PHONE (без хардкода).
+    // Адрес — только город (Москва): консистентно с zip_lock_logo.php, invoice.php и
+    // timezone Europe/Moscow. Улицу НЕ выводим: SELLER_ADDRESS — плейсхолдер, а фиктивный
+    // street-адрес вредит SEO. TODO: владелец даёт реальный адрес → полный PostalAddress + LocalBusiness.
+    $orgJsonLd = [
+        '@context'     => 'https://schema.org',
+        '@type'        => 'Organization',
+        'name'         => 'ZLOCK - Производство zip пакетов оптом',
+        'url'          => 'https://zippaket-optom.ru/',
+        'logo'         => 'https://zippaket-optom.ru/images/logo.png',
+        'description'  => 'Производство ZIP-пакетов на заказ',
+        'address'      => [
+            '@type'          => 'PostalAddress',
+            'addressLocality' => 'Москва',
+            'addressCountry'  => 'RU',
+        ],
+        'contactPoint' => [
+            '@type'             => 'ContactPoint',
+            'telephone'         => SUPPORT_PHONE,
+            'contactType'       => 'sales',
+            'areaServed'        => 'RU',
+            'availableLanguage' => 'Russian',
+        ],
+    ];
+    ?>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "ZLOCK - Производство zip пакетов оптом",
-      "url": "https://zippaket-optom.ru/",
-      "logo": "https://zippaket-optom.ru/images/logo.png",
-      "description": "Производство ZIP-пакетов на заказ",
-      "address": { "@type": "PostalAddress", "addressLocality": "Москва", "addressCountry": "RU" },
-      "contactPoint": { "@type": "ContactPoint", "telephone": "+7 (920) 346-50-67", "contactType": "customer service", "availableLanguage": "Russian" }
-    }
+    <?= json_encode($orgJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
     </script>
 </head>
 <body class="zlock">
@@ -212,7 +233,7 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                     <div class="z-hero-visual" data-reveal>
                         <div class="z-glow"></div>
                         <div class="z-hero-card">
-                            <img src="/images/pvd.png" alt="ZIP-пакет с бегунком">
+                            <img src="/images/pvd.png" alt="ZIP-пакет с бегунком" width="800" height="494" fetchpriority="high" loading="eager">
                             <div class="z-card-veil"></div>
                             <div class="z-hero-cap">
                                 <div class="z-chip-mint">ПВД · с бегунком</div>
@@ -710,9 +731,9 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
         </div><!-- /.z-content -->
     </div><!-- /.site-wrapper -->
 
-    <script src="/js/script.js"></script>
-    <script src="/js/cart.js"></script>
-    <script src="/js/home.js"></script>
+    <script src="/js/script.js" defer></script>
+    <script src="/js/cart.js" defer></script>
+    <script src="/js/home.js" defer></script>
     <script src="/js/rfq.js" defer></script>
 
     <script>

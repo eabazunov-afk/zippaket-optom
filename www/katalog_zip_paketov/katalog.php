@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/catalog_functions.php';
 require_once __DIR__ . '/../includes/product_view.php';
 require_once __DIR__ . '/../includes/seo.php';
+require_once __DIR__ . '/../includes/catalog_schema.php';
 
 // Получаем параметры фильтрации
 $filters = [
@@ -73,6 +74,7 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
     <script type="application/ld+json">
     <?= seo_breadcrumb_jsonld($crumbs) ?>
     </script>
+    <?= catalog_itemlist_jsonld($result['products']) ?>
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/images/zlock.ico">

@@ -76,3 +76,24 @@ function review_delete(int $id): void {
     try { $s = getDbConnection()->prepare("DELETE FROM reviews WHERE id=?"); $s->execute([$id]); }
     catch (PDOException $e) { error_log('review_delete: ' . $e->getMessage()); }
 }
+
+/** Средний балл → строка "4.7" (1 знак, точка). Пусто если ≤0. */
+function rating_round(float $avg): string {
+    if ($avg <= 0) { return ''; }
+    return number_format($avg, 1, '.', '');
+}
+
+/** Агрегат одобренных отзывов: ['count'=>int, 'avg'=>float]. Опц. по товару. */
+function reviews_rating_aggregate(?int $productId = null): array {
+    try {
+        $db = getDbConnection();
+        if ($productId !== null) {
+            $stmt = $db->prepare("SELECT COUNT(*) c, COALESCE(AVG(rating),0) a FROM reviews WHERE is_approved=1 AND product_id=?");
+            $stmt->execute([$productId]);
+        } else {
+            $stmt = $db->query("SELECT COUNT(*) c, COALESCE(AVG(rating),0) a FROM reviews WHERE is_approved=1");
+        }
+        $row = $stmt->fetch();
+        return ['count' => (int)($row['c'] ?? 0), 'avg' => (float)($row['a'] ?? 0)];
+    } catch (PDOException $e) { error_log('reviews_rating_aggregate: ' . $e->getMessage()); return ['count' => 0, 'avg' => 0.0]; }
+}
