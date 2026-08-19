@@ -6,6 +6,18 @@ require_once __DIR__ . '/payment/payment_status_map.php';
 
 function order_create(array $checkoutData, array $lines): array
 {
+    return order_create_db(getDbConnection(), $checkoutData, $lines);
+}
+
+/**
+ * Та же логика с явно переданным подключением — точка расширения для тестов
+ * (фейковый PDO вместо реальной БД). Контракт возвращаемых значений см. выше.
+ *
+ * @return array{ok:bool, error?:string, issues?:array, order_id?:int,
+ *               order_number?:string, access_token?:string, total?:float}
+ */
+function order_create_db(PDO $db, array $checkoutData, array $lines): array
+{
     if (empty($lines)) {
         return ['ok' => false, 'error' => 'empty_cart'];
     }
@@ -16,12 +28,18 @@ function order_create(array $checkoutData, array $lines): array
     if ($issues) {
         return ['ok' => false, 'error' => 'invalid_cart', 'issues' => $issues];
     }
+    // Суммы считаются здесь, из строк корзины: с клиента приходят только id и qty,
+    // ни items_total, ни total из $checkoutData не берутся.
     $totals = cart_totals($lines);
-    $db = getDbConnection();
     try {
         $db->beginTransaction();
 
-        $countStmt = $db->query("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()");
+        // Полуинтервал вместо DATE(created_at) = CURDATE(): функция от колонки
+        // отключила бы idx_created, а так COUNT идёт по диапазону индекса.
+        $countStmt = $db->query(
+            "SELECT COUNT(*) FROM orders
+             WHERE created_at >= CURDATE() AND created_at < CURDATE() + INTERVAL 1 DAY"
+        );
         $seq = (int)$countStmt->fetchColumn() + 1;
         // Непредсказуемый токен доступа к заказу/счёту (защита от IDOR по номеру).
         $accessToken = bin2hex(random_bytes(16));

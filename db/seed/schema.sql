@@ -242,7 +242,13 @@ CREATE TABLE IF NOT EXISTS `products` (
   KEY `idx_category` (`category`),
   KEY `idx_abc_xyz` (`abc_class`,`xyz_class`),
   KEY `idx_size` (`width`,`height`),
-  KEY `idx_stock` (`stock_quantity`)
+  KEY `idx_stock` (`stock_quantity`),
+  KEY `idx_active` (`is_active`),
+  KEY `idx_active_created` (`is_active`,`created_at`),
+  KEY `idx_active_sold` (`is_active`,`quantity_sold`,`stock_quantity`),
+  KEY `idx_active_price` (`is_active`,`price_rub`),
+  KEY `idx_active_stock` (`is_active`,`stock_quantity`),
+  KEY `idx_active_category` (`is_active`,`category`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

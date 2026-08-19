@@ -265,7 +265,6 @@ $priceVal = $hasPrice ? (float)$product['price_rub'] : 0.0;
         </main>
         <?php include __DIR__ . '/footer.php'; ?>
     </div>
-    <script src="/js/script.js"></script>
-    <script src="/js/cart.js"></script>
+    <!-- Общие скрипты (script.js, cart.js) подключены в footer.php -->
 </body>
 </html>
