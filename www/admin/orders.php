@@ -126,6 +126,10 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                 <div class='fa-icon'><i class="fas fa-shopping-bag"></i></div>
                 <div class='menu-text'><strong>Заказы магазина</strong><p>Заказы и оплаты из каталога</p></div>
             </a>
+            <a href='/admin/reviews.php' class='menu-item'>
+                <div class='fa-icon'><i class="fas fa-star"></i></div>
+                <div class='menu-text'><strong>Отзывы</strong><p>Модерация отзывов клиентов</p></div>
+            </a>
             <a href='/admin/calculations.php' class='menu-item'>
                 <div class='fa-icon'><i class="fas fa-calculator"></i></div>
                 <div class='menu-text'><strong>Расчёты</strong><p>Финансовые расчеты и отчеты</p></div>

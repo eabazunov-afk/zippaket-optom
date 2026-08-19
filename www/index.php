@@ -3,6 +3,8 @@
 require_once 'includes/config.php';
 require_once 'includes/catalog_functions.php';
 require_once __DIR__ . '/includes/home_view.php';
+require_once __DIR__ . '/includes/reviews.php';
+require_once __DIR__ . '/includes/faq.php';
 // У главной свой cookie-баннер ниже — не дублируем общим из footer.php
 define('COOKIE_BANNER_RENDERED', true);
 
@@ -463,41 +465,80 @@ $zSaleEnd = (strtotime('today 23:59:59') + 3 * 86400) * 1000;
                 </div>
             </div>
 
-            <!-- ===== ОТЗЫВЫ / ДОВЕРИЕ (⚠️ ЗАГЛУШКИ — заменить на реальные) ===== -->
+            <!-- ===== ОТЗЫВЫ / ДОВЕРИЕ ===== -->
             <section class="z-section">
                 <div class="z-wrap">
                     <div class="z-sec-head z-center" data-reveal>
                         <div class="z-eyebrow">Отзывы</div>
                         <h2 class="z-h2">Нам доверяют оптовые покупатели</h2>
                     </div>
+                    <?php $reviews = reviews_approved(6); ?>
+                    <?php if ($reviews): ?>
                     <div class="z-adv-grid">
-                        <?php
-                        // ⚠️ ЗАГЛУШКИ отзывов — заменить на реальные (имя, компания, текст)
-                        $reviews = [
-                            ['Алексей М.', 'оптовый покупатель', 'Заказывали партию слайдеров под фасовку — приехало в срок, качество отличное. Менеджер на связи, пересчитал цену под наш объём.'],
-                            ['ООО «Пример»', 'производство продуктов', 'Берём грипперы регулярно. Удобно, что можно по счёту для юрлица. Цена на объём приятная.'],
-                            ['Ирина К.', 'маркетплейс-селлер', 'Нужна была упаковка с печатью — сделали образец бесплатно, потом тираж. Рекомендую.'],
-                        ];
-                        foreach ($reviews as $r): ?>
+                        <?php foreach ($reviews as $r): ?>
                         <div class="z-card z-lift" data-reveal>
-                            <div style="color:var(--z-gold);margin-bottom:10px;font-size:14px">★★★★★</div>
-                            <p style="margin:0 0 16px"><?= htmlspecialchars($r[2]) ?></p>
+                            <div style="color:var(--z-gold);margin-bottom:10px;font-size:14px"><?= review_stars((int)$r['rating']) ?></div>
+                            <p style="margin:0 0 16px"><?= htmlspecialchars($r['body']) ?></p>
                             <div style="display:flex;align-items:center;gap:12px">
                                 <span class="z-ico" style="width:42px;height:42px;font-size:18px;margin:0"><i class="ph ph-user"></i></span>
                                 <div>
-                                    <div style="font-weight:700;color:#fff"><?= htmlspecialchars($r[0]) ?></div>
-                                    <div style="font-size:13px;color:var(--z-text-3)"><?= htmlspecialchars($r[1]) ?></div>
+                                    <div style="font-weight:700;color:var(--z-text)"><?= htmlspecialchars($r['author_name']) ?></div>
+                                    <div style="font-size:13px;color:var(--z-text-3)"><?= htmlspecialchars((string)($r['author_role'] ?? '')) ?></div>
                                 </div>
                             </div>
                         </div>
                         <?php endforeach; ?>
                     </div>
+                    <?php endif; ?>
                     <!-- Гарантии / сертификаты -->
                     <div class="z-glass" style="margin-top:24px;padding:22px 26px;display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:center" data-reveal>
                         <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-shield-check" style="color:var(--z-mint);font-size:20px"></i> Сертифицированные материалы EVA/ПВД</span>
                         <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-factory" style="color:var(--z-mint);font-size:20px"></i> Собственное производство</span>
                         <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-arrows-clockwise" style="color:var(--z-mint);font-size:20px"></i> Возврат по закону</span>
                         <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-receipt" style="color:var(--z-mint);font-size:20px"></i> Чек и закрывающие документы</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-file-text" style="color:var(--z-mint);font-size:20px"></i> Договор и счёт для юрлиц</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-percent" style="color:var(--z-mint);font-size:20px"></i> Работаем с НДС</span>
+                        <span style="display:flex;align-items:center;gap:9px;color:var(--z-text-2)"><i class="ph ph-gift" style="color:var(--z-mint);font-size:20px"></i> Образцы бесплатно</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== КЕЙСЫ ОТГРУЗОК + ЛОГОТИПЫ КЛИЕНТОВ ===== -->
+            <?php $tm = require __DIR__ . '/data/testimonials.php'; if (!empty($tm['cases'])): ?>
+            <section class="z-section z-cases" data-reveal>
+                <div class="z-wrap">
+                    <div class="z-sec-head z-center"><div class="z-eyebrow">Кейсы</div><h2 class="z-h2">Отгрузки клиентам</h2></div>
+                    <div class="z-adv-grid">
+                        <?php foreach ($tm['cases'] as $c): ?>
+                        <div class="z-card z-lift">
+                            <div style="font-weight:800;color:var(--z-mint);font-size:22px"><?= htmlspecialchars($c['result']) ?></div>
+                            <div style="font-weight:700;color:var(--z-text);margin:6px 0"><?= htmlspecialchars($c['company']) ?></div>
+                            <p style="margin:0;color:var(--z-text-2)"><?= htmlspecialchars($c['detail']) ?></p>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php if (!empty($tm['logos'])): ?>
+                    <div class="z-glass" style="margin-top:24px;padding:20px;display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:center" data-reveal>
+                        <?php foreach ($tm['logos'] as $logo): ?><img src="<?= htmlspecialchars($logo) ?>" alt="Клиент" loading="lazy" style="height:38px;opacity:.8"><?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </section>
+            <?php endif; ?>
+
+            <!-- ===== FAQ ПО ОПТУ + schema.org разметка ===== -->
+            <?php $faq = require __DIR__ . '/data/faq.php'; ?>
+            <?= faq_jsonld($faq) ?>
+            <section class="z-section z-faq" data-reveal>
+                <div class="z-wrap">
+                    <div class="z-sec-head z-center"><div class="z-eyebrow">Вопросы</div><h2 class="z-h2">Частые вопросы опта</h2></div>
+                    <div class="z-faq-list">
+                        <?php foreach ($faq as $f): ?>
+                        <details class="z-card" style="margin-bottom:10px">
+                            <summary style="cursor:pointer;font-weight:700;color:var(--z-text)"><?= htmlspecialchars($f['q']) ?></summary>
+                            <p style="margin:10px 0 0;color:var(--z-text-2)"><?= htmlspecialchars($f['a']) ?></p>
+                        </details>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </section>

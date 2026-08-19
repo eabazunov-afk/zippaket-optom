@@ -123,4 +123,5 @@
         </div>
     </div>
 </footer>
+<?php include __DIR__ . '/includes/contact_fab.php'; ?>
 <?php include __DIR__ . '/includes/cookie_banner.php'; ?>
