@@ -323,7 +323,8 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
         <div class="filters">
             <h3>Фильтры заявок</h3>
             <form method="GET" class="filter-form">
- <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                <!-- CSRF-токен в GET-форме не нужен (фильтры ничего не меняют), а в
+                     query-string он утекал бы в историю браузера, Referer и логи -->
                 <div class="form-group">
                     <label for="status">Статус</label>
                     <select id="status" name="status" class="form-control">

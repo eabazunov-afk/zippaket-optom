@@ -40,9 +40,17 @@ cmd /c "`"$mysql`" -u root $db < db\seed\products-data.sql"
 ## Миграции
 
 Применять по порядку имён файлов. Все миграции **идемпотентны** — повторный
-запуск не падает и не плодит дубликаты (проверено двойным прогоном).
-На свежем сиде они лишь досыпают стартовые строки: отзывы, цены калькулятора,
-роль `superadmin`.
+запуск не падает и не плодит дубликаты (проверено тройным прогоном всех семи
+на чистой БД 2026-08-19).
+На свежем сиде они лишь досыпают стартовые строки (отзывы, цены калькулятора):
+`schema.sql` — снимок уже мигрированной схемы (15 таблиц, новый ENUM ролей,
+индексы `idx_active_*` на месте), поэтому все `ALTER`-части проходят вхолостую.
+Подъём админа до `superadmin` на свежем сиде тоже ничего не делает — таблица
+`admins` в сиде пустая (`--no-data`), аккаунт заводится вручную
+(`SETUP.md`, «Админ-пользователь»).
+
+Прогонять их всё равно нужно: сид может отстать от `db/migrations/`, а на
+существующей (боевой или перенесённой) БД именно они и делают всю работу.
 
 PowerShell (Windows, как на дев-машине):
 
@@ -79,12 +87,37 @@ done
 | `2026-06-19-order-access-token.sql` | `orders.access_token` + индекс (IDOR-фикс ссылок на заказ/счёт), бэкофилл токенов |
 | `2026-07-02-reviews.sql` | таблица `reviews` (отзывы с модерацией) + 3 стартовых отзыва |
 | `2026-07-03-settings.sql` | таблица `settings` (key-value) + цены материалов калькулятора |
-| `2026-08-18-admin-roles.sql` | `admins.role` → `enum('superadmin','admin','manager','viewer')`, подъём старейшего админа до `superadmin` |
+| `2026-08-18-admin-roles.sql` | `admins.role` → `enum('superadmin','admin','manager','viewer')` + подъём старейшего активного админа до `superadmin`, если суперадмина ещё нет |
+| `2026-08-18-indexes.sql` | 6 составных индексов на `products` + `ANALYZE TABLE` (только `KEY`, схему не меняет) |
 | `2026-08-18-offer-carts.sql` | таблица `offer_carts` («сборная корзина» расчётов из `includes/api.php`) |
 
 > Обязательны все. Без `2026-07-02-reviews.sql` падает блок отзывов на главной,
 > `admin/reviews.php` и `review_add.php`; без `2026-07-03-settings.sql` —
 > `includes/app_settings.php` и `admin/settings.php`.
+
+**`2026-08-18-admin-roles.sql` меняет данные, а не только схему.** Вторым запросом
+она делает `UPDATE admins SET role='superadmin' WHERE role='admin' AND is_active=1
+AND NOT EXISTS (…superadmin…) ORDER BY id ASC LIMIT 1` — поднимает **одного**
+старейшего активного администратора, и только когда суперадмина в таблице нет.
+Без этого после ужесточения прав (`edit_users`/`delete_users` есть только
+у `superadmin`) управлять учётками стало бы некому. Повторный прогон ничего
+не делает: суперадмин уже есть, `NOT EXISTS` не выполняется.
+
+Проверено на временной БД с четырьмя админами (`admin/is_active=0`,
+два `admin/is_active=1`, `manager`): повышен ровно один — старейший **активный**
+`admin`; неактивный пропущен, второй активный остался `admin`; второй прогон
+ничего не изменил.
+
+После накатки на боевой БД **проверить глазами**, кого повысило:
+`SELECT id, username, role, is_active FROM admins ORDER BY id;` (см. `DEPLOY.md`, п. 3.1).
+
+**`2026-08-18-indexes.sql`** добавляет `idx_active`, `idx_active_created`,
+`idx_active_sold`, `idx_active_price`, `idx_active_stock`, `idx_active_category` —
+все вида `(is_active, <колонка сортировки>)`, под реальную форму запросов каталога
+(`WHERE is_active = 1 … ORDER BY … LIMIT N`). Идемпотентна: наличие каждого индекса
+проверяется по `information_schema.STATISTICS` перед `ALTER`. Завершается
+`ANALYZE TABLE products` — без него оптимизатор игнорирует свежие индексы
+(кардинальность `NULL` сразу после `ALTER`). Данные не трогает.
 
 ## Откат
 
@@ -94,6 +127,16 @@ done
 ```sql
 -- 2026-08-18-offer-carts
 DROP TABLE IF EXISTS `offer_carts`;
+
+-- 2026-08-18-indexes (данные не затрагивает, откат безопасен и на проде —
+-- вернётся только медленный каталог)
+ALTER TABLE `products`
+  DROP INDEX `idx_active`,
+  DROP INDEX `idx_active_created`,
+  DROP INDEX `idx_active_sold`,
+  DROP INDEX `idx_active_price`,
+  DROP INDEX `idx_active_stock`,
+  DROP INDEX `idx_active_category`;
 
 -- 2026-08-18-admin-roles (роли superadmin/viewer станут недопустимы;
 -- сначала перевести таких пользователей в 'admin'/'manager')

@@ -31,7 +31,19 @@ cp www/includes/config.example.php www/includes/config.php
 - **все `SELLER_*`** — иначе футер сайта падает с Fatal (SELLER_NAME, SELLER_INN, SELLER_OGRN, SELLER_KPP, SELLER_ADDRESS, SELLER_WORKHOURS, SELLER_PHONE, SELLER_EMAIL, SELLER_BANK, SELLER_ACCOUNT, SELLER_CORR, SELLER_BIK).
 
 Остальное (RECAPTCHA, AMOCRM, YOOKASSA, FNS) для локальной разработки можно
-оставить заглушками — оплата/CRM просто не будут работать.
+оставить заглушками — оплата/CRM просто не будут работать. Config это заметит:
+`config_warn_placeholders()` раз в час пишет в лог строку
+`config: не заполнены секреты (…)` — на локалке это норма, на проде — повод
+дозаполнить (`DEPLOY.md`, п. 4.1).
+
+Отдельно про `LOG_DIR`: он указывает на каталог `logs/` **рядом с `www/`**
+(вне веб-корня) — туда пишутся `app-error.log` (из `includes/api.php`) и
+`tg-bot.log` (из `tg/bot_lib.php`). Каталог создаётся кодом сам; если прав нет,
+логи молча уходят в системный `error_log` PHP. Каталог в `.gitignore`.
+
+Telegram-бот локально не нужен. Если всё же поднимаешь — `www/tg/config.php`
+из `www/tg/config.example.php`: кроме `BOT_TOKEN`/`ADMIN_CHAT_ID` там обязателен
+`TG_WEBHOOK_SECRET`, без него `tg/bot.php` отвечает 403 на всё (fail-closed).
 
 ## 3. База данных
 
@@ -72,7 +84,9 @@ mysql -u root -p c103264_zippaket_optom_ru < c103264_zippaket_optom_ru.sql
 
 После заливки базы накати миграции по порядку имён. Все они идемпотентны —
 повторный запуск не падает и не плодит дубликаты; на свежем сиде они лишь
-досыпают стартовые строки (отзывы, цены калькулятора, роль `superadmin`).
+досыпают стартовые строки (отзывы, цены калькулятора) — `schema.sql` уже содержит
+мигрированную схему, так что `ALTER`-части проходят вхолостую. Прогонять их всё
+равно надо: сид может отстать от `db/migrations/`.
 
 PowerShell:
 
@@ -100,7 +114,9 @@ done
 - `2026-06-19-order-access-token.sql` — токен доступа к заказу (IDOR-фикс)
 - `2026-07-02-reviews.sql` — отзывы
 - `2026-07-03-settings.sql` — настройки калькулятора (цены материалов)
-- `2026-08-18-admin-roles.sql` — роли админов (`superadmin`/`viewer`)
+- `2026-08-18-admin-roles.sql` — роли админов (`superadmin`/`viewer`) + подъём
+  старейшего активного админа до `superadmin`, если суперадмина ещё нет
+- `2026-08-18-indexes.sql` — составные индексы каталога (`products`) + `ANALYZE TABLE`
 - `2026-08-18-offer-carts.sql` — «сборная корзина» расчётов
 
 Подробности (что делает каждая, откат, как пересобрать сид) — `db/README.md`.
@@ -109,8 +125,14 @@ done
 
 Аккаунты админки лежат в таблице `admins` и **не** передаются через git.
 Если базу залил из дампа — там уже есть `admin` (пароль знаешь ты). Если нет —
-заведи запись вручную (роль `admin` или `manager`, `password_hash` через
+заведи запись вручную (`password_hash` через
 `password_hash('пароль', PASSWORD_DEFAULT)`).
+
+Роли после `2026-08-18-admin-roles.sql`: `superadmin` > `admin` > `manager` >
+`viewer`. Заводи себе **`superadmin`** — управление учётками (`edit_users`,
+`delete_users`) есть только у него. Если завёл `admin` и он единственный активный,
+миграция сама поднимет его до `superadmin` при следующем прогоне (она
+идемпотентна и повышает только когда суперадмина нет вовсе).
 
 ## 4. Запуск дев-сервера
 
@@ -137,8 +159,9 @@ php -S 127.0.0.1:8000 -t www router.php
 > `127.0.0.1`, а не `localhost`: на Windows `localhost` резолвится в `::1`,
 > и `php -S` садится только на IPv6.
 >
-> В `www/` лежит ещё `_dev_router.php` — более ранний вариант того же роутера.
-> Он не используется и является кандидатом на удаление.
+> Роутер в проекте один — `router.php` в корне репозитория. Более ранний дубль
+> `www/_dev_router.php` удалён; правило, закрывающее его в `www/.htaccess`,
+> оставлено на случай старых копий на проде.
 
 ## 5. Тесты
 
@@ -153,7 +176,7 @@ php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
 ```
 
 Ожидаемо — строка `OK (...)` без единого F/E.
-Последний замер: `OK (124 tests, 450 assertions)` — 2026-08-18, PHPUnit 9.6.34.
+Последний замер: `OK (174 tests, 716 assertions)` — 2026-08-19, PHPUnit 9.6.34.
 Число тестов растёт с каждой фичей; ориентир — статус `OK`, а не конкретное число.
 
 ---
@@ -162,10 +185,12 @@ php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
 
 | Через git (есть на GitHub) | Только локально (настроить заново) |
 |---|---|
-| Весь код, шаблоны, CSS/JS | `config.php` (пароли/ключи) |
-| Миграции и сиды БД (`db/`) | Сама база данных (данные) |
-| Тесты, документация | Загруженные файлы в `www/uploads/` |
-| `router.php`, `start-dev.ps1` | Аккаунты админки |
+| Весь код, шаблоны, CSS/JS | `www/includes/config.php` (пароли/ключи) |
+| Миграции и сиды БД (`db/`) | `www/tg/config.php` (токен бота, `TG_WEBHOOK_SECRET`) |
+| Тесты, документация | Сама база данных (данные) |
+| `router.php`, `start-dev.ps1` | Загруженные файлы в `www/uploads/` |
+| `*.example.php` (шаблоны конфигов) | Аккаунты админки |
+| | Логи (`logs/`, `www/logs/`, `www/admin/logs/`) |
 | | `www/vendor/` (ставится `composer install`) |
 | | Composer (`www/composer` — phar, в `.gitignore`) |
 | | Полный дамп БД (`*.sql`, `*.tar.gz`) |

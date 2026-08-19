@@ -225,6 +225,49 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/**
+ * Незаполненные секреты: константы, оставшиеся плейсхолдерами «ВАШ_…».
+ * Возвращает список имён — пусто, если всё заполнено.
+ */
+function config_placeholder_keys(): array
+{
+    $keys = [
+        'RECAPTCHA_SITE_KEY', 'RECAPTCHA_SECRET_KEY',
+        'AMOCRM_ACCESS_TOKEN', 'AMOCRM_CLIENT_ID', 'AMOCRM_CLIENT_SECRET',
+        'YOOKASSA_SHOP_ID', 'YOOKASSA_SECRET_KEY',
+        'FNS_API_KEY',
+    ];
+    $missing = [];
+    foreach ($keys as $k) {
+        if (!defined($k)) { $missing[] = $k; continue; }
+        $v = (string)constant($k);
+        if ($v === '' || mb_stripos($v, 'ВАШ_') === 0) { $missing[] = $k; }
+    }
+    return $missing;
+}
+
+/**
+ * Предупредить в лог о незаполненных секретах. Молчаливая заглушка опаснее
+ * ошибки: reCAPTCHA без ключа пропускает всех, ЮKassa без кредов не создаёт
+ * платёж, неверный YOOKASSA_VAT_CODE уходит в чек 54-ФЗ.
+ * Чтобы не забивать лог, пишем не чаще раза в час (маркер в LOG_DIR).
+ */
+function config_warn_placeholders(): void
+{
+    $missing = config_placeholder_keys();
+    if (!$missing) { return; }
+
+    $dir = defined('LOG_DIR') ? LOG_DIR : sys_get_temp_dir();
+    $stamp = rtrim($dir, "/\\") . DIRECTORY_SEPARATOR . 'config-warn.stamp';
+    if (is_file($stamp) && (time() - (int)filemtime($stamp)) < 3600) { return; }
+    if (is_dir($dir) && is_writable($dir)) { @touch($stamp); }
+
+    error_log('config: не заполнены секреты (' . implode(', ', $missing)
+        . ') — соответствующие интеграции работают в режиме заглушки');
+}
+
+config_warn_placeholders();
+
 // Автоматическое обновление времени жизни сессии
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > SESSION_LIFETIME)) {
     session_unset();
