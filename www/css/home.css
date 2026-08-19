@@ -54,8 +54,11 @@ body.zlock .site-wrapper { background: transparent; }
 
 /* ---- Стекло-карточки + reveal + hover ---- */
 .z-glass { background: var(--z-surface); border: 1px solid var(--z-hairline); border-radius: var(--z-radius); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-[data-reveal] { opacity: 0; transform: translateY(30px); }
-[data-reveal].z-in { opacity: 1; transform: none; transition: opacity .85s var(--z-ease), transform .85s var(--z-ease); }
+/* Появление блоков при скролле. .35s вместо .85s и 12px вместо 30px: длинный
+   переход при быстрой прокрутке читался как «текст не догрузился» — низ страницы
+   был заметно бледнее верха. */
+[data-reveal] { opacity: 0; transform: translateY(12px); }
+[data-reveal].z-in { opacity: 1; transform: none; transition: opacity .35s var(--z-ease), transform .35s var(--z-ease); }
 .z-lift { transition: transform .35s var(--z-ease), border-color .35s var(--z-ease), box-shadow .35s var(--z-ease); }
 .z-lift:hover { transform: translateY(-8px); border-color: rgba(154, 123, 46, .4); box-shadow: var(--z-shadow); }
 

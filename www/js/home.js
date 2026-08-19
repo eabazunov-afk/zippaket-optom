@@ -41,7 +41,10 @@
             entries.forEach(function (e) {
                 if (e.isIntersecting) { io.unobserve(e.target); reveal(e.target); }
             });
-        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        // threshold 0.01 без отрицательного rootMargin: блок начинает проявляться,
+        // едва коснувшись экрана. С 0.12 и -8% старт откладывался до момента,
+        // когда элемент уже заметно вошёл в кадр, — появление выглядело запоздалым.
+        }, { threshold: 0.01, rootMargin: '0px' });
         els.forEach(function (el) { io.observe(el); });
 
         // Подстраховка от «пропавшего» текста: при быстром скролле или переходе
