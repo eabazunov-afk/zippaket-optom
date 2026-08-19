@@ -12,7 +12,7 @@ PHP и MySQL ищутся автоматически в стандартных �
 это единственный канонический способ запуска dev-сервера в проекте.
 
 .PARAMETER Port
-Порт dev-сервера. По умолчанию 8000.
+Порт dev-сервера. По умолчанию 8077 (8000 занят другим проектом на этой машине).
 
 .PARAMETER MysqlPort
 Порт MySQL. По умолчанию 3306. Если порт уже слушают — MySQL не запускается повторно.
@@ -26,7 +26,7 @@ PHP и MySQL ищутся автоматически в стандартных �
 .\start-dev.ps1 -Port 8077 -SkipMysql
 #>
 param(
-    [int]$Port = 8000,
+    [int]$Port = 8077,
     [int]$MysqlPort = 3306,
     [switch]$SkipMysql
 )
@@ -136,7 +136,7 @@ if (-not (Test-Path (Join-Path $WWW 'includes\config.php'))) {
 }
 
 if (Test-Port $Port) {
-    Write-Host "Порт $Port уже занят. Запусти с другим: .\start-dev.ps1 -Port 8077" -ForegroundColor Red
+    Write-Host "Порт $Port уже занят. Запусти с другим: .\start-dev.ps1 -Port 8123" -ForegroundColor Red
     exit 1
 }
 

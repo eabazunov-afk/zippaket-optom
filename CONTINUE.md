@@ -227,11 +227,11 @@ php vendor/phpunit/phpunit/phpunit --bootstrap tests/bootstrap.php tests
 ```
 Запустить сайт — из корня репозитория:
 ```powershell
-.\start-dev.ps1          # http://127.0.0.1:8000/ , админка /admin/
+.\start-dev.ps1          # http://127.0.0.1:8077/ , админка /admin/
 ```
 Скрипт сам находит PHP и MySQL (Laragon или PATH) и поднимает встроенный
 PHP-сервер через `router.php` (эмуляция ЧПУ из `www/.htaccess`).
-Без PowerShell — то же вручную: `php -S 127.0.0.1:8000 -t www router.php`.
+Без PowerShell — то же вручную: `php -S 127.0.0.1:8077 -t www router.php`.
 
 > На Windows без PHP в PATH используйте полный путь к php.exe
 > (напр. `C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe`).

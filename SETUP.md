@@ -139,8 +139,8 @@ done
 **Канонический способ — `start-dev.ps1`** (он же поднимет MySQL, если тот не запущен):
 
 ```powershell
-.\start-dev.ps1              # http://127.0.0.1:8000/
-.\start-dev.ps1 -Port 8077   # другой порт
+.\start-dev.ps1              # http://127.0.0.1:8077/
+.\start-dev.ps1 -Port 8123   # другой порт
 .\start-dev.ps1 -SkipMysql   # если MySQL уже поднят Laragon'ом
 ```
 
@@ -151,10 +151,10 @@ PHP и MySQL скрипт ищет сам в `C:\laragon`, `%USERPROFILE%\larago
 ЧПУ-правила `www/.htaccess`):
 
 ```bash
-php -S 127.0.0.1:8000 -t www router.php
+php -S 127.0.0.1:8077 -t www router.php
 ```
 
-Открыть: http://127.0.0.1:8000/ · админка: http://127.0.0.1:8000/admin/
+Открыть: http://127.0.0.1:8077/ · админка: http://127.0.0.1:8077/admin/
 
 > `127.0.0.1`, а не `localhost`: на Windows `localhost` резолвится в `::1`,
 > и `php -S` садится только на IPv6.
