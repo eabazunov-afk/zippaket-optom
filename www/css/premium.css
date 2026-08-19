@@ -6,22 +6,22 @@
    =========================================================================== */
 
 :root {
-    --pm-bg-dark-1: #0B1F3A;
-    --pm-bg-dark-2: #12345C;
-    --pm-mint: #5FE3D0;
-    --pm-mint-deep: #0A8F8F;
-    --pm-cta: #FFB020;
-    --pm-cta-deep: #E0961A;
-    --pm-content-bg: #F4F7FB;
-    --pm-card: #FFFFFF;
-    --pm-text: #0B1F3A;
-    --pm-text-muted: #64748B;
-    --pm-border: #E6ECF3;
+    --pm-bg-dark-1: var(--z-ink);
+    --pm-bg-dark-2: var(--z-ink-2);
+    --pm-mint: var(--z-mint);
+    --pm-mint-deep: var(--z-mint-2);
+    --pm-cta: var(--z-gold);
+    --pm-cta-deep: var(--z-gold-2);
+    --pm-content-bg: var(--z-bg);
+    --pm-card: var(--z-surface);
+    --pm-text: var(--z-text);
+    --pm-text-muted: var(--z-text-2);
+    --pm-border: var(--z-hairline);
     --pm-radius: 16px;
     --pm-radius-btn: 30px;
     --pm-shadow-sm: 0 4px 16px rgba(11, 31, 58, 0.06);
     --pm-shadow-md: 0 10px 30px rgba(11, 31, 58, 0.10);
-    --pm-shadow-mint: 0 8px 24px rgba(10, 143, 143, 0.28);
+    --pm-shadow-mint: 0 8px 24px rgba(154, 123, 46, 0.24);
 }
 
 /* --- База страницы --- */
@@ -55,7 +55,7 @@ body.premium .catalog-header-section {
     top: -60px;
     width: 220px;
     height: 220px;
-    background: radial-gradient(circle, rgba(95, 227, 208, 0.30), transparent 70%);
+    background: radial-gradient(circle, rgba(198, 162, 78, 0.22), transparent 70%);
     pointer-events: none;
 }
 .premium .pm-pagehead h1 {
@@ -80,13 +80,13 @@ body.premium .catalog-header-section {
 .premium .btn-primary {
     background: linear-gradient(135deg, var(--pm-mint) 0%, var(--pm-mint-deep) 100%);
     border: none;
-    color: #06231f;
+    color: #231A08;
     box-shadow: var(--pm-shadow-mint);
 }
 .premium .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(10, 143, 143, 0.38);
-    color: #06231f;
+    box-shadow: 0 12px 30px rgba(154, 123, 46, 0.30);
+    color: #231A08;
 }
 .premium .btn-outline {
     background: transparent;
@@ -94,12 +94,12 @@ body.premium .catalog-header-section {
     color: var(--pm-mint-deep);
 }
 .premium .btn-outline:hover {
-    background: rgba(10, 143, 143, 0.08);
+    background: rgba(154, 123, 46, 0.08);
     transform: translateY(-2px);
 }
 .premium .btn-cta {
     background: linear-gradient(135deg, var(--pm-cta) 0%, var(--pm-cta-deep) 100%);
-    color: #3a2400;
+    color: #231A08;
     border: none;
 }
 
@@ -120,7 +120,7 @@ body.premium .catalog-header-section {
 }
 .premium .compact-card.special {
     border-color: var(--pm-cta);
-    box-shadow: 0 8px 24px rgba(255, 176, 32, 0.18);
+    box-shadow: 0 8px 24px rgba(198, 162, 78, 0.18);
 }
 
 /* --- Цена --- */
@@ -181,7 +181,7 @@ body.premium .catalog-header-section {
 .premium .form-group textarea:focus {
     outline: none;
     border-color: var(--pm-mint);
-    box-shadow: 0 0 0 3px rgba(95, 227, 208, 0.25);
+    box-shadow: 0 0 0 3px rgba(198, 162, 78, 0.22);
 }
 
 /* --- Корзина --- */

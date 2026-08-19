@@ -1,23 +1,26 @@
 <?php
 
 require_once 'init.php';
+require_once __DIR__ . '/app_settings.php';
 
 class Calculator {
-    private $db;
-    
-    // Стоимость материалов за кг (уточненные цены)
-    private $materialPrices = [
-        'EVA' => 380,   // руб/кг для EVA (матовый)
-        'ПВД' => 360    // руб/кг для ПВД (прозрачный)
-    ];
-    
+    // Стоимость материалов за кг. Задаётся в админке (таблица settings),
+    // при отсутствии настроек — дефолты из calc_default_material_prices().
+    private $materialPrices;
+
     // Константы из формулы
     private $zipperWeightPerMeter = 6.4; // вес молнии на 1 метр (г/м)
     private $sliderWeight = 0.25;        // вес бегунка (г)
     private $filmDensity = 0.92;         // плотность пленки (г/м² на 1 мкм)
-    
-    public function __construct() {
-        $this->db = getDbConnection();
+
+    /**
+     * @param array|null $materialPrices Явные цены ['EVA'=>..,'ПВД'=>..] (для
+     *   тестов/инъекции). Если null — берутся из настроек БД с фолбэком.
+     */
+    public function __construct(?array $materialPrices = null) {
+        $this->materialPrices = ($materialPrices !== null)
+            ? calc_material_prices($materialPrices)
+            : calc_material_prices_from_settings();
     }
     
     /**
@@ -96,30 +99,28 @@ class Calculator {
 
 
     /**
-     * Скидка в зависимости от тиража
+     * Скидка в зависимости от тиража.
+     * Синхронизировано с оптовыми тарифами витрины (WHOLESALE_TIERS):
+     * Опт от 300к ×0.82 (−18%), Опт от 20к ×0.92 (−8%), Розница до 20к — без скидки.
      */
     private function getDiscountByQuantity($quantity) {
-        if ($quantity >= 30000) {
-            return 30;    // 30% скидка
+        if ($quantity >= 300000) {
+            return 18;    // Опт от 300к (×0.82)
         } elseif ($quantity >= 20000) {
-            return 20;    // 20% скидка
-        } elseif ($quantity >= 10000) {
-            return 15;    // 15% скидка
+            return 8;     // Опт от 20к (×0.92)
         } else {
-            return 0;     // без скидки
+            return 0;     // Розница — без скидки
         }
     }
-    
+
     /**
-     * Определить уровень цены по количеству
+     * Определить уровень цены по количеству (совпадает с тарифами витрины)
      */
     private function getQuantityTier($quantity) {
-        if ($quantity >= 30000) {
-            return 'opt30k';
+        if ($quantity >= 300000) {
+            return 'opt300k';
         } elseif ($quantity >= 20000) {
             return 'opt20k';
-        } elseif ($quantity >= 10000) {
-            return 'opt10k';
         } else {
             return 'small';
         }
@@ -145,18 +146,18 @@ public function getAvailableOptions() {
             1000 => '1,000 шт',
             3000 => '3,000 шт',
             5000 => '5,000 шт',
-            10000 => '10,000 шт (-15%)',
-            15000 => '15,000 шт (-15%)',
-            20000 => '20,000 шт (-20%)',
-            25000 => '25,000 шт (-20%)',
-            30000 => '30,000 шт (-30%)',
-            40000 => '40,000 шт (-30%)',
-            50000 => '50,000 шт (-30%)',
-            100000 => '100,000 шт (-30%)',
-            200000 => '200,000 шт (-30%)',
-            300000 => '300,000 шт (-30%)',
-            500000 => '500,000 шт (-30%)',
-            1000000 => '1,000,000 шт (-30%)'
+            10000 => '10,000 шт',
+            15000 => '15,000 шт',
+            20000 => '20,000 шт (-8%)',
+            25000 => '25,000 шт (-8%)',
+            30000 => '30,000 шт (-8%)',
+            40000 => '40,000 шт (-8%)',
+            50000 => '50,000 шт (-8%)',
+            100000 => '100,000 шт (-8%)',
+            200000 => '200,000 шт (-8%)',
+            300000 => '300,000 шт (-18%)',
+            500000 => '500,000 шт (-18%)',
+            1000000 => '1,000,000 шт (-18%)'
         ]
     ];
 }
@@ -183,9 +184,9 @@ public function getAvailableOptions() {
         
         $base_price = $total_weight_kg * 380; // 0.01013 * 380 = 3.85 ₽
         
-        // Для 20,000 шт
-        $discount = 20; // -20%
-        $unit_price = $base_price * (1 - $discount/100); // 3.85 * 0.80 = 3.08 ₽
+        // Для 20,000 шт (опт от 20к)
+        $discount = 8; // -8%
+        $unit_price = $base_price * (1 - $discount/100); // 3.85 * 0.92 = 3.54 ₽
         
         return [
             'width_m' => $width_m,
@@ -333,6 +334,11 @@ function displayCalculatorForm() {
 
 
 
+
+<div class="calc-action-hint">
+    <i class="fas fa-wand-magic-sparkles"></i>
+    <span>Меняйте параметры — цена пересчитается автоматически. Для точной цены с учётом печати и доставки нажмите <b>«Запросить КП»</b>.</span>
+</div>
 
 <div class="calculator-results" id="calculatorResults">
     <div class="results-header">
@@ -778,7 +784,7 @@ if (this.weightInfoElement) {
             const materialPrice = data.calculation_details.material_price_per_kg;
             this.resultNoteElement.innerHTML = `
                 <i class="fas fa-info-circle"></i>
-                <span>Цена материала: ${materialPrice} ₽/кг. Скидки: от 10к шт -15%, от 20к шт -20%, от 30к шт -30%</span>
+                <span>Цена материала: ${materialPrice} ₽/кг. Скидки за объём: от 20к шт −8%, от 300к шт −18%</span>
             `;
         }
     }
@@ -1095,6 +1101,29 @@ requestOffer() {
     .result-note i {
         margin-top: 2px;
     }
+
+    .calc-action-hint {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        margin: 0 0 1rem;
+        padding: 0.8rem 1rem;
+        background: rgba(154, 123, 46, 0.08);
+        border: 1px solid rgba(154, 123, 46, 0.22);
+        border-radius: 10px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: var(--z-text-2, #5B5347);
+    }
+
+    .calc-action-hint i {
+        color: var(--z-mint, #9A7B2E);
+        font-size: 1.05rem;
+        margin-top: 1px;
+        flex-shrink: 0;
+    }
+
+    .calc-action-hint b { color: var(--z-text, #1A1712); }
     </style>
     <?php
     return ob_get_clean();

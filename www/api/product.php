@@ -51,13 +51,6 @@ if ($quick) {
                             <span class="spec-label">Категория:</span>
                             <span class="spec-value"><?= htmlspecialchars($product['category']) ?></span>
                         </div>
-                        <div class="spec-row">
-                            <span class="spec-label">Класс:</span>
-                            <span class="spec-value">
-                                <span class="badge-abc <?= $product['abc_class'] ?>"><?= $product['abc_class'] ?></span>
-                                <span class="badge-xyz <?= $product['xyz_class'] ?>"><?= $product['xyz_class'] ?></span>
-                            </span>
-                        </div>
                     </div>
 
                     <div class="quick-view-price">
@@ -69,7 +62,9 @@ if ($quick) {
                         <button class="btn btn-primary js-cart-add"
                                 data-id="<?= $product['id'] ?>"
                                 data-name="<?= htmlspecialchars($product['full_name']) ?>"
-                                data-price="<?= $product['price_rub'] ?>">
+                                data-price="<?= $product['price_rub'] ?>"
+                                data-min="<?= (int)($product['min_order_qty'] ?? 1) ?>"
+                                data-step="<?= (int)($product['qty_step'] ?? 1) ?>">
                             <i class="fas fa-shopping-cart"></i> В корзину
                         </button>
                         <a href="/product/<?= $product['id'] ?>" class="btn btn-outline">

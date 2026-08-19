@@ -177,7 +177,7 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin';
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
                                 <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
                                 <input type="hidden" name="action" value="delete">
-                                <button class="btn btn-sm btn-danger" type="submit"><i class="fas fa-trash"></i></button>
+                                <button class="btn btn-sm btn-danger" type="submit" data-tooltip="Удалить отзыв" aria-label="Удалить отзыв" onclick="return confirm('Удалить этот отзыв?')"><i class="fas fa-trash"></i></button>
                             </form>
                         </div>
                     </td>

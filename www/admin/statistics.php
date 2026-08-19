@@ -168,22 +168,22 @@ $utmStats = $stmt->fetchAll();
 
 // Массивы для иконок и названий (с защитой от null)
 $trafficIcons = [
-    'paid_advertising' => '💸',
-    'seo' => '🔍',
-    'direct' => '🏠',
-    'social' => '👥',
-    'referral' => '🔗',
-    'email' => '✉️',
-    'telegram_bot' => '🤖',
-    'yandex' => '🔶',
-    'google' => '🔵',
-    'yandex_direct' => '🔶',
-    'google_ads' => '🔵',
-    'facebook_ads' => '📘',
-    'vk_ads' => '📱',
-    'instagram' => '📸',
-    'telegram' => '📱',
-    '' => '🏠' // Пустая строка = прямой переход
+    'paid_advertising' => '<i class="fas fa-bullhorn"></i>',
+    'seo' => '<i class="fas fa-magnifying-glass"></i>',
+    'direct' => '<i class="fas fa-house"></i>',
+    'social' => '<i class="fas fa-users"></i>',
+    'referral' => '<i class="fas fa-link"></i>',
+    'email' => '<i class="fas fa-envelope"></i>',
+    'telegram_bot' => '<i class="fas fa-robot"></i>',
+    'yandex' => '<i class="fas fa-diamond"></i>',
+    'google' => '<i class="fab fa-google"></i>',
+    'yandex_direct' => '<i class="fas fa-diamond"></i>',
+    'google_ads' => '<i class="fab fa-google"></i>',
+    'facebook_ads' => '<i class="fab fa-facebook"></i>',
+    'vk_ads' => '<i class="fas fa-mobile-screen"></i>',
+    'instagram' => '<i class="fab fa-instagram"></i>',
+    'telegram' => '<i class="fas fa-mobile-screen"></i>',
+    '' => '<i class="fas fa-house"></i>' // Пустая строка = прямой переход
 ];
 
 $trafficLabels = [
@@ -398,7 +398,7 @@ $trafficLabels = [
     <div class='content-container'>
         <div class="statistics-container">
             <div class="content-header">
-                <h1>📊 Статистика трафика</h1>
+                <h1><i class="fas fa-chart-column"></i> Статистика трафика</h1>
                 <p>Анализ посещений и конверсий за период</p>
             </div>
             
@@ -500,7 +500,7 @@ $trafficLabels = [
                             $conversion = isset($stat['conversion']) ? (float)$stat['conversion'] : 0;
                             
                             // Получаем иконку и название с защитой от null
-                            $icon = isset($trafficIcons[$source]) ? $trafficIcons[$source] : '❓';
+                            $icon = isset($trafficIcons[$source]) ? $trafficIcons[$source] : '<i class="fas fa-circle-question"></i>';
                             $label = isset($trafficLabels[$source]) ? $trafficLabels[$source] : ($source ?: 'Прямой переход');
                             
                             // Определяем класс для конверсии

@@ -6,41 +6,49 @@
    =========================================================================== */
 
 :root {
-    /* Поверхности (тонированный near-black navy, не чистый чёрный) */
-    --z-bg: #070E18;
-    --z-bg-2: #0A1422;
-    --z-surface: rgba(255, 255, 255, 0.045);
-    --z-surface-2: rgba(255, 255, 255, 0.07);
-    --z-hairline: rgba(255, 255, 255, 0.09);
-    --z-hairline-strong: rgba(255, 255, 255, 0.16);
+    /* === Светлая тема A3 «Бронза / тихая роскошь» === */
+    /* Поверхности (тёплая нейтральная бумага, не стерильно-белое) */
+    --z-bg: #F4F2EC;
+    --z-bg-2: #FBFAF6;
+    --z-surface: #FFFFFF;
+    --z-surface-2: #F3EFE3;
+    --z-hairline: rgba(26, 23, 18, 0.11);
+    --z-hairline-strong: rgba(26, 23, 18, 0.18);
 
-    /* Текст */
-    --z-text: #EAF2FB;
-    --z-text-2: #A9C0DA;
-    --z-text-3: #7E94B0;
+    /* Текст (ink) */
+    --z-text: #1A1712;
+    --z-text-2: #5B5347;
+    --z-text-3: #948B7B;
 
-    /* Акценты — один мятный + один золотой CTA */
-    --z-mint: #5FE3D0;
-    --z-mint-2: #34D3BE;
-    --z-mint-deep: #0A8F8F;
-    --z-gold: #FFB020;
-    --z-gold-2: #FFCB63;
-    --z-tg: #229ED9;
+    /* Акцент — бронза (интерактив) + бронзовый CTA. Имена mint/gold сохранены. */
+    --z-mint: #9A7B2E;        /* иконки/активное/акцент-фон */
+    --z-mint-2: #7C6122;      /* тёмный бронз — текст-ссылки (контраст AA) */
+    --z-mint-deep: #C6A24E;   /* светлый бронз — акценты на тёмных панелях */
+    --z-gold: #C6A24E;        /* CTA верх градиента */
+    --z-gold-2: #9A7B2E;      /* CTA низ градиента */
+    --z-tg: #1B8FC4;
 
-    /* Тени — тонированы под фон (навигатор-сине-чёрные, не pure black) */
-    --z-shadow-sm: 0 6px 20px rgba(4, 10, 20, 0.45);
-    --z-shadow: 0 18px 44px rgba(4, 10, 20, 0.55);
-    --z-shadow-lg: 0 40px 90px rgba(2, 8, 18, 0.62);
-    --z-glow-mint: 0 16px 48px rgba(10, 143, 143, 0.30);
-    --z-glow-gold: 0 16px 40px rgba(255, 176, 32, 0.30);
+    /* Тёмные «акцент-моменты» (ink-панели на светлом: доверие, футер, CTA-бэнд) */
+    --z-ink: #1A1712;
+    --z-ink-2: #2A2620;
+    --z-on-ink: #EDE8DD;
+    --z-on-ink-2: #A99E88;
+    --z-on-ink-acc: #D8B65E;
 
-    --z-radius: 20px;
-    --z-radius-sm: 14px;
+    /* Тени — мягкие, тонированы под ink, не pure black */
+    --z-shadow-sm: 0 1px 2px rgba(26, 23, 18, 0.05);
+    --z-shadow: 0 1px 2px rgba(26, 23, 18, 0.05), 0 12px 30px rgba(26, 23, 18, 0.07);
+    --z-shadow-lg: 0 20px 50px rgba(26, 23, 18, 0.12);
+    --z-glow-mint: 0 12px 30px rgba(154, 123, 46, 0.22);
+    --z-glow-gold: 0 12px 30px rgba(198, 162, 78, 0.24);
+
+    --z-radius: 16px;
+    --z-radius-sm: 12px;
     --z-pill: 30px;
     --z-ease: cubic-bezier(.2, .7, .2, 1);
     --z-container: 1240px;
 
-    --font-display: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
@@ -67,14 +75,14 @@ body.zlock ::selection { background: var(--z-mint); color: var(--z-bg); }
 
 /* Контентные (юридические) страницы */
 .legal-page { max-width: 880px; }
-body.zlock .legal-page h2 { color: #fff; margin: 30px 0 12px; font-size: 1.35rem; }
+body.zlock .legal-page h2 { color: var(--z-text); margin: 30px 0 12px; font-size: 1.35rem; }
 body.zlock .legal-page h3 { color: var(--z-text); margin: 20px 0 8px; font-size: 1.1rem; }
 body.zlock .legal-page p, body.zlock .legal-page li { color: var(--z-text-2); line-height: 1.7; }
 body.zlock .legal-page ul, body.zlock .legal-page ol { padding-left: 22px; margin: 10px 0; }
 body.zlock .legal-page a { color: var(--z-mint); }
-.legal-stub { background: rgba(255,176,32,.12); border: 1px solid rgba(255,176,32,.35); color: #FFCB63; border-radius: 12px; padding: 14px 16px; margin: 0 0 22px; font-size: 14px; }
+.legal-stub { background: rgba(154,123,46,.10); border: 1px solid rgba(154,123,46,.30); color: var(--z-mint-2); border-radius: 12px; padding: 14px 16px; margin: 0 0 22px; font-size: 14px; }
 .legal-req { background: var(--z-surface); border: 1px solid var(--z-hairline); border-radius: 12px; padding: 16px 18px; margin: 16px 0; }
-body.zlock .legal-req b { color: #fff; }
+body.zlock .legal-req b { color: var(--z-text); }
 
 /* ===== ОБЩАЯ ШАПКА (единая тёмная на всех страницах) ===== */
 .top-bar {
@@ -88,7 +96,7 @@ body.zlock .legal-req b { color: #fff; }
     position: sticky;
     top: 0;
     z-index: 200;
-    background: rgba(7, 14, 24, 0.78);
+    background: rgba(251, 250, 246, 0.82);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--z-hairline);
@@ -105,8 +113,8 @@ body.zlock .legal-req b { color: #fff; }
 
 /* Кнопка "Заказать звонок" → золотой премиум-CTA */
 .main-header .btn-primary, .z-btn-gold {
-    background: linear-gradient(135deg, var(--z-gold) 0%, #E0961A 100%);
-    color: #2a1c00;
+    background: linear-gradient(135deg, var(--z-gold) 0%, var(--z-gold-2) 100%);
+    color: #231A08;
     border: none;
     border-radius: var(--z-pill);
     font-weight: 700;
@@ -130,50 +138,52 @@ body.zlock .legal-req b { color: #fff; }
 
 /* ===== ОБЩИЙ ФУТЕР (единый тёмный) ===== */
 .main-footer {
-    background: var(--z-bg-2);
-    border-top: 1px solid var(--z-hairline);
-    color: var(--z-text-2);
+    background: var(--z-ink);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--z-on-ink-2);
     /* На главной фоновый .z-veil (position:fixed) — сплошной --z-bg у низа экрана.
        Футер рендерится вне .z-content (z-index:2), поэтому вуаль накрывала его и
        «гасила» текст (особенно нижнюю строку). Поднимаем футер над вуалью. */
     position: relative;
     z-index: 2;
 }
-.main-footer .footer-title, .main-footer .logo-subtitle, .main-footer .logo-text { color: var(--z-text); }
+.main-footer .footer-title, .main-footer .logo-subtitle, .main-footer .logo-text { color: var(--z-on-ink); }
 .main-footer .footer-description,
 .main-footer .footer-link,
 .main-footer .legal-link,
 .main-footer .footer-copyright,
-.main-footer .contact-item span { color: var(--z-text-2); }
-.main-footer .contact-item a { color: var(--z-text); }
-.main-footer .footer-link:hover, .main-footer .legal-link:hover, .main-footer .contact-item a:hover { color: var(--z-mint); }
-.main-footer .contact-item i { color: var(--z-mint); }
+.main-footer .contact-item span { color: var(--z-on-ink-2); }
+.main-footer .footer-link:hover, .main-footer .legal-link:hover { color: var(--z-on-ink-acc); }
+.main-footer i { color: var(--z-on-ink-acc); }
+.main-footer .contact-item a { color: var(--z-on-ink); }
+.main-footer .footer-link:hover, .main-footer .legal-link:hover, .main-footer .contact-item a:hover { color: var(--z-on-ink-acc); }
+.main-footer .contact-item i { color: var(--z-on-ink-acc); }
 .main-footer .logo-icon {
-    background: linear-gradient(135deg, var(--z-mint), var(--z-mint-deep));
-    color: var(--z-bg);
+    background: linear-gradient(135deg, var(--z-mint-deep), var(--z-mint));
+    color: var(--z-ink);
 }
 .main-footer .footer-social .social-link,
 .main-footer .social-link {
-    background: var(--z-surface);
-    border: 1px solid var(--z-hairline);
-    color: var(--z-text-2);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--z-on-ink-2);
     transition: all .25s var(--z-ease);
 }
-.main-footer .social-link:hover { color: var(--z-mint); border-color: var(--z-mint); transform: translateY(-2px); }
-.main-footer .footer-bottom { border-top: 1px solid var(--z-hairline); }
+.main-footer .social-link:hover { color: var(--z-on-ink-acc); border-color: var(--z-on-ink-acc); transform: translateY(-2px); }
+.main-footer .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.08); }
 /* Реквизиты — центрированной строкой, без кривых переносов */
 .main-footer .footer-requisites {
     text-align: center;
-    color: var(--z-text-2);
+    color: var(--z-on-ink-2);
     font-size: 13px;
     line-height: 1.6;
     padding: 16px 20px 4px;
-    border-top: 1px solid var(--z-hairline);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     margin-top: 8px;
 }
 .main-footer .footer-legal { justify-content: center !important; flex-wrap: wrap; gap: 8px 18px; }
 .main-footer .footer-bottom { flex-wrap: wrap; gap: 12px; }
-.main-footer .payment-icons i { color: var(--z-text-3); }
+.main-footer .payment-icons i { color: var(--z-on-ink-2); }
 
 /* ===== ПЛАВАЮЩИЙ ВИДЖЕТ СВЯЗИ (FAB) ===== */
 /* Фиксирован внизу справа. z-index ниже cookie-баннера (9999), чтобы не перекрывать его. */

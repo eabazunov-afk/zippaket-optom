@@ -413,17 +413,18 @@ $adminRole = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : 'admin';
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="/admin/lead_details.php?id=<?php echo $lead['id']; ?>" class="btn btn-sm btn-info">
+                                        <a href="/admin/lead_details.php?id=<?php echo $lead['id']; ?>" class="btn btn-sm btn-info" data-tooltip="Открыть заявку" aria-label="Открыть заявку">
     <i class="fas fa-eye"></i>
 </a>
-                                        <a href="?action=change_status&id=<?php echo $lead['id']; ?>&status=processed" class="btn btn-sm btn-warning">
+                                        <a href="?action=change_status&id=<?php echo $lead['id']; ?>&status=processed" class="btn btn-sm btn-warning" data-tooltip="В работу" aria-label="В работу">
                                             <i class="fas fa-spinner"></i>
                                         </a>
-                                        <a href="?action=change_status&id=<?php echo $lead['id']; ?>&status=completed" class="btn btn-sm btn-success">
+                                        <a href="?action=change_status&id=<?php echo $lead['id']; ?>&status=completed" class="btn btn-sm btn-success" data-tooltip="Завершить" aria-label="Завершить">
                                             <i class="fas fa-check"></i>
                                         </a>
-                                        <a href="?action=delete&id=<?php echo $lead['id']; ?>" 
+                                        <a href="?action=delete&id=<?php echo $lead['id']; ?>"
                                            class="btn btn-sm btn-danger"
+                                           data-tooltip="Удалить" aria-label="Удалить"
                                            onclick="return confirm('Удалить заявку #<?php echo $lead['id']; ?>?')">
                                             <i class="fas fa-trash"></i>
                                         </a>

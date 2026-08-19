@@ -2,7 +2,7 @@
 
 /* Хлебные крошки */
 .breadcrumbs-section {
-    background: #f8fafc;
+    background: #FBFAF6;
     padding: 15px 0;
     border-bottom: 1px solid #eef2f6;
 }
@@ -26,38 +26,38 @@
 }
 
 .breadcrumbs .separator {
-    color: #94a3b8;
+    color: #948B7B;
     font-size: 12px;
 }
 
 .breadcrumbs .current {
-    color: #64748b;
+    color: #5B5347;
     font-weight: 500;
 }
 
 /* Заголовок каталога */
 .catalog-header-section {
     padding: 40px 0 20px;
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    background: linear-gradient(135deg, #FBFAF6 0%, #ffffff 100%);
 }
 
 .catalog-title {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #1e293b;
+    color: #1A1712;
     margin-bottom: 10px;
 }
 
 .catalog-count {
     font-size: 1.2rem;
     font-weight: 400;
-    color: #64748b;
+    color: #5B5347;
     margin-left: 10px;
 }
 
 .catalog-description {
     font-size: 1.1rem;
-    color: #475569;
+    color: #5B5347;
     max-width: 800px;
     line-height: 1.6;
 }
@@ -92,13 +92,13 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #f1f5f9;
+    border-bottom: 2px solid #F3EFE3;
 }
 
 .filter-header h3 {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #1e293b;
+    color: #1A1712;
     margin: 0;
     display: flex;
     align-items: center;
@@ -106,7 +106,7 @@
 }
 
 .reset-filters {
-    color: #64748b;
+    color: #5B5347;
     text-decoration: none;
     font-size: 0.9rem;
     transition: color 0.2s;
@@ -122,7 +122,7 @@
 
 .filter-group-title {
     font-weight: 600;
-    color: #334155;
+    color: #3A342B;
     margin-bottom: 12px;
     display: flex;
     align-items: center;
@@ -148,12 +148,12 @@
     gap: 8px;
     cursor: pointer;
     font-size: 0.95rem;
-    color: #475569;
+    color: #5B5347;
     transition: color 0.2s;
 }
 
 .filter-option:hover {
-    color: #1e293b;
+    color: #1A1712;
 }
 
 .filter-option input[type="radio"] {
@@ -165,13 +165,13 @@
 
 .filter-option i {
     width: 20px;
-    color: #64748b;
+    color: #5B5347;
 }
 
 .filter-input {
     width: 100%;
     padding: 10px 15px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #E7E1D4;
     border-radius: 12px;
     font-size: 0.95rem;
     transition: all 0.2s;
@@ -194,7 +194,7 @@
 
 .filter-label {
     font-size: 0.9rem;
-    color: #64748b;
+    color: #5B5347;
     margin-bottom: 5px;
 }
 
@@ -205,7 +205,7 @@
 }
 
 .filter-separator {
-    color: #94a3b8;
+    color: #948B7B;
 }
 
 .filter-checkbox {
@@ -235,10 +235,10 @@
 .sidebar-title {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #1e293b;
+    color: #1A1712;
     margin: 0 0 15px 0;
     padding-bottom: 10px;
-    border-bottom: 2px solid #f1f5f9;
+    border-bottom: 2px solid #F3EFE3;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -255,14 +255,14 @@
 }
 
 .popular-item:hover {
-    background: #f8fafc;
+    background: #FBFAF6;
 }
 
 .popular-image {
     width: 60px;
     height: 60px;
     flex-shrink: 0;
-    background: #f8fafc;
+    background: #FBFAF6;
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -282,7 +282,7 @@
 .popular-name {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #1e293b;
+    color: #1A1712;
     margin-bottom: 3px;
     line-height: 1.3;
 }
@@ -295,7 +295,7 @@
 
 .popular-size {
     font-size: 0.8rem;
-    color: #64748b;
+    color: #5B5347;
 }
 
 /* Спецпредложения */
@@ -324,7 +324,7 @@
 .special-name {
     font-size: 0.95rem;
     font-weight: 600;
-    color: #1e293b;
+    color: #1A1712;
     margin-bottom: 8px;
     padding-right: 50px;
 }
@@ -332,13 +332,13 @@
 .special-price {
     font-size: 1.2rem;
     font-weight: 800;
-    color: #1e293b;
+    color: #1A1712;
     margin-bottom: 5px;
 }
 
 .special-stock {
     font-size: 0.8rem;
-    color: #64748b;
+    color: #5B5347;
     margin-bottom: 10px;
 }
 
@@ -361,16 +361,16 @@
 }
 
 .sort-block label {
-    color: #475569;
+    color: #5B5347;
     font-size: 0.95rem;
 }
 
 .sort-select {
     padding: 8px 30px 8px 15px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #E7E1D4;
     border-radius: 30px;
     font-size: 0.95rem;
-    color: #1e293b;
+    color: #1A1712;
     background: white;
     cursor: pointer;
     appearance: none;
@@ -395,17 +395,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: #FBFAF6;
+    border: 1px solid #E7E1D4;
     border-radius: 30px;
     cursor: pointer;
     transition: all 0.2s;
-    color: #64748b;
+    color: #5B5347;
 }
 
 .view-btn:hover {
-    background: #e2e8f0;
-    color: #1e293b;
+    background: #E7E1D4;
+    color: #1A1712;
 }
 
 .view-btn.active {
@@ -472,7 +472,7 @@
 .product-image {
     position: relative;
     padding: 20px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: linear-gradient(135deg, #FBFAF6 0%, #F3EFE3 100%);
     height: 180px;
     display: flex;
     align-items: center;
@@ -522,7 +522,7 @@
 }
 
 .product-name a {
-    color: #1e293b;
+    color: #1A1712;
     text-decoration: none;
     transition: color 0.2s;
 }
@@ -539,18 +539,18 @@
 }
 
 .spec-item {
-    background: #f8fafc;
+    background: #FBFAF6;
     padding: 4px 10px;
     border-radius: 30px;
     font-size: 0.8rem;
-    color: #475569;
+    color: #5B5347;
     display: flex;
     align-items: center;
     gap: 4px;
 }
 
 .spec-item i {
-    color: #64748b;
+    color: #5B5347;
     font-size: 0.7rem;
 }
 
@@ -577,7 +577,7 @@
 }
 
 .stock-count {
-    color: #64748b;
+    color: #5B5347;
     font-size: 0.8rem;
 }
 
@@ -597,12 +597,12 @@
 .current-price {
     font-size: 1.3rem;
     font-weight: 800;
-    color: #1e293b;
+    color: #1A1712;
 }
 
 .price-unit {
     font-size: 0.8rem;
-    color: #64748b;
+    color: #5B5347;
 }
 
 .price-opt {
@@ -643,18 +643,18 @@
 
 .no-products i {
     font-size: 5rem;
-    color: #e2e8f0;
+    color: #E7E1D4;
     margin-bottom: 20px;
 }
 
 .no-products h3 {
     font-size: 1.5rem;
-    color: #1e293b;
+    color: #1A1712;
     margin-bottom: 10px;
 }
 
 .no-products p {
-    color: #64748b;
+    color: #5B5347;
     margin-bottom: 20px;
 }
 
@@ -675,9 +675,9 @@
     align-items: center;
     justify-content: center;
     background: white;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #E7E1D4;
     border-radius: 40px;
-    color: #475569;
+    color: #5B5347;
     transition: all 0.2s;
     text-decoration: none;
 }
@@ -701,17 +701,17 @@
     align-items: center;
     justify-content: center;
     background: white;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #E7E1D4;
     border-radius: 8px;
-    color: #475569;
+    color: #5B5347;
     text-decoration: none;
     transition: all 0.2s;
     font-weight: 500;
 }
 
 .page-link:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    background: #F3EFE3;
+    border-color: #DAD2C2;
 }
 
 .page-link.active {
@@ -726,7 +726,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #94a3b8;
+    color: #948B7B;
 }
 
 /* SEO-блок */
@@ -744,13 +744,13 @@
 
 .seo-content h2 {
     font-size: 2rem;
-    color: #1e293b;
+    color: #1A1712;
     margin-bottom: 25px;
     font-weight: 700;
 }
 
 .seo-content p {
-    color: #475569;
+    color: #5B5347;
     line-height: 1.7;
     margin-bottom: 20px;
     font-size: 1.05rem;
@@ -762,7 +762,7 @@
 }
 
 .seo-content li {
-    color: #475569;
+    color: #5B5347;
     line-height: 1.7;
     margin-bottom: 10px;
     font-size: 1.05rem;
@@ -892,7 +892,7 @@
     flex-shrink: 0;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: linear-gradient(135deg, #FBFAF6 0%, #F3EFE3 100%);
     border-radius: 20px 0 0 20px;
     margin: 0;
     padding: 20px;
@@ -927,7 +927,7 @@
 }
 
 .products-list .product-name a {
-    color: #1e293b;
+    color: #1A1712;
     text-decoration: none;
 }
 
@@ -941,7 +941,7 @@
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding: 1rem;
-    background: #f8fafc;
+    background: #FBFAF6;
     border-radius: 16px;
 }
 
@@ -950,7 +950,7 @@
     padding: 0;
     border-radius: 0;
     font-size: 0.95rem;
-    color: #475569;
+    color: #5B5347;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -985,8 +985,8 @@
 }
 
 .products-list .stock-count {
-    color: #64748b;
-    background: #f8fafc;
+    color: #5B5347;
+    background: #FBFAF6;
     padding: 0.35rem 1rem;
     border-radius: 30px;
     font-size: 0.9rem;
@@ -1008,12 +1008,12 @@
 .products-list .current-price {
     font-size: 2rem;
     font-weight: 800;
-    color: #1e293b;
+    color: #1A1712;
 }
 
 .products-list .price-unit {
     font-size: 0.9rem;
-    color: #64748b;
+    color: #5B5347;
 }
 
 .products-list .price-opt {

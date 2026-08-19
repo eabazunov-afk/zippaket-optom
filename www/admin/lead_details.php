@@ -103,33 +103,33 @@ function formatSource($source) {
     if (empty($source)) return 'Не указан';
     
     $sourceLabels = [
-        'yandex_direct' => '🔶 Яндекс.Директ',
-        'google_ads' => '🔵 Google Ads',
-        'facebook_ads' => '🔵 Facebook Ads',
-        'yandex' => '🔶 Яндекс',
-        'google' => '🔵 Google',
-        'vkontakte' => '🔵 ВКонтакте',
-        'facebook' => '🔵 Facebook',
-        'instagram' => '📷 Instagram',
-        'direct' => '🏠 Прямой заход',
-        'organic' => '🔍 Органический поиск',
-        'social' => '👥 Социальные сети',
-        'referral' => '🔗 Переход с сайта',
-        'email' => '✉️ Email',
-        'website' => '🌐 Сайт'
+        'yandex_direct' => '<i class="fas fa-diamond"></i> Яндекс.Директ',
+        'google_ads' => '<i class="fab fa-google"></i> Google Ads',
+        'facebook_ads' => '<i class="fab fa-google"></i> Facebook Ads',
+        'yandex' => '<i class="fas fa-diamond"></i> Яндекс',
+        'google' => '<i class="fab fa-google"></i> Google',
+        'vkontakte' => '<i class="fab fa-google"></i> ВКонтакте',
+        'facebook' => '<i class="fab fa-google"></i> Facebook',
+        'instagram' => '<i class="fab fa-instagram"></i> Instagram',
+        'direct' => '<i class="fas fa-house"></i> Прямой заход',
+        'organic' => '<i class="fas fa-magnifying-glass"></i> Органический поиск',
+        'social' => '<i class="fas fa-users"></i> Социальные сети',
+        'referral' => '<i class="fas fa-link"></i> Переход с сайта',
+        'email' => '<i class="fas fa-envelope"></i> Email',
+        'website' => '<i class="fas fa-globe"></i> Сайт'
     ];
     
     return $sourceLabels[$source] ?? $source;
 }
 
 function getDeviceIcon($deviceType) {
-    if (empty($deviceType)) return '❓';
+    if (empty($deviceType)) return '<i class="fas fa-circle-question"></i>';
     
-    if (stripos($deviceType, 'mobile') !== false) return '📱';
-    if (stripos($deviceType, 'desktop') !== false) return '💻';
-    if (stripos($deviceType, 'tablet') !== false) return '📱';
+    if (stripos($deviceType, 'mobile') !== false) return '<i class="fas fa-mobile-screen"></i>';
+    if (stripos($deviceType, 'desktop') !== false) return '<i class="fas fa-laptop"></i>';
+    if (stripos($deviceType, 'tablet') !== false) return '<i class="fas fa-mobile-screen"></i>';
     
-    return '💻';
+    return '<i class="fas fa-laptop"></i>';
 }
 
 function formatStatus($status) {
@@ -157,49 +157,49 @@ function getStatusColor($status) {
 function getTrafficTypeInfo($trafficType) {
     $info = [
         'paid_advertising' => [
-            'icon' => '💸',
+            'icon' => '<i class="fas fa-bullhorn"></i>',
             'label' => 'Рекламный трафик',
             'color' => '#dc3545',
             'description' => 'Платный трафик из рекламных систем (Google Ads, Яндекс.Директ, Facebook Ads и др.)'
         ],
         'seo' => [
-            'icon' => '🔍',
+            'icon' => '<i class="fas fa-magnifying-glass"></i>',
             'label' => 'SEO/Органический поиск',
             'color' => '#28a745',
             'description' => 'Бесплатный трафик из поисковых систем (Google, Яндекс и др.)'
         ],
         'direct' => [
-            'icon' => '🏠',
+            'icon' => '<i class="fas fa-house"></i>',
             'label' => 'Прямой переход',
             'color' => '#007bff',
             'description' => 'Пользователь напрямую ввел URL сайта или использовал закладку'
         ],
         'social' => [
-            'icon' => '👥',
+            'icon' => '<i class="fas fa-users"></i>',
             'label' => 'Социальные сети',
             'color' => '#17a2b8',
             'description' => 'Трафик из социальных сетей (ВКонтакте, Facebook, Instagram и др.)'
         ],
         'referral' => [
-            'icon' => '🔗',
+            'icon' => '<i class="fas fa-link"></i>',
             'label' => 'Реферальный трафик',
             'color' => '#6f42c1',
             'description' => 'Переходы с других сайтов (партнерские ссылки, упоминания и т.д.)'
         ],
         'email' => [
-            'icon' => '✉️',
+            'icon' => '<i class="fas fa-envelope"></i>',
             'label' => 'Email-рассылка',
             'color' => '#fd7e14',
             'description' => 'Переходы из email рассылок и писем'
         ],
         'telegram_bot' => [
-            'icon' => '🤖',
+            'icon' => '<i class="fas fa-robot"></i>',
             'label' => 'Telegram Bot',
             'color' => '#20c997',
             'description' => 'Заявки из Telegram бота'
         ],
         'unknown' => [
-            'icon' => '❓',
+            'icon' => '<i class="fas fa-circle-question"></i>',
             'label' => 'Неизвестный источник',
             'color' => '#6c757d',
             'description' => 'Не удалось определить источник трафика'
@@ -1043,9 +1043,9 @@ if (!empty($orderItems)):
                                 <?php 
                                 $searchEngine = $lead['search_engine'] ?? $utmData['search_engine'] ?? '';
                                 if ($searchEngine === 'google') {
-                                    echo '🔵 Google';
+                                    echo '<i class="fab fa-google"></i> Google';
                                 } elseif ($searchEngine === 'yandex') {
-                                    echo '🔶 Яндекс';
+                                    echo '<i class="fas fa-diamond"></i> Яндекс';
                                 } else {
                                     echo safeOutput($searchEngine);
                                 }
@@ -1089,7 +1089,7 @@ if (!empty($orderItems)):
                         <div class="detail-item">
                             <span class="detail-label">Бот</span>
                             <span class="detail-value" style="color: <?php echo ($lead['is_bot'] == 1 || ($utmData['is_bot'] ?? false)) ? '#dc3545' : '#28a745'; ?>">
-                                <?php echo ($lead['is_bot'] == 1 || ($utmData['is_bot'] ?? false)) ? '🤖 Да' : '👤 Нет'; ?>
+                                <?php echo ($lead['is_bot'] == 1 || ($utmData['is_bot'] ?? false)) ? '<i class="fas fa-robot"></i> Да' : '<i class="fas fa-user"></i> Нет'; ?>
                             </span>
                         </div>
                         <?php endif; ?>

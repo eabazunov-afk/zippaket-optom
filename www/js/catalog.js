@@ -290,14 +290,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (closeBtn) {
             closeBtn.addEventListener('click', function() {
-                modal.classList.remove('show');
+                modal.classList.remove('active');
             });
         }
         
         // Закрытие по клику вне модалки
         window.addEventListener('click', function(e) {
             if (e.target === modal) {
-                modal.classList.remove('show');
+                modal.classList.remove('active');
             }
         });
     }
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Показываем загрузку
         content.innerHTML = '<div class="loading-spinner">Загрузка...</div>';
-        modal.classList.add('show');
+        modal.classList.add('active');
         
         // Загружаем данные через AJAX
         fetch(`/api/product.php?id=${productId}&quick=1`)

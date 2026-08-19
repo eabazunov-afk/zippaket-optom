@@ -185,10 +185,10 @@ if (file_exists(__DIR__ . '/../includes/utm_tracker.php')) {
         
         .compact-badge {
             position: absolute;
-            top: -8px;
+            top: 10px;
             right: 10px;
-            background: #f59e0b;
-            color: white;
+            background: var(--z-gold);
+            color: #231A08;
             font-size: 0.7rem;
             font-weight: 700;
             padding: 4px 10px;

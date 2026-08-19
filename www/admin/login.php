@@ -179,16 +179,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Ваш существующий CSS */
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        /* Тема ZLOCK «Бронза / тихая роскошь» */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Plus Jakarta Sans', -apple-system, Segoe UI, sans-serif;
+            background: linear-gradient(135deg, #F4F2EC 0%, #EDE8DD 100%);
+            color: #1A1712;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -197,27 +199,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .login-container {
-            background: white;
+            background: #FFFFFF;
+            border: 1px solid rgba(26, 23, 18, 0.11);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 24px 60px rgba(26, 23, 18, 0.18);
             width: 100%;
             max-width: 400px;
             overflow: hidden;
         }
-        
+
         .login-header {
-            background: #2563eb;
-            color: white;
-            padding: 30px;
+            background: linear-gradient(135deg, #1A1712 0%, #2A2620 100%);
+            color: #EDE8DD;
+            padding: 34px 30px;
             text-align: center;
         }
-        
+
         .login-logo {
             font-size: 32px;
             margin-bottom: 10px;
+            color: #D8B65E;
         }
-        
+
         .login-header h1 {
+            font-family: 'Fraunces', Georgia, serif;
             font-size: 24px;
             font-weight: 600;
         }
@@ -284,29 +289,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .input-with-icon input:focus {
             outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: #9A7B2E;
+            box-shadow: 0 0 0 3px rgba(154, 123, 46, 0.15);
         }
-        
+
         .btn-login {
             width: 100%;
             padding: 15px;
-            background: #2563eb;
-            color: white;
+            background: linear-gradient(135deg, #C6A24E 0%, #9A7B2E 100%);
+            color: #231A08;
             border: none;
             border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.25s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
-        
+
         .btn-login:hover {
-            background: #1d4ed8;
+            filter: brightness(1.05);
+            transform: translateY(-1px);
         }
         
         .login-footer {
@@ -317,7 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .login-footer a {
-            color: #2563eb;
+            color: #7C6122;
             text-decoration: none;
         }
         
@@ -395,7 +401,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="login-footer">
                 <p>Для доступа требуется авторизация</p>
-                <p><a href="/">← Вернуться на сайт</a></p>
+                <p><a href="/"><i class="fas fa-arrow-left"></i> Вернуться на сайт</a></p>
             </div>
         </div>
     </div>

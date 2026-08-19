@@ -63,7 +63,7 @@ if (isset($_GET['download'])) {
         <main class="main-content">
             <section class="z-section">
                 <div class="z-wrap" style="max-width:560px;margin:0 auto">
-                    <div class="z-badge" style="margin-bottom:18px"><i class="ph ph-download-simple"></i><span>Прайс-лист в XLS</span></div>
+                    <div class="z-badge" style="margin-bottom:18px"><i class="fas fa-download"></i><span>Прайс-лист в XLS</span></div>
                     <h1 class="z-h1" style="font-size:clamp(28px,4vw,40px)">Скачать актуальный прайс</h1>
                     <p class="z-hero-sub" style="margin-bottom:26px">Оставьте контакт — и мы сформируем свежий прайс-лист с ценами по уровням опта, размерами и наличием на складе. Файл откроется в Excel.</p>
 
@@ -74,7 +74,7 @@ if (isset($_GET['download'])) {
                         <input type="hidden" name="type" value="price_download">
                         <input type="hidden" id="recaptchaToken" name="recaptcha_token">
                         <label class="z-consent"><input type="checkbox" name="pdn_consent" value="1" required> Я даю <a href="/polconf.html" target="_blank" style="color:var(--z-mint)">согласие на обработку персональных данных</a></label>
-                        <button type="submit" class="z-btn z-btn-gold z-shine"><i class="ph ph-download-simple"></i>Скачать прайс</button>
+                        <button type="submit" class="z-btn z-btn-gold z-shine"><i class="fas fa-download"></i>Скачать прайс</button>
                     </form>
                     <p id="priceFormMsg" style="margin-top:14px;font-size:14px;color:var(--z-text-3)" role="status"></p>
                 </div>

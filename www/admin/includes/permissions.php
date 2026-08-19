@@ -29,7 +29,7 @@ $PERMISSIONS = [
         'view_calculations' => true,
         'edit_calculations' => true,
         'view_settings' => true,
-        'edit_settings' => false,
+        'edit_settings' => true,
         'export_data' => true,
         'view_logs' => false,
     ],
